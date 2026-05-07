@@ -1,5 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
+﻿<!DOCTYPE html>
+<html lang="my">
 
 <head>
     <meta charset="UTF-8">
@@ -14,7 +14,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
     <style>
         body {
-            font-family: sans-serif;
+            font-family: 'Pyidaungsu', 'Padauk', 'Myanmar Sans Serif', sans-serif;
             background: #121212;
             background-image: radial-gradient(circle at 50% 0%, #2a2a2a 0%, #121212 70%);
             color: white;
@@ -367,6 +367,90 @@
             box-shadow: 0 45px 0 rgba(0, 0, 0, 0.4), 0 90px 0 rgba(0, 0, 0, 0.4);
         }
 
+        .tank-guides {
+            position: absolute;
+            inset: 0;
+            z-index: 4;
+            pointer-events: none;
+        }
+
+        /* --- UPDATED RULER CSS --- */
+        .tank-ruler {
+            position: absolute;
+            left: -15px;
+            /* Pull ruler closer to tank */
+            top: 0;
+            bottom: 0;
+            width: 12px;
+            z-index: 4;
+            pointer-events: none;
+        }
+
+        .tank-ruler-tick {
+            position: absolute;
+            left: 0;
+            width: 5px;
+            /* Slightly shorter ticks */
+            height: 1px;
+            background: rgba(210, 220, 235, 0.20);
+        }
+
+        .tank-ruler-tick.major {
+            width: 8px;
+            /* Slightly shorter major ticks */
+            background: rgba(210, 220, 235, 0.30);
+        }
+
+        .tank-guide-line {
+            position: absolute;
+            left: 8px;
+            right: 8px;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.10);
+        }
+
+        .tank-guide-line.low-marker {
+            left: 4px;
+            right: 4px;
+            height: 2px;
+            background: rgba(255, 193, 7, 0.45);
+            box-shadow: 0 0 4px rgba(255, 193, 7, 0.25);
+        }
+
+        .tank-guide-line.full-marker {
+            left: 4px;
+            right: 4px;
+            height: 2px;
+            background: rgba(40, 167, 69, 0.45);
+            box-shadow: 0 0 4px rgba(40, 167, 69, 0.25);
+        }
+
+        .tank-guide-label {
+            position: absolute;
+            left: -82px;
+            /* Pull text closer to ruler to fix mobile overflow */
+            transform: translateY(-50%);
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            text-align: right;
+            width: 60px;
+            /* Reduce width so it stays compact */
+            opacity: 0.55;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6);
+            white-space: nowrap;
+        }
+
+        /* ------------------------- */
+
+        .low-marker .tank-guide-label {
+            color: rgba(255, 193, 7, 0.62);
+        }
+
+        .full-marker .tank-guide-label {
+            color: rgba(40, 167, 69, 0.62);
+        }
+
         .tank-text {
             position: absolute;
             top: 50%;
@@ -412,7 +496,6 @@
             font-size: 1.1rem;
         }
 
-        /* --- LOGIN PAGE INPUT CENTERING --- */
         #loginScreen input {
             text-align: center !important;
             margin-bottom: 15px;
@@ -421,10 +504,7 @@
 
         #devPin {
             letter-spacing: 8px !important;
-            /* Space out the PIN dots */
         }
-
-        /* ---------------------------------- */
 
         .show-pass {
             margin-top: 8px;
@@ -544,22 +624,6 @@
             font-size: 0.95rem;
         }
 
-        .lang-mm .badge {
-            font-size: 0.8rem;
-            letter-spacing: 0;
-        }
-
-        .lang-mm .row span:first-child {
-            flex: 1;
-            text-align: left;
-            white-space: nowrap;
-        }
-
-        .lang-mm .row span:last-child {
-            flex: none;
-            text-align: right;
-        }
-
         @media screen and (max-width: 440px) {
             .lang-mm .row {
                 font-size: 0.82rem !important;
@@ -572,22 +636,10 @@
                 white-space: nowrap;
             }
 
-            .lang-mm h2 {
-                font-size: 1.1rem;
-            }
-
             .lang-mm .btn {
                 font-size: 0.8rem !important;
                 padding: 12px 2px !important;
                 white-space: nowrap;
-            }
-
-            .lang-mm input::placeholder {
-                font-size: 0.68rem !important;
-            }
-
-            #fileName {
-                font-size: 0.72rem !important;
             }
         }
     </style>
@@ -646,7 +698,16 @@
                         <div id="tankFill" class="tank-fill"></div>
                         <div class="tank-glaze"></div>
                     </div>
+                    <div class="tank-ruler" id="tankRuler" aria-hidden="true"></div>
                     <div class="tank-ridges"></div>
+                    <div class="tank-guides" id="tankGuides">
+                        <div class="tank-guide-line low-marker" id="lowTankMarker" style="bottom: 30%;">
+                            <span class="tank-guide-label" id="lowTankMarkerLabel">LOW 30%</span>
+                        </div>
+                        <div class="tank-guide-line full-marker" id="fullTankMarker" style="bottom: 100%;">
+                            <span class="tank-guide-label" id="fullTankMarkerLabel">FULL 100%</span>
+                        </div>
+                    </div>
                     <div id="tankVal" class="tank-text">-- %</div>
                 </div>
                 <div class="row"><span>Voltage:</span> <span id="volt" style="font-weight:bold; font-size:1.2rem;">--
@@ -708,6 +769,8 @@
                     id="uH" onchange="markDirty('uH')"></select>
                 <div class="lbl-wrap"><label>Low Tank Start Level</label><span class="range">20 - 50 %</span></div>
                 <select id="lowTank" onchange="markDirty('lowTank')"></select>
+                <div class="lbl-wrap"><label>Full Tank Stop Level</label><span class="range">80 - 100 %</span></div>
+                <select id="fullPoint" onchange="markDirty('fullPoint')"></select>
                 <div class="lbl-wrap"><label>High Voltage Set</label><span class="range">230 - 260 V</span></div><select
                     id="vH" onchange="markDirty('vH')"></select>
                 <div class="lbl-wrap"><label>Low Voltage Set</label><span class="range">150 - 190 V</span></div><select
@@ -753,7 +816,6 @@
                             style="color:white; font-weight:bold;">Unknown</span></div>
                     <div class="lbl-wrap"><label>Upload Token File (.key)</label></div>
 
-                    <!-- CORRECTED SINGLE FLEX LABEL -->
                     <label
                         style="display:flex; align-items:center; padding: 8px; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1); cursor:pointer; color: #aaa; border-radius:8px; margin-bottom:5px; width:100%; box-sizing:border-box; text-align:left; overflow:hidden;">
                         <span
@@ -805,25 +867,35 @@
     </div>
 
     <script>
-        if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('service-worker.js'); }); }
-
         const BROKER = "210195b635414206adcd944325fe6f59.s1.eu.hivemq.cloud";
         const PORT = 8884;
         const USER = "my_switch";
         const PASS = "My_password123";
 
         let sysLang = localStorage.getItem('cloudLang') ? parseInt(localStorage.getItem('cloudLang')) : 0;
-        const dict = { "Device: Online": "စက် အွန်လိုင်း", "Device: Offline": "စက် အော့ဖ်လိုင်း", "Connecting...": "ချိတ်ဆက်နေသည်...", "NORMAL": "ပုံမှန်", "OVER": "ကျော်လွန်", "UNDER": "လျော့နည်း", "ON": "ဖွင့်", "OFF": "ပိတ်", "PUMPING": "ရေတင်နေသည်", "STANDBY": "အသင့်အနေအထား", "DRY ALRM": "ရေမရှိ အချက်ပေး", "LOCKED": "ပိတ်သိမ်းထားသည်", "EXPIRED": "သက်တမ်းကုန်ပြီ", "Active": "အသက်ဝင်သည်", "days left": "ရက် ကျန်သည်" };
+        const dict = {
+            "Device: Online": "စက် အွန်လိုင်း",
+            "Device: Offline": "စက် အော့ဖ်လိုင်း",
+            "Connecting...": "ချိတ်ဆက်နေသည်...",
+            "NORMAL": "ပုံမှန်",
+            "OVER": "ကျော်လွန်",
+            "UNDER": "လျော့နည်း",
+            "ON": "ဖွင့်",
+            "OFF": "ပိတ်",
+            "PUMPING": "ရေတင်နေသည်",
+            "STANDBY": "အသင့်အနေအထား",
+            "DRY ALRM": "ရေမရှိ အချက်ပေး",
+            "LOCKED": "ပိတ်သိမ်းထားသည်",
+            "EXPIRED": "သက်တမ်းကုန်ပြီ",
+            "Active": "အသက်ဝင်သည်",
+            "days left": "ရက် ကျန်သည်"
+        };
         const tr = (t) => (sysLang == 1 && dict[t]) ? dict[t] : t;
 
         const vibe = () => {
             try {
-                if (window.AndroidBridge && window.AndroidBridge.triggerVibration) {
-                    window.AndroidBridge.triggerVibration(100);
-                }
-                else if (window.navigator && window.navigator.vibrate) {
-                    window.navigator.vibrate(100);
-                }
+                if (window.AndroidBridge && window.AndroidBridge.triggerVibration) { window.AndroidBridge.triggerVibration(100); }
+                else if (window.navigator && window.navigator.vibrate) { window.navigator.vibrate(100); }
             } catch (e) { }
         };
 
@@ -836,13 +908,11 @@
                 document.getElementById('btnLogin').innerText = "ချိတ်ဆက်ပါ";
                 document.getElementById('tabHome').innerText = "🏠 ပင်မစာမျက်နှာ";
                 document.getElementById('tabSettings').innerText = "⚙️ ဆက်တင်များ";
-
-                // Explicitly translate the file picker text
                 if (fileNameEl) fileNameEl.innerText = "ဖိုင်ရွေးချယ်ထားခြင်းမရှိပါ";
 
                 document.body.innerHTML = document.body.innerHTML
                     .replace("💧Tank Water Level", "💧ရေတိုင်ကီ ရေအမှတ်")
-                    .replace("<span>Voltage:</span>", "<span>လျှပ်စစ်အား-</span>")
+                    .replace("<span>Voltage:</span>", "<span>လျှပ်စစ်ဗို့အား-</span>")
                     .replace("<span>Volt Status:</span>", "<span>ဗို့အား အခြေအနေ-</span>")
                     .replace("<span>Pump:</span>", "<span>ရေမော်တာ-</span>")
                     .replace("<span>System Info:</span>", "<span>စက် အချက်အလက်-</span>")
@@ -855,37 +925,36 @@
                     .replace(">Water Pump<", ">ရေမော်တာ<")
                     .replace(">Air Compressor<", ">လေကွန်ပရက်ဆာ<")
                     .replace("Tank Height", "ရေတိုင်ကီ အမြင့်")
-                    .replace("Low Tank Start Level", "ရေမော်တာစတင်မည့် ရေမှတ်")
+                    .replace("Low Tank Start Level", "ရေမော်တာစတင်မည့် ရေအမှတ်")
                     .replace("High Voltage Set", "ဗို့အားလွန် သတ်မှတ်ချက်")
                     .replace("Low Voltage Set", "ဗို့အားလျော့ သတ်မှတ်ချက်")
                     .replace("Voltage Resume Gap", "ဗို့အားပြန်ဖွင့် ကွာဟချက်")
                     .replace("Dry-Run Delay", "ရေမရှိ အချက်ပေးချိန်")
-                    .replace("Pump Cool-down (After 1Hr)", "၁နာရီမောင်းပြီး အနားပေးချိန်")
+                    .replace("Pump Cool-down (After 1Hr)", "၁ နာရီမောင်းပြီး အနားပေးချိန်")
                     .replace("Disable / 5 - 15m", "ပိတ်မည် / ၅ - ၁၅ မိနစ်")
                     .replace("Auto-Retry Wait", "ပြန်လည်စတင်ရန် စောင့်ချိန်")
                     .replace("Smart Scheduling (DND)", "ညဘက် အသံပိတ်စနစ် (DND)")
                     .replace("Start Hour", "စတင်ရန် အချိန်")
                     .replace("End Hour", "ပြီးဆုံးရန် အချိန်")
                     .replace("Home Time Zone (GMT)", "အချိန်ဇုန် (GMT)")
-                    .replace("Save & Reboot", "သိမ်းဆည်း၍ ပြန်ဖွင့်မည်")
-                    .replace("Save &amp; Reboot", "သိမ်းဆည်း၍ ပြန်ဖွင့်မည်")
+                    .replace("Save & Reboot", "သိမ်းဆည်းပြီး ပြန်ဖွင့်မည်")
                     .replace("Maintenance", "ပြုပြင်ထိန်းသိမ်းမှု")
                     .replace("License Management", "လိုင်စင် စီမံခန့်ခွဲမှု")
-                    .replace("Upload Token File (.key)", "လိုင်စင်တိုကင်ဖိုင်တင်ရန် (.key)")
+                    .replace("Upload Token File (.key)", "လိုင်စင် တိုကင်ဖိုင် တင်ရန် (.key)")
                     .replace(">Activate via Text<", ">စာသားဖြင့် သက်တမ်းတိုးမည်<")
-                    .replace("Leave empty to keep current", "မပြောင်းလိုပါက အလွတ်ထားပါ")
+                    .replace("Leave empty to keep current", "မပြောင်းလဲလိုပါက အလွတ်ထားပါ")
                     .replace("Show WiFi Password", "ဝိုင်ဖိုင် စကားဝှက် ပြမည်")
                     .replace("Show PIN", "ပင်နံပါတ် ပြမည်")
                     .replace(">Upload File<", ">ဖိုင် တင်မည်<")
                     .replace("Paste Token String", "တိုကင် စာသား ထည့်ပါ")
                     .replace("Paste MTc... string here", "ဖုန်းဖြင့်ရသော တိုကင်စာသားကို ဤနေရာတွင် ထည့်ပါ")
                     .replace("Cloud ID:", "ကလောက် အိုင်ဒီ-")
-                    .replace("Device IP:", "စက် အိုင်ပီ-")
+                    .replace("Device IP:", "စက် အိုင်ဒီ-")
                     .replace(">Logout<", ">ထွက်မည်<")
                     .replace(">Update Now<", ">ယခု အဆင့်မြှင့်မည်<")
                     .replace("Current Version:", "လက်ရှိ ဗားရှင်း-")
                     .replace("⚠️ SYSTEM EXPIRED ⚠️", "⚠️ စနစ် သက်တမ်းကုန်ဆုံးသွားပါပြီ ⚠️")
-                    .replace("Pump operations are disabled.", "ရေမော်တာ အသုံးပြုခွင့် ပိတ်ထားပါသည်။")
+                    .replace("Pump operations are disabled.", "ရေမော်တာ အသုံးပြုခွင့် ပိတ်ထားပါသည် ။")
                     .replace("⚠️ SUBSCRIPTION ENDING SOON ⚠️", "⚠️ သက်တမ်းကုန်ဆုံးရန် နီးကပ်နေပါပြီ ⚠️")
                     .replace("System Notice", "စနစ် အသိပေးချက်")
                     .replace("System processing...", "စနစ် အလုပ်လုပ်နေပါသည်...")
@@ -914,6 +983,7 @@
 
         const uH = document.getElementById('uH'); for (let i = 12; i <= 84; i += 6) { let opt = document.createElement('option'); opt.value = i; opt.innerText = (i / 12).toFixed(1) + " ft"; uH.appendChild(opt); }
         const lowTank = document.getElementById('lowTank'); for (let i = 20; i <= 50; i += 5) { let opt = document.createElement('option'); opt.value = i; opt.innerText = i + " %"; lowTank.appendChild(opt); }
+        const fullPoint = document.getElementById('fullPoint'); for (let i = 80; i <= 100; i += 5) { let opt = document.createElement('option'); opt.value = i; opt.innerText = i + " %"; fullPoint.appendChild(opt); }
         const vH = document.getElementById('vH'); for (let i = 230; i <= 260; i++) { let opt = document.createElement('option'); opt.value = i; opt.innerText = i + " Volts"; vH.appendChild(opt); }
         const vL = document.getElementById('vL'); for (let i = 150; i <= 190; i++) { let opt = document.createElement('option'); opt.value = i; opt.innerText = i + " Volts"; vL.appendChild(opt); }
         const vG = document.getElementById('vG'); for (let i = 1; i <= 10; i++) { let opt = document.createElement('option'); opt.value = i; opt.innerText = i + " Volts"; vG.appendChild(opt); } vG.value = "5";
@@ -970,76 +1040,57 @@
             btnLogin.innerText = (sysLang == 1 ? "ချိတ်ဆက်နေသည်..." : "Connecting...");
             btnLogin.disabled = true;
 
-            if (client) {
-                try { client.onMessageArrived = null; client.onConnectionLost = null; client.disconnect(); } catch (e) { }
-            }
+            if (client) { try { client.onMessageArrived = null; client.onConnectionLost = null; client.disconnect(); } catch (e) { } }
 
             client = new Paho.MQTT.Client(BROKER, PORT, "Web_" + Math.random().toString(16).substr(2, 8));
 
             client.onMessageArrived = (msg) => {
                 const topic = msg.destinationName, raw = msg.payloadString;
                 if (topic.endsWith("/online")) { updateOnlineStatus(raw === "1"); return; }
-
                 [document.getElementById('refreshBtn'), document.getElementById('refreshBtnS')].forEach(b => b && b.classList.remove('spinning'));
-                document.getElementById('lastMsg').innerText = (sysLang == 1 ? "နောက်ဆုံးချိတ်ဆက်မှု- " : "Last sync: ") + formatTime();
+                document.getElementById('lastMsg').innerText = (sysLang == 1 ? "နောက်ဆုံး ချိတ်ဆက်မှု- " : "Last sync: ") + formatTime();
 
                 try {
                     const data = JSON.parse(raw);
                     if (data.alert) {
                         if (data.alert === "Access Denied" && !dataReceived) {
                             const err = document.getElementById('loginError');
-                            err.innerText = data.reason;
-                            err.style.display = 'block';
+                            err.innerText = data.reason; err.style.display = 'block';
                             btnLogin.innerText = (sysLang == 1 ? "ပြန်ချိတ်မည်" : "Connect");
-                            btnLogin.disabled = false;
-                            isConnecting = false;
-                            client.disconnect();
+                            btnLogin.disabled = false; isConnecting = false; client.disconnect();
                         } else {
                             showModal(data.reason || data.alert);
                             if (data.alert === "Access Denied") setTimeout(() => location.reload(), 3000);
                         }
                         return;
                     }
-
                     if (!dataReceived) {
                         dataReceived = true;
                         document.getElementById('loginScreen').style.display = 'none';
                         document.getElementById('dashboard').style.display = 'block';
                         if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
                     }
-                    updateUI(data);
-                    resetWatchdog();
+                    updateUI(data); resetWatchdog();
                 } catch (e) { console.error("Parse error", e); }
             };
 
             client.onConnectionLost = (e) => {
-                updateOnlineStatus(false);
-                isConnecting = false;
+                updateOnlineStatus(false); isConnecting = false;
                 [document.getElementById('refreshBtn'), document.getElementById('refreshBtnS')].forEach(b => b && b.classList.remove('spinning'));
                 if (e.errorCode !== 0) {
-                    console.warn("Connection lost:", e.errorMessage);
-                    // Only auto-reconnect if we already successfully logged in once
                     if (dataReceived) setTimeout(connect, 5000);
-                    else {
-                        btnLogin.innerText = (sysLang == 1 ? "ပြန်ချိတ်မည်" : "Connect");
-                        btnLogin.disabled = false;
-                    }
+                    else { btnLogin.innerText = (sysLang == 1 ? "ပြန်ချိတ်မည်" : "Connect"); btnLogin.disabled = false; }
                 }
             };
 
             client.connect({
-                useSSL: true, userName: USER, password: PASS,
-                timeout: 10,
+                useSSL: true, userName: USER, password: PASS, timeout: 10,
                 onSuccess: () => {
                     isConnecting = false;
-                    btnLogin.innerText = (sysLang == 1 ? "စင့်ခ်လုပ်နေသည်..." : "Syncing...");
+                    btnLogin.innerText = (sysLang == 1 ? "လုပ်ဆောင်နေသည်..." : "Syncing...");
                     client.subscribe(`smartpump/${deviceID}/status`);
                     client.subscribe(`smartpump/${deviceID}/online`);
-
-                    // Request data once
                     setTimeout(requestData, 500);
-
-                    // If no data received in 5 seconds, retry request
                     if (pollInterval) clearInterval(pollInterval);
                     pollInterval = setInterval(() => {
                         if (!dataReceived && client && client.isConnected()) requestData();
@@ -1061,14 +1112,10 @@
         function requestData() {
             vibe();
             [document.getElementById('refreshBtn'), document.getElementById('refreshBtnS')].forEach(b => b && b.classList.add('spinning'));
-            if (client && client.isConnected()) {
-                sendCmd({ get: 1 });
-            } else {
-                connect();
-            }
+            if (client && client.isConnected()) { sendCmd({ get: 1 }); } else { connect(); }
         }
-        function logout() { vibe(); if (confirm("Are you sure you want to logout?")) { if (client && client.isConnected()) { try { client.disconnect(); } catch (e) { } } localStorage.removeItem("cloudPumpPin"); location.reload(); } }
 
+        function logout() { vibe(); if (confirm("Are you sure you want to logout?")) { if (client && client.isConnected()) { try { client.disconnect(); } catch (e) { } } localStorage.removeItem("cloudPumpPin"); location.reload(); } }
         function sendReset() { vibe(); sendCmd({ reset: 1 }); }
         function sendToggle() { vibe(); sendCmd({ toggle: 1 }); }
 
@@ -1076,8 +1123,7 @@
             vibe();
             const oldText = sysLang == 1 ? "ဗားရှင်း အသစ်စစ်ရန်" : "Check for Updates";
             btn.innerText = sysLang == 1 ? "စစ်ဆေးနေသည်..." : "Checking...";
-            btn.disabled = true;
-            sendCmd({ otaCheck: 1 });
+            btn.disabled = true; sendCmd({ otaCheck: 1 });
             setTimeout(() => { btn.innerText = oldText; btn.disabled = false; }, 10000);
         }
 
@@ -1087,14 +1133,14 @@
             vibe();
             if (isExpired) { showModal("License Expired. Cannot save settings."); return; }
             const ssid = document.getElementById('ssid').value.trim();
-            if (!ssid) { alert("SSID cannot be empty! Please wait for dashboard to sync or enter WiFi name."); return; }
+            if (!ssid) { alert("SSID cannot be empty!"); return; }
             if (!confirm("Save settings and reboot device?")) return;
             localStorage.setItem('cloudLang', parseInt(document.getElementById('appLang').value));
             activeTab = 'saving';
             sendCmd({
                 save: 1, ssid: ssid, pass: document.getElementById('wifiPass').value, newPin: document.getElementById('newPin').value || devicePin,
                 opM: parseInt(document.getElementById('opM').value), vDly: parseInt(document.getElementById('vDly').value),
-                uH: parseFloat(document.getElementById('uH').value), lowTank: parseInt(document.getElementById('lowTank').value), vH: parseInt(document.getElementById('vH').value), vL: parseInt(document.getElementById('vL').value), vG: parseInt(document.getElementById('vG').value),
+                uH: parseFloat(document.getElementById('uH').value), lowTank: parseInt(document.getElementById('lowTank').value), fullPoint: parseInt(document.getElementById('fullPoint').value), vH: parseInt(document.getElementById('vH').value), vL: parseInt(document.getElementById('vL').value), vG: parseInt(document.getElementById('vG').value),
                 dD: parseInt(document.getElementById('dD').value), rstM: parseInt(document.getElementById('rstM').value), rM: parseInt(document.getElementById('rM').value),
                 dndEn: parseInt(document.getElementById('dndEn').value), dndS: parseInt(document.getElementById('dndS').value), dndE: parseInt(document.getElementById('dndE').value),
                 tzOf: parseFloat(document.getElementById('tzOf').value)
@@ -1103,9 +1149,9 @@
             setTimeout(() => location.reload(), 20000);
         }
 
-        function uploadLicenseFile() { vibe(); const fileInput = document.getElementById('licFile'); if (fileInput.files.length === 0) { alert("Please select a .key file first."); return; } const file = fileInput.files[0]; const reader = new FileReader(); reader.onload = function (e) { sendLicense(e.target.result.trim()); }; reader.readAsText(file); }
-        function uploadLicenseText() { vibe(); const val = document.getElementById('licText').value.trim(); if (val.length < 10) { alert("Invalid token string."); return; } sendLicense(val); }
-        function sendLicense(token) { if (token.length > 10) { sendCmd({ lic: token }); alert("License Token Sent! The device will reply shortly."); setTimeout(() => { document.getElementById('licFile').value = ""; document.getElementById('licText').value = ""; }, 500); } else { alert("Invalid license content."); } }
+        function uploadLicenseFile() { vibe(); const fileInput = document.getElementById('licFile'); if (fileInput.files.length === 0) { alert("Please select a .key file."); return; } const file = fileInput.files[0]; const reader = new FileReader(); reader.onload = function (e) { sendLicense(e.target.result.trim()); }; reader.readAsText(file); }
+        function uploadLicenseText() { vibe(); const val = document.getElementById('licText').value.trim(); if (val.length < 10) { alert("Invalid token."); return; } sendLicense(val); }
+        function sendLicense(token) { if (token.length > 10) { sendCmd({ lic: token }); alert("License Token Sent!"); } else { alert("Invalid license."); } }
         function sendCmd(p) { if (!client || !client.isConnected()) return; p.pin = devicePin; let msg = new Paho.MQTT.Message(JSON.stringify(p)); msg.destinationName = `smartpump/${deviceID}/set`; client.send(msg); }
 
         const dirtyFields = new Set();
@@ -1114,30 +1160,45 @@
         function safeUpdate(id, val, suffix) {
             const el = document.getElementById(id);
             if (!el || document.activeElement === el || val === undefined || val === null || dirtyFields.has(id)) return;
-
             if (el.tagName === 'SELECT') {
                 let exists = Array.from(el.options).some(opt => opt.value == val);
                 if (!exists) {
-                    let opt = document.createElement('option');
-                    opt.value = val;
-                    opt.innerText = val + (suffix ? " " + suffix : "");
-                    el.appendChild(opt);
+                    let opt = document.createElement('option'); opt.value = val;
+                    opt.innerText = val + (suffix ? " " + suffix : ""); el.appendChild(opt);
                 }
-            }
+                el.value = val;
+            } else if (activeTab === 'home' || el.value === "") el.value = val;
+        }
 
-            if (el.tagName === 'SELECT') el.value = val;
-            else if (activeTab === 'home' || el.value === "") el.value = val;
+        function setTankGuides(d) {
+            const low = parseInt(d.lowTank, 10) || 30;
+            const full = parseInt(d.fullPoint || d.fullTank, 10) || 100;
+            const lowMarker = document.getElementById('lowTankMarker');
+            const fullMarker = document.getElementById('fullTankMarker');
+            if (lowMarker) lowMarker.style.bottom = low + '%';
+            if (fullMarker) fullMarker.style.bottom = full + '%';
+            document.getElementById('lowTankMarkerLabel').innerText = (sysLang == 1 ? 'စတင် ' : 'LOW ') + low + '%';
+            document.getElementById('fullTankMarkerLabel').innerText = (sysLang == 1 ? 'ပြည့် ' : 'FULL ') + full + '%';
+        }
+
+        function renderTankRulerTicks() {
+            const ruler = document.getElementById('tankRuler');
+            if (!ruler || ruler.dataset.ready === '1') return;
+            let html = '';
+            for (let v = 0; v <= 100; v += 5) {
+                const cls = (v % 25 === 0) ? 'tank-ruler-tick major' : 'tank-ruler-tick';
+                html += '<div class="' + cls + '" style="bottom:' + v + '%;"></div>';
+            }
+            ruler.innerHTML = html; ruler.dataset.ready = '1';
         }
 
         function updateUI(d) {
-            if (sysLang == 1) document.body.classList.add('lang-mm'); else document.body.classList.remove('lang-mm');
-            if (document.getElementById('dndBadgeC')) {
-                if (d.dndAct == 1) { document.getElementById('dndBadgeC').style.display = 'block'; } else { document.getElementById('dndBadgeC').style.display = 'none'; }
-            }
+            renderTankRulerTicks();
+            if (sysLang == 1) document.body.classList.add('lang-mm');
+            if (document.getElementById('dndBadgeC')) document.getElementById('dndBadgeC').style.display = (d.dndAct == 1) ? 'block' : 'none';
 
-            isExpired = d.expired ? true : false;
+            isExpired = !!d.expired;
             const expBanner = document.getElementById('expiryBanner'), warnBanner = document.getElementById('warnBanner'), licStat = document.getElementById('licStat');
-
             if (isExpired) {
                 expBanner.style.display = 'block'; warnBanner.style.display = 'none';
                 licStat.innerHTML = '<span style="color:#ff6b6b">' + (sysLang == 1 ? "သက်တမ်းကုန်ပြီ" : "EXPIRED") + '</span>';
@@ -1145,60 +1206,43 @@
                 expBanner.style.display = 'none';
                 if (d.daysLeft <= 7 && d.daysLeft >= 0) {
                     warnBanner.style.display = 'block';
-                    document.getElementById('warnMsg').innerText = sysLang == 1 ? d.daysLeft + " ရက် ကျန်ပါသေးသည်။" : d.daysLeft + " days remaining.";
+                    document.getElementById('warnMsg').innerText = sysLang == 1 ? d.daysLeft + " ရက် ကျန်ပါသေးသည် ။" : d.daysLeft + " days remaining.";
                 } else warnBanner.style.display = 'none';
                 licStat.innerHTML = sysLang == 1 ? '<span style="color:#28a745">အသက်ဝင်သည် (' + d.daysLeft + ' ရက် ကျန်သည်)</span>' : '<span style="color:#28a745">Active (' + d.daysLeft + ' days left)</span>';
             }
 
             const tankFill = document.getElementById('tankFill');
             if (!tankFill || activeTab === 'saving') return;
+            setTankGuides(d);
             tankFill.style.height = (d.tank || 0) + '%';
             if (d.tank <= (d.lowTank || 30)) tankFill.classList.add('low-water'); else tankFill.classList.remove('low-water');
             if (d.pStat == "ON") tankFill.classList.add('pumping'); else tankFill.classList.remove('pumping');
 
-            let vS = d.vStat || "--"; let iF = d.info || "--"; let pS = d.pStat || "--"; let tS = d.tStr || (d.tank !== undefined ? d.tank + '%' : "-- %");
+            let vS = d.vStat || "--", iF = d.info || "--", pS = d.pStat || "--", tS = d.tStr || (d.tank !== undefined ? d.tank + '%' : "-- %");
             if (sysLang == 1) {
                 if (vS == "NORMAL") vS = "ပုံမှန်"; else if (vS == "OVER") vS = "ကျော်လွန်"; else if (vS == "UNDER") vS = "လျော့နည်း"; else if (vS == "DELAY") vS = "စောင့်ဆိုင်း";
-                if (iF == "DRY_RUN_ALARM!") iF = "ရေမရှိ အချက်ပေး!"; else if (iF == "PUMP_LOCKED!") iF = "ပိတ်သိမ်းထားသည်!"; else if (iF == "WAITING_RETRY!") iF = "ပြန်စရန်စောင့်နေသည်!"; else if (iF == "SENSOR_ERROR!") iF = "ဆင်ဆာ ချို့ယွင်းချက်!"; else if (iF == "SYSTEM_STANDBY!") iF = "အသင့်အနေအထား!"; else if (iF == "FLOW_DETECTED!") iF = "ရေစီးဆင်းမှုရှိသည်!"; else if (iF == "FLOW_CHECKING!") iF = "ရေစီးဆင်းမှုစစ်ဆေးနေ!"; else if (iF == "COOLING_DOWN!") iF = "အအေးခံနေသည်!"; else if (iF == "VENTING_VALVE!") iF = "လေလျှော့နေသည်!"; else if (iF == "OVER_VOLTAGE!") iF = "ဗို့အားကျော်လွန်နေသည်!"; else if (iF == "UNDER_VOLTAGE!") iF = "ဗို့အားလျော့နည်းနေသည်!"; else if (iF.startsWith("VOLT_DELAY")) { let secs = iF.replace("VOLT_DELAY", "").replace(/[()s]/g, "").trim(); iF = "ဗို့အားပြန်တည်ငြိမ်ရန်စောင့်ချိန်! (" + secs + ")"; }
-                if (d.pStat == "ON") pS = "ဖွင့်"; else if (d.pStat == "OFF") pS = "ပိတ်"; else if (d.pStat == "PUMPING") pS = "ရေတင်နေသည်"; else if (d.pStat == "STANDBY") pS = "အသင့်အနေအထား"; else if (d.pStat == "DRY ALRM") pS = "ရေမရှိ အချက်ပေး"; else if (d.pStat == "LOCKED") pS = "ပိတ်သိမ်းထားသည်";
-                if (d.tStr == "FULL") tS = "ပြည့်"; else if (d.tStr == "LOW") tS = "နည်း"; else if (d.tStr == "ERR") tS = "ချို့";
+                if (iF == "DRY_RUN_ALARM!") iF = "ရေမရှိ အချက်ပေး!"; else if (iF == "PUMP_LOCKED!") iF = "ပိတ်သိမ်းထားသည်!"; else if (iF == "WAITING_RETRY!") iF = "ပြန်စရန်စောင့်နေသည်!"; else if (iF == "SENSOR_ERROR!") iF = "ဆင်ဆာ ချို့ယွင်းချက်!"; else if (iF == "SYSTEM_STANDBY!") iF = "အသင့်အနေအထား!"; else if (iF == "FLOW_DETECTED!") iF = "ရေစီးဆင်းမှုရှိသည်!"; else if (iF == "FLOW_CHECKING!") iF = "ရေစီးဆင်းမှုစစ်ဆေးနေ!"; else if (iF == "COOLING_DOWN!") iF = "အအေးခံနေသည်!"; else if (iF == "VENTING_VALVE!") iF = "လေလျှော့နေသည်!";
+                if (d.pStat == "ON") pS = "ဖွင့်"; else if (d.pStat == "OFF") pS = "ပိတ်"; else if (d.pStat == "PUMPING") pS = "ရေတင်နေသည်"; else if (d.pStat == "STANDBY") pS = "အသင့်အနေအထား";
+                if (d.tStr == "FULL") tS = "ပြည့်"; else if (d.tStr == "LOW") tS = "နည်း";
             }
 
             document.getElementById('tankVal').innerText = tS;
             document.getElementById('dispIp').innerText = d.ip || "---";
             document.getElementById('dispCid').innerText = d.id || "---";
             document.getElementById('volt').innerText = (d.volt || "--") + " V";
-
-            setBadge('vstat', vS, (d.vStat == "NORMAL") ? 'success' : (d.vStat == "DELAY" ? 'warning' : 'danger'));
-            setBadge('pstate', pS, (d.pStat == "ON") ? 'success' : (d.pStat == "DRY ALRM" || d.pStat == "LOCKED" ? 'danger' : 'secondary'));
-
-            let iType = 'info';
-            if (d.info && (d.info.includes("ALARM") || d.info.includes("ERROR"))) iType = 'danger';
-            else if (d.info && (d.info.includes("WAITING") || d.info.includes("LOCKED") || d.info.includes("COOLING") || d.info.includes("VENTING"))) iType = 'warning';
-            else if (d.info && d.info.includes("FLOW_DETECTED")) iType = 'success';
-            setBadge('info', iF, iType);
+            setBadge('vstat', vS, (d.vStat == "NORMAL") ? 'success' : 'danger');
+            setBadge('pstate', pS, (d.pStat == "ON") ? 'success' : 'secondary');
+            setBadge('info', iF, 'info');
 
             updateOnlineStatus(true);
             const btn = document.getElementById('btnToggle'), rst = document.getElementById('btnReset');
-
             if (d.err) {
                 btn.style.display = 'none'; rst.style.display = 'block';
-                rst.innerText = sysLang == 1 ? "အချက်ပေး ပြန်ပိတ်မည်" : "Reset Alarm";
-                rst.onclick = sendReset;
-            } else if (d.sErr && !d.ack) {
-                btn.style.display = 'block'; rst.style.display = 'none';
-                btn.innerText = sysLang == 1 ? "အချက်ပေး ပြန်ပိတ်မည်" : "Reset Alarm"; btn.className = "btn btn-red";
-                btn.onclick = sendToggle;
+                rst.innerText = sysLang == 1 ? "အချက်ပေး ပြန်ပိတ်မည်" : "Reset Alarm"; rst.onclick = sendReset;
             } else {
-                btn.style.display = 'block'; rst.style.display = 'none';
-                btn.onclick = sendToggle;
-                if (isExpired) {
-                    btn.innerText = sysLang == 1 ? "လိုင်စင် သက်တမ်းကုန်ပြီ" : "LICENSE EXPIRED";
-                    btn.className = "btn btn-grey"; btn.disabled = true;
-                } else if (iF == "VENTING_VALVE!" || iF == "လေလျှော့နေသည်!") {
-                    btn.innerText = sysLang == 1 ? "စောင့်ဆိုင်းပါ..." : "PLEASE WAIT...";
-                    btn.className = "btn btn-grey"; btn.disabled = true;
-                } else {
+                btn.style.display = 'block'; rst.style.display = 'none'; btn.onclick = sendToggle;
+                if (isExpired) { btn.innerText = sysLang == 1 ? "လိုင်စင် သက်တမ်းကုန်ပြီ" : "LICENSE EXPIRED"; btn.className = "btn btn-grey"; btn.disabled = true; }
+                else {
                     btn.disabled = false;
                     btn.innerText = sysLang == 1 ? (d.pStat == "ON" ? 'ရေမော်တာ ပိတ်မည်' : 'ရေမော်တာ ဖွင့်မည်') : (d.pStat == "ON" ? 'Stop Pump' : 'Start Pump');
                     btn.className = "btn " + (d.pStat == "ON" ? "btn-red" : "btn-green");
@@ -1207,22 +1251,15 @@
 
             const cdRow = document.getElementById('cdRow');
             if (cdRow) {
-                if (d.err == 2 && d.rM > 0) { cdRow.style.display = 'flex'; cdRow.children[0].innerText = sysLang == 1 ? 'ပြန်လည်စတင်ရန်-' : 'Retry in:'; localRetryCd = d.rCd; let m = Math.floor(localRetryCd / 60); let s = localRetryCd % 60; document.getElementById('cd').innerText = m + 'm ' + s + 's'; if (!localCdInterval) { localCdInterval = setInterval(() => { if (localRetryCd > 0) { localRetryCd--; let cm = Math.floor(localRetryCd / 60); let cs = localRetryCd % 60; document.getElementById('cd').innerText = cm + 'm ' + cs + 's'; } }, 1000); } }
-                else if (d.isDR) { if (localCdInterval) { clearInterval(localCdInterval); localCdInterval = null; } cdRow.style.display = 'flex'; cdRow.children[0].innerText = sysLang == 1 ? 'ရေမရှိ အချက်ပေးရန်-' : 'Dry-Run in:'; let cleanVal = String(d.cd).replace(/[()s]/g, ""); document.getElementById('cd').innerText = d.cd + "s"; }
-                else if (d.info == "COOLING_DOWN!" || d.info == "အအေးခံနေသည်!") { cdRow.style.display = 'flex'; cdRow.children[0].innerText = sysLang == 1 ? 'အအေးခံရန် ကျန်ချိန်-' : 'Cooling in:'; localRetryCd = d.rstCd || 0; let m = Math.floor(localRetryCd / 60); let s = localRetryCd % 60; document.getElementById('cd').innerText = m + 'm ' + s + 's'; if (!localCdInterval) { localCdInterval = setInterval(() => { if (localRetryCd > 0) { localRetryCd--; let cm = Math.floor(localRetryCd / 60); let cs = localRetryCd % 60; document.getElementById('cd').innerText = cm + 'm ' + cs + 's'; } }, 1000); } }
-                else { if (localCdInterval) { clearInterval(localCdInterval); localCdInterval = null; } cdRow.style.display = 'none'; }
+                if (d.err == 2 && d.rM > 0) { cdRow.style.display = 'flex'; cdRow.children[0].innerText = sysLang == 1 ? 'ပြန်လည်စတင်ရန်-' : 'Retry in:'; localRetryCd = d.rCd; }
+                else if (d.isDR) { cdRow.style.display = 'flex'; cdRow.children[0].innerText = sysLang == 1 ? 'ရေမရှိ အချက်ပေးရန်-' : 'Dry-Run in:'; document.getElementById('cd').innerText = d.cd + "s"; }
+                else cdRow.style.display = 'none';
             }
 
-            [document.getElementById('otaHub'), document.getElementById('otaHubS')].forEach(h => { if (h) h.style.display = d.ota ? 'block' : 'none'; });
-            [document.getElementById('otaMsg'), document.getElementById('otaMsgS')].forEach(m => { if (m) m.innerText = sysLang == 1 ? 'ဗားရှင်းသစ် v' + (d.nVer || "") + ' ရနိုင်ပါပြီ!' : 'New Version v' + (d.nVer || "") + ' Available!'; });
-
-
+            if (d.ota) { document.getElementById('otaHub').style.display = 'block'; document.getElementById('otaMsg').innerText = "Update Available!"; }
             if (d.opM !== undefined) { safeUpdate('opM', d.opM); toggleVDly(); }
-            if (d.vDly !== undefined) safeUpdate('vDly', d.vDly, "Seconds");
-            if (d.uH !== undefined) safeUpdate('uH', d.uH); if (d.lowTank !== undefined) safeUpdate('lowTank', d.lowTank); if (d.vH !== undefined) safeUpdate('vH', d.vH, "Volts"); if (d.vL !== undefined) safeUpdate('vL', d.vL, "Volts"); if (d.vG !== undefined) safeUpdate('vG', d.vG, "Volts");
-            if (d.dD !== undefined) safeUpdate('dD', d.dD, "Seconds"); if (d.rstM !== undefined) safeUpdate('rstM', d.rstM); if (d.rM !== undefined) safeUpdate('rM', d.rM);
-            if (d.ssid !== undefined) safeUpdate('ssid', d.ssid); if (d.dndEn !== undefined) safeUpdate('dndEn', d.dndEn); if (d.dndS !== undefined) safeUpdate('dndS', d.dndS);
-            if (d.dndE !== undefined) safeUpdate('dndE', d.dndE); if (d.tzOf !== undefined) safeUpdate('tzOf', d.tzOf);
+            if (d.uH !== undefined) safeUpdate('uH', d.uH);
+            if (d.ssid !== undefined) safeUpdate('ssid', d.ssid);
             if (d.ver) document.getElementById('curVer').innerText = 'v' + d.ver;
         }
 
