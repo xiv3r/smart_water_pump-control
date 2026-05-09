@@ -801,6 +801,8 @@
                     id="uH" onchange="markDirty('uH')"></select>
                 <div class="lbl-wrap"><label>Low Tank Start Level</label><span class="range">20 - 50 %</span></div>
                 <select id="lowTank" onchange="markDirty('lowTank')"></select>
+                <div class="lbl-wrap"><label>High Tank Stop Level</label><span class="range">80 - 100 %</span></div>
+                <select id="fullTank" onchange="markDirty('fullTank')"></select>
                 <div class="lbl-wrap"><label>High Voltage Set</label><span class="range">230 - 260 V</span></div><select
                     id="vH" onchange="markDirty('vH')"></select>
                 <div class="lbl-wrap"><label>Low Voltage Set</label><span class="range">150 - 190 V</span></div><select
@@ -949,6 +951,7 @@
                     .replace(">Air Compressor<", ">လေကွန်ပရက်ဆာ<")
                     .replace("Tank Height", "ရေတိုင်ကီ အမြင့်")
                     .replace("Low Tank Start Level", "ရေမော်တာစတင်မည့် ရေမှတ်")
+                    .replace("High Tank Stop Level", "ရေမော်တာရပ်မည့် ရေမှတ်")
                     .replace("High Voltage Set", "ဗို့အားလွန် သတ်မှတ်ချက်")
                     .replace("Low Voltage Set", "ဗို့အားလျော့ သတ်မှတ်ချက်")
                     .replace("Voltage Resume Gap", "ဗို့အားပြန်ဖွင့် ကွာဟချက်")
@@ -1007,6 +1010,7 @@
 
         const uH = document.getElementById('uH'); for (let i = 12; i <= 84; i += 6) { let opt = document.createElement('option'); opt.value = i; opt.innerText = (i / 12).toFixed(1) + " ft"; uH.appendChild(opt); }
         const lowTank = document.getElementById('lowTank'); for (let i = 20; i <= 50; i += 5) { let opt = document.createElement('option'); opt.value = i; opt.innerText = i + " %"; lowTank.appendChild(opt); }
+        const fullTank = document.getElementById('fullTank'); for (let i = 80; i <= 100; i += 5) { let opt = document.createElement('option'); opt.value = i; opt.innerText = i + " %"; fullTank.appendChild(opt); }
         const vH = document.getElementById('vH'); for (let i = 230; i <= 260; i++) { let opt = document.createElement('option'); opt.value = i; opt.innerText = i + " Volts"; vH.appendChild(opt); }
         const vL = document.getElementById('vL'); for (let i = 150; i <= 190; i++) { let opt = document.createElement('option'); opt.value = i; opt.innerText = i + " Volts"; vL.appendChild(opt); }
         const vG = document.getElementById('vG'); for (let i = 1; i <= 10; i++) { let opt = document.createElement('option'); opt.value = i; opt.innerText = i + " Volts"; vG.appendChild(opt); } vG.value = "5";
@@ -1187,7 +1191,7 @@
             sendCmd({
                 save: 1, ssid: ssid, pass: document.getElementById('wifiPass').value, newPin: document.getElementById('newPin').value || devicePin,
                 opM: parseInt(document.getElementById('opM').value), vDly: parseInt(document.getElementById('vDly').value),
-                uH: parseFloat(document.getElementById('uH').value), lowTank: parseInt(document.getElementById('lowTank').value), vH: parseInt(document.getElementById('vH').value), vL: parseInt(document.getElementById('vL').value), vG: parseInt(document.getElementById('vG').value),
+                uH: parseFloat(document.getElementById('uH').value), lowTank: parseInt(document.getElementById('lowTank').value), fullTank: parseInt(document.getElementById('fullTank').value), vH: parseInt(document.getElementById('vH').value), vL: parseInt(document.getElementById('vL').value), vG: parseInt(document.getElementById('vG').value),
                 dD: parseInt(document.getElementById('dD').value), rstM: parseInt(document.getElementById('rstM').value), rM: parseInt(document.getElementById('rM').value),
                 dndEn: parseInt(document.getElementById('dndEn').value), dndS: parseInt(document.getElementById('dndS').value), dndE: parseInt(document.getElementById('dndE').value),
                 tzOf: parseFloat(document.getElementById('tzOf').value)
@@ -1336,7 +1340,7 @@
 
             if (d.opM !== undefined) { safeUpdate('opM', d.opM); toggleVDly(); }
             if (d.vDly !== undefined) safeUpdate('vDly', d.vDly, "Seconds");
-            if (d.uH !== undefined) safeUpdate('uH', d.uH); if (d.lowTank !== undefined) safeUpdate('lowTank', d.lowTank); if (d.vH !== undefined) safeUpdate('vH', d.vH, "Volts"); if (d.vL !== undefined) safeUpdate('vL', d.vL, "Volts"); if (d.vG !== undefined) safeUpdate('vG', d.vG, "Volts");
+            if (d.uH !== undefined) safeUpdate('uH', d.uH); if (d.lowTank !== undefined) safeUpdate('lowTank', d.lowTank); if (d.fullTank !== undefined) safeUpdate('fullTank', d.fullTank); if (d.vH !== undefined) safeUpdate('vH', d.vH, "Volts"); if (d.vL !== undefined) safeUpdate('vL', d.vL, "Volts"); if (d.vG !== undefined) safeUpdate('vG', d.vG, "Volts");
             if (d.dD !== undefined) safeUpdate('dD', d.dD, "Seconds"); if (d.rstM !== undefined) safeUpdate('rstM', d.rstM); if (d.rM !== undefined) safeUpdate('rM', d.rM);
             if (d.ssid !== undefined) safeUpdate('ssid', d.ssid); if (d.dndEn !== undefined) safeUpdate('dndEn', d.dndEn); if (d.dndS !== undefined) safeUpdate('dndS', d.dndS);
             if (d.dndE !== undefined) safeUpdate('dndE', d.dndE); if (d.tzOf !== undefined) safeUpdate('tzOf', d.tzOf);
