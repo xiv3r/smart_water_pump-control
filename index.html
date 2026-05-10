@@ -1,519 +1,600 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     <title>Smart Pump Control Installer</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Smart Pump Control Premium Installer — ESP32-S3 firmware flasher and setup guide.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* --- GLOBAL STYLES --- */
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            text-align: center;
-            margin: 0;
-            padding: 20px 10px;
-            background-color: #f4f6f9;
-            color: #333;
+        /* ─── DESIGN TOKENS ─────────────────────────────────────── */
+        :root {
+            --bg-deep:      #080c17;
+            --bg-card:      #0e1525;
+            --bg-surface:   #161e30;
+            --accent-blue:  #00b4f0;
+            --accent-cyan:  #00e5d1;
+            --accent-green: #00e87a;
+            --accent-red:   #ff3b5c;
+            --accent-amber: #ffb020;
+            --text-primary: #e8eef7;
+            --text-muted:   #5a6a85;
+            --text-dim:     #2e3d58;
+            --border:       rgba(0,180,240,0.12);
+            --glow-blue:    rgba(0,180,240,0.35);
         }
 
+        /* ─── RESET & BASE ──────────────────────────────────────── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-deep);
+            background-image:
+                radial-gradient(ellipse 80% 50% at 50% -10%, rgba(0,100,200,0.18) 0%, transparent 65%),
+                radial-gradient(ellipse 40% 30% at 90% 90%,  rgba(0,80,120,0.10)  0%, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            text-align: center;
+            padding: 30px 12px 50px;
+            min-height: 100vh;
+        }
+
+        /* Subtle star-field overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                radial-gradient(1px 1px at 15% 25%, rgba(0,180,240,0.5) 0%, transparent 100%),
+                radial-gradient(1px 1px at 80% 55%, rgba(0,229,209,0.4) 0%, transparent 100%),
+                radial-gradient(1.5px 1.5px at 45% 75%, rgba(0,232,122,0.3) 0%, transparent 100%),
+                radial-gradient(1px 1px at 70% 20%, rgba(168,85,247,0.3) 0%, transparent 100%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ─── TYPOGRAPHY ────────────────────────────────────────── */
         h1 {
-            color: #03ef;
-            margin-bottom: 10px;
-            font-size: 1.8rem;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
         }
 
         h2 {
-            font-size: 1.1rem;
-            color: #555;
+            font-size: 1rem;
+            color: var(--text-muted);
+            font-weight: 400;
             margin-top: 0;
         }
 
         p {
-            color: #666;
-            max-width: 600px;
-            margin: 10px auto;
-            line-height: 1.6;
+            color: var(--text-muted);
+            max-width: 580px;
+            margin: 12px auto;
+            line-height: 1.7;
+            font-size: 0.95rem;
         }
 
-        /* --- MAIN CONTAINER --- */
+        code {
+            background: rgba(0,180,240,0.1);
+            border: 1px solid rgba(0,180,240,0.2);
+            padding: 2px 7px;
+            border-radius: 5px;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent-cyan);
+            font-size: 0.88em;
+        }
+
+        a { color: var(--accent-blue); text-decoration: none; }
+        a:hover { color: var(--accent-cyan); text-decoration: underline; }
+
+        /* ─── MAIN CONTAINER ────────────────────────────────────── */
         .container {
-            padding: 20px 15px;
-            /* Compact padding for mobile */
-            background-color: #fff;
-            border-radius: 16px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
+            padding: 30px 20px;
+            background: rgba(14, 21, 37, 0.85);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            box-shadow:
+                0 0 0 1px rgba(0,180,240,0.04),
+                0 24px 70px rgba(0,0,0,0.65),
+                inset 0 1px 0 rgba(255,255,255,0.04);
             display: block;
             margin: 0 auto;
-            max-width: 800px;
+            max-width: 820px;
             width: 100%;
-            box-sizing: border-box;
+            animation: fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Top accent line */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 10%; right: 10%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-blue), var(--accent-cyan), transparent);
+            border-radius: 1px;
+        }
+
+        /* ─── LOGO ──────────────────────────────────────────────── */
         .logo {
-            width: 100px;
+            width: 96px;
             height: auto;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
             border-radius: 50%;
+            border: 2px solid rgba(0,180,240,0.4);
+            box-shadow: 0 0 20px rgba(0,180,240,0.5), 0 0 60px rgba(0,180,240,0.2);
+            animation: logoPulse 3s ease-in-out infinite;
         }
 
-        /* --- BUTTONS --- */
+        @keyframes logoPulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(0,180,240,0.5), 0 0 55px rgba(0,180,240,0.18); }
+            50%       { box-shadow: 0 0 35px rgba(0,180,240,0.8), 0 0 90px rgba(0,180,240,0.38); }
+        }
+
+        /* ─── BADGE / VERSION CHIP ──────────────────────────────── */
+        .version-chip {
+            display: inline-block;
+            background: rgba(0,180,240,0.1);
+            border: 1px solid rgba(0,180,240,0.3);
+            color: var(--accent-blue);
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 100px;
+            margin-bottom: 14px;
+        }
+
+        /* ─── BUTTONS ───────────────────────────────────────────── */
         .button {
             border: none;
             color: white;
-            padding: 15px 30px;
+            padding: 16px 30px;
             text-align: center;
-            text-decoration: none;
+            text-decoration: none !important;
             display: inline-block;
-            font-size: 16px;
-            margin: 20px 0;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 0.6px;
             cursor: pointer;
-            border-radius: 8px;
+            border-radius: 13px;
             width: 100%;
-            max-width: 300px;
-            font-weight: bold;
-            transition: transform 0.1s;
+            max-width: 280px;
+            transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+            position: relative;
+            overflow: hidden;
         }
 
-        .button:active {
-            transform: scale(0.98);
+        .button::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 60%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
+            animation: shimmer 2.8s infinite;
         }
+
+        @keyframes shimmer {
+            0%   { left: -100%; }
+            100% { left: 220%; }
+        }
+
+        .button:hover  { transform: translateY(-3px); }
+        .button:active { transform: scale(0.97); opacity: 0.9; }
 
         .button-v1 {
-            background-color: #03ef;
+            background: linear-gradient(135deg, #005fa3, var(--accent-blue));
+            box-shadow: 0 4px 22px rgba(0,180,240,0.4);
         }
+        .button-v1:hover { box-shadow: 0 8px 35px rgba(0,180,240,0.6); }
+
+        .button-cloud {
+            background: linear-gradient(135deg, #006b45, var(--accent-green));
+            box-shadow: 0 4px 22px rgba(0,232,122,0.35);
+            color: #001a0e;
+        }
+        .button-cloud:hover { box-shadow: 0 8px 35px rgba(0,232,122,0.55); }
 
         .button-premium {
-            background-color: #ffc107;
-            color: #000;
+            background: linear-gradient(135deg, #b87000, var(--accent-amber));
+            box-shadow: 0 4px 22px rgba(255,176,32,0.35);
+            color: #1a0e00;
+        }
+        .button-premium:hover { box-shadow: 0 8px 35px rgba(255,176,32,0.55); }
+
+        /* ─── DIVIDER ───────────────────────────────────────────── */
+        .section-divider {
+            border: none;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            margin: 28px 0;
         }
 
-        /* --- GRID LAYOUT (The Fix) --- */
+        /* ─── GRID LAYOUT ───────────────────────────────────────── */
         .grid-container {
             display: grid;
             grid-template-columns: 1fr;
-            /* Default to 1 column (Mobile) */
-            gap: 20px;
+            gap: 18px;
             text-align: left;
-            margin-top: 30px;
+            margin-top: 28px;
             width: 100%;
         }
 
         @media(min-width: 768px) {
-            .grid-container {
-                grid-template-columns: 1fr 1fr;
-                /* 2 columns on Desktop */
-            }
-
-            .container {
-                padding: 40px;
-                /* More padding on Desktop */
-            }
+            .grid-container { grid-template-columns: 1fr 1fr; }
+            .container { padding: 45px 40px; }
         }
 
+        /* ─── CARDS ─────────────────────────────────────────────── */
         .card {
-            background: #fff;
-            border: 1px solid #e1e4e8;
-            border-radius: 8px;
-            padding: 20px;
+            background: rgba(10, 16, 30, 0.7);
+            border: 1px solid rgba(0,180,240,0.1);
+            border-radius: 18px;
+            padding: 22px;
             display: flex;
             flex-direction: column;
             width: 100%;
-            box-sizing: border-box;
-            /* CRITICAL FIX: This prevents the wide table from breaking the grid on mobile */
             min-width: 0;
+            transition: transform 0.28s cubic-bezier(0.4,0,0.2,1),
+                        border-color 0.28s,
+                        box-shadow 0.28s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0,180,240,0.28);
+            box-shadow: 0 14px 45px rgba(0,0,0,0.5), 0 0 22px rgba(0,180,240,0.1);
         }
 
         .card h3 {
             margin-top: 0;
-            color: #03ef;
-            font-size: 1.1rem;
+            margin-bottom: 14px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1rem;
+            font-weight: 700;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .card ol,
-        .card ul {
+        .card ol, .card ul {
             padding-left: 20px;
             margin-bottom: 0;
         }
 
         .card li {
-            margin-bottom: 8px;
-            font-size: 0.95rem;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: #8ca0be;
+            line-height: 1.6;
         }
 
-        code {
-            background: #f1f3f5;
-            padding: 2px 5px;
-            border-radius: 4px;
-            font-family: monospace;
-            color: #d63384;
-            word-wrap: break-word;
-        }
+        .card li b { color: var(--text-primary); font-weight: 600; }
 
-        /* --- WIRING TABLE STYLES --- */
+        /* Tinted card variants */
+        .card-blue  { background: rgba(0, 60, 130, 0.12) !important; border-color: rgba(0,180,240,0.18) !important; }
+        .card-amber { background: rgba(120, 70, 0, 0.15) !important; border-color: rgba(255,176,32,0.18) !important; }
+        .card-blue h3  { background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan)); -webkit-background-clip: text; background-clip: text; }
+        .card-amber h3 { background: linear-gradient(90deg, var(--accent-amber), #ff8c42); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+
+        /* ─── WIRING WRAPPER ────────────────────────────────────── */
         .wiring-wrapper {
             overflow-x: auto;
-            /* Scroll horizontally if too wide */
-            background: white;
-            padding: 15px 5px;
-            border-radius: 12px;
-            border: 1px solid #e1e4e8;
+            background: rgba(4, 10, 20, 0.8);
+            border: 1px solid rgba(0,180,240,0.12);
+            padding: 20px 10px;
+            border-radius: 16px;
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 0;
         }
 
         .wiring-table {
             margin: 0 auto;
             border-spacing: 0;
             border-collapse: separate;
-            font-family: monospace;
-            font-size: 12px;
-            /* Smaller font for mobile */
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
         }
 
         .wiring-table td {
             padding: 4px 2px;
             vertical-align: middle;
-            height: 32px;
+            height: 34px;
             white-space: nowrap;
         }
 
         /* Component Boxes */
         .comp-base {
-            border-radius: 6px;
-            font-weight: bold;
-            padding: 6px 4px;
+            border-radius: 8px;
+            font-weight: 700;
+            padding: 7px 5px;
             display: inline-block;
-            width: 90px;
-            /* Compact width */
+            width: 95px;
             text-align: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
             font-size: 11px;
+            transition: box-shadow 0.3s;
         }
+        .comp-base:hover { box-shadow: 0 0 14px rgba(0,180,240,0.5); }
 
         .comp-sensor {
-            background: #e1f5fe;
-            border: 2px solid #0288d1;
-            color: #01579b;
+            background: rgba(0, 80, 160, 0.25);
+            border: 1.5px solid rgba(0,180,240,0.6);
+            color: var(--accent-blue);
         }
-
         .comp-actuator {
-            background: #ffebee;
-            border: 2px solid #c62828;
-            color: #c62828;
+            background: rgba(160, 0, 40, 0.2);
+            border: 1.5px solid rgba(255,59,92,0.5);
+            color: #ff7090;
         }
-
         .comp-display {
-            background: #e0f2f1;
-            border: 2px solid #00695c;
-            color: #00695c;
+            background: rgba(0, 100, 90, 0.2);
+            border: 1.5px solid rgba(0,229,209,0.5);
+            color: var(--accent-cyan);
         }
-
         .comp-input {
-            background: #eeeeee;
-            border: 2px solid #616161;
-            color: #424242;
+            background: rgba(60,60,80,0.25);
+            border: 1.5px solid rgba(160,160,200,0.4);
+            color: #a0a8c0;
         }
 
-        /* ESP32 Board Styles */
+        /* ESP32 Board */
         .board-body-left {
-            background: #263238;
-            color: #ffffff;
+            background: #071408;
+            color: #00ff88;
             text-align: left;
-            border-left: 2px solid #37474f;
-            padding-left: 5px;
-            width: 60px;
-            font-family: Consolas, monospace;
+            border-left: 2px solid #1a4a1a;
+            padding-left: 6px;
+            width: 66px;
+            font-family: 'JetBrains Mono', monospace;
+            text-shadow: 0 0 8px rgba(0,255,136,0.6);
+            font-size: 10px;
         }
-
         .board-body-right {
-            background: #263238;
-            color: #ffffff;
+            background: #071408;
+            color: #00ff88;
             text-align: right;
-            border-right: 2px solid #37474f;
-            padding-right: 5px;
-            width: 60px;
-            font-family: Consolas, monospace;
+            border-right: 2px solid #1a4a1a;
+            padding-right: 6px;
+            width: 66px;
+            font-family: 'JetBrains Mono', monospace;
+            text-shadow: 0 0 8px rgba(0,255,136,0.6);
+            font-size: 10px;
         }
-
         .board-header {
-            background: #37474f;
-            color: white;
+            background: linear-gradient(90deg, #0a2215, #154030);
+            color: #00ff88;
             text-align: center;
-            font-weight: bold;
-            padding: 8px;
-            font-size: 1em;
-            letter-spacing: 1px;
+            font-weight: 700;
+            padding: 9px;
+            font-size: 0.85em;
+            letter-spacing: 2px;
             border-radius: 8px 8px 0 0;
+            text-shadow: 0 0 12px rgba(0,255,136,0.8);
         }
-
         .board-footer {
-            background: #37474f;
+            background: linear-gradient(90deg, #0a2215, #154030);
             height: 8px;
             border-radius: 0 0 8px 8px;
         }
 
-        /* Connectors */
+        /* Wires */
         .wire-line {
             height: 2px;
-            background: #cfd8dc;
-            width: 10px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
+            box-shadow: 0 0 4px rgba(0,180,240,0.7);
+            width: 12px;
             display: inline-block;
             vertical-align: middle;
             position: relative;
+            animation: wirePulse 2.2s ease-in-out infinite;
+        }
+
+        @keyframes wirePulse {
+            0%, 100% { opacity: 0.55; box-shadow: 0 0 4px rgba(0,180,240,0.6); }
+            50%       { opacity: 1;    box-shadow: 0 0 10px rgba(0,229,209,1); }
         }
 
         .wire-dot {
-            width: 4px;
-            height: 4px;
-            background: #b0bec5;
+            width: 5px; height: 5px;
+            background: var(--accent-cyan);
             border-radius: 50%;
             position: absolute;
-            top: -1px;
+            top: -1.5px;
+            box-shadow: 0 0 5px var(--accent-cyan);
+        }
+        .dot-left  { right: 0; }
+        .dot-right { left: 0; }
+
+        /* ─── FOOTER ────────────────────────────────────────────── */
+        .page-footer {
+            margin-top: 28px;
+            font-size: 0.82rem;
+            color: var(--text-dim);
+        }
+        .page-footer strong { color: var(--text-muted); }
+
+        /* ─── COMPAT NOTE ───────────────────────────────────────── */
+        .compat-note {
+            display: inline-block;
+            background: rgba(255,176,32,0.08);
+            border: 1px solid rgba(255,176,32,0.2);
+            color: #b08000;
+            padding: 5px 14px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            margin-top: 6px;
         }
 
-        .dot-left {
-            right: 0;
-        }
-
-        .dot-right {
-            left: 0;
+        /* Buttons row */
+        .btn-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 14px;
+            margin-top: 26px;
         }
     </style>
     <script type="module" src="https://unpkg.com/esp-web-tools@9/dist/web/install-button.js?module"></script>
 </head>
 
 <body>
-
     <div class="container">
-        <!-- Ensure logo.png is in the same folder -->
-        <img src="logo.png" alt="Logo" class="logo">
+        <!-- Logo -->
+        <img src="logo.png" alt="Smart Pump Logo" class="logo">
 
+        <!-- Title -->
         <h1>Smart Pump Control</h1>
-        <h2>Premium Version • v1.2.0</h2>
+        <div class="version-chip">Premium Edition &nbsp;·&nbsp; v1.2.0</div>
+        <h2>Pump &amp; Compressor Dual-Mode Controller</h2>
 
         <p>
-            An advanced <b>Pump & Compressor</b> Dual-Mode Controller with <b>Voltage Protection</b>,
-            <b>Dry-Run Auto-Retry</b>, <b>Solenoid Venting</b>, and <b>Cloud Tracking</b>.
+            Advanced <b>Voltage Protection</b>, <b>Dry-Run Auto-Retry</b>,
+            <b>Solenoid Venting</b>, and <b>Cloud MQTT Tracking</b> — all in one firmware.
         </p>
 
-        <!-- Button for Firmware Installation -->
+        <!-- Flash Button -->
         <esp-web-install-button manifest="installer_manifest.json">
-            <button slot="activate" class="button button-v1">CONNECT & INSTALL</button>
+            <button slot="activate" class="button button-v1">⚡ CONNECT &amp; INSTALL</button>
         </esp-web-install-button>
+        <div><span class="compat-note">🔌 Compatible with ESP32-S3 · Connect via USB</span></div>
 
-        <p style="font-size: 0.9rem; color: #888;">Compatible with ESP32-S3. Connect via USB.</p>
+        <!-- Dashboard & Guide Links -->
+        <hr class="section-divider">
 
-        <!-- Link to Cloud App & Premium Guide -->
-        <div style="margin-top: 30px; padding-top: 25px; border-top: 1px solid #eee;">
-            <p style="font-weight: 600; color: #333; margin-bottom: 20px;">📘 Access Documentation & Cloud Dashboard:</p>
-            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px;">
-                <a href="cloud_control.html" class="button" style="background-color: #28a745; margin: 0; max-width: 250px;">OPEN CLOUD DASHBOARD</a>
-                <a href="user_guide_premium.html" target="_blank" class="button button-premium" style="margin: 0; max-width: 250px;">📖 TECHNICAL MANUAL</a>
-            </div>
+        <p style="font-weight:600; color:var(--text-primary); margin-bottom:18px;">📘 Documentation &amp; Cloud Access</p>
+        <div class="btn-row">
+            <a href="cloud_control.html" class="button button-cloud">☁️ CLOUD DASHBOARD</a>
+            <a href="user_guide_premium.html" target="_blank" class="button button-premium">📖 TECHNICAL MANUAL</a>
         </div>
 
+        <!-- Info Cards -->
         <div class="grid-container">
 
             <!-- Setup Guide -->
-            <div class="card" style="background: #e3f2fd; border-color: #bbdefb;">
+            <div class="card card-blue">
                 <h3>🚀 Quick Setup</h3>
                 <ol>
-                    <li><b>WiFi Setup:</b> Connect to hotspot <code>Auto-Pump-Config</code> (Password:
-                        <code>12345678</code>).
-                    </li>
-                    <li><b>Configure:</b> Open <a href="http://192.168.4.1" target="_blank">192.168.4.1</a> and enter
-                        your Home WiFi details.</li>
-                    <li><b>Access:</b> After reboot, visit the device IP address shown on the LCD to access the dashboard.
-                    </li>
-                    <li><b>Settings:</b> Set your Tank Height, Voltage Limits, and Auto-Retry logic in the settings
-                        menu.</li>
+                    <li><b>WiFi Setup:</b> Connect to hotspot <code>Auto-Pump-Config</code> (Password: <code>12345678</code>).</li>
+                    <li><b>Configure:</b> Open <a href="http://192.168.4.1" target="_blank">192.168.4.1</a> and enter your Home WiFi details.</li>
+                    <li><b>Access:</b> After reboot, visit the device IP shown on the LCD to open the dashboard.</li>
+                    <li><b>Settings:</b> Set Tank Height, Voltage Limits, and Auto-Retry logic in the settings menu.</li>
                 </ol>
             </div>
 
             <!-- Features -->
-            <div class="card" style="background: #fff3e0; border-color: #ffe0b2;">
-                <h3>🛡️ Safety & Features</h3>
+            <div class="card card-amber">
+                <h3>🛡️ Safety &amp; Features</h3>
                 <ul>
                     <li><b>Dual-Mode:</b> Switch between <b>Water Pump</b> and <b>Air Compressor</b> operations.</li>
                     <li><b>Solenoid Venting:</b> Automatic pressure release valve for compressor reliability.</li>
-                    <li><b>Voltage Guard:</b> Automatic cut-off (>250V or <170V).</li>
+                    <li><b>Voltage Guard:</b> Automatic cut-off (&gt;250 V or &lt;170 V).</li>
                     <li><b>Dry-Run System:</b> Smart flow detection with <b>Auto-Retry</b> or <b>Lock</b> modes.</li>
                     <li><b>Cool-Down Logic:</b> Hardware overheating protection for high-demand loads.</li>
                     <li><b>Smart Scheduling:</b> DND mode for automated overnight silence.</li>
                 </ul>
             </div>
 
+            <!-- Wiring Guide — spans full width -->
+            <div class="card" style="grid-column: 1 / -1; background: rgba(5,10,22,0.6); border-color: rgba(0,255,136,0.12);">
+                <h3 style="background: linear-gradient(90deg,#00ff88,#00e5d1); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;">🔌 Wiring Guide (ESP32-S3)</h3>
 
-            <!-- Wiring Guide -->
-            <div class="card" style="background: #f1f8e9; border-color: #c5e1a5; grid-column: 1 / -1;">
-                <h3>🔌 Wiring Guide (ESP32-S3)</h3>
-
-                <!-- Wiring Diagram (HTML/CSS Version) -->
                 <div class="wiring-wrapper">
                     <table class="wiring-table">
-                        <!-- Top Header -->
+                        <!-- Header -->
                         <tr>
-                            <td></td>
-                            <td></td>
-                            <td colspan="2" class="board-header">ESP32-S3</td>
-                            <td></td>
-                            <td></td>
+                            <td></td><td></td>
+                            <td colspan="2" class="board-header">⚙ ESP32-S3</td>
+                            <td></td><td></td>
                         </tr>
-
-                        <!-- Row 1: LCD I2C (Start from 01/02) -->
+                        <!-- LCD SDA / SCL -->
                         <tr>
-                            <td>
-                                <div class="comp-base comp-display">🖥️ LCD (SDA)</div>
-                            </td>
-                            <td>
-                                <div class="wire-line">
-                                    <div class="wire-dot dot-left"></div>
-                                </div>
-                            </td>
+                            <td><div class="comp-base comp-display">🖥️ LCD (SDA)</div></td>
+                            <td><div class="wire-line"><div class="wire-dot dot-left"></div></div></td>
                             <td class="board-body-left">GPIO 01</td>
                             <td class="board-body-right">GPIO 02</td>
-                            <td>
-                                <div class="wire-line">
-                                    <div class="wire-dot dot-right"></div>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="comp-base comp-display">🖥️ LCD (SCL)</div>
-                            </td>
+                            <td><div class="wire-line"><div class="wire-dot dot-right"></div></div></td>
+                            <td><div class="comp-base comp-display">🖥️ LCD (SCL)</div></td>
                         </tr>
-
-                        <!-- Row 2: Voltage / Trig -->
+                        <!-- Volt / Trig -->
                         <tr>
-                            <td>
-                                <div class="comp-base comp-sensor">⚡ Volt Sensor</div>
-                            </td>
-                            <td>
-                                <div class="wire-line">
-                                    <div class="wire-dot dot-left"></div>
-                                </div>
-                            </td>
+                            <td><div class="comp-base comp-sensor">⚡ Volt Sensor</div></td>
+                            <td><div class="wire-line"><div class="wire-dot dot-left"></div></div></td>
                             <td class="board-body-left">GPIO 04</td>
                             <td class="board-body-right">GPIO 05</td>
-                            <td>
-                                <div class="wire-line">
-                                    <div class="wire-dot dot-right"></div>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="comp-base comp-sensor">📏 Ultra Trig</div>
-                            </td>
+                            <td><div class="wire-line"><div class="wire-dot dot-right"></div></div></td>
+                            <td><div class="comp-base comp-sensor">📏 Ultra Trig</div></td>
                         </tr>
-
-                        <!-- Row 3: Echo / Buzzer -->
+                        <!-- Echo / Buzzer -->
                         <tr>
-                            <td>
-                                <div class="comp-base comp-sensor">📏 Ultra Echo</div>
-                            </td>
-                            <td>
-                                <div class="wire-line">
-                                    <div class="wire-dot dot-left"></div>
-                                </div>
-                            </td>
+                            <td><div class="comp-base comp-sensor">📏 Ultra Echo</div></td>
+                            <td><div class="wire-line"><div class="wire-dot dot-left"></div></div></td>
                             <td class="board-body-left">GPIO 06</td>
                             <td class="board-body-right">GPIO 07</td>
-                            <td>
-                                <div class="wire-line">
-                                    <div class="wire-dot dot-right"></div>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="comp-base comp-actuator">🔔 Buzzer</div>
-                            </td>
+                            <td><div class="wire-line"><div class="wire-dot dot-right"></div></div></td>
+                            <td><div class="comp-base comp-actuator">🔔 Buzzer</div></td>
                         </tr>
-
-                        <!-- Row 4: Motor / Manual Button -->
+                        <!-- Motor / Manual Btn -->
                         <tr>
-                            <td>
-                                <div class="comp-base comp-actuator">⚙️ Motor</div>
-                            </td>
-                            <td>
-                                <div class="wire-line">
-                                    <div class="wire-dot dot-left"></div>
-                                </div>
-                            </td>
+                            <td><div class="comp-base comp-actuator">⚙️ Motor</div></td>
+                            <td><div class="wire-line"><div class="wire-dot dot-left"></div></div></td>
                             <td class="board-body-left">GPIO 08</td>
                             <td class="board-body-right">GPIO 09</td>
-                            <td>
-                                <div class="wire-line">
-                                    <div class="wire-dot dot-right"></div>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="comp-base comp-input">🔘 Manual Btn</div>
-                            </td>
+                            <td><div class="wire-line"><div class="wire-dot dot-right"></div></div></td>
+                            <td><div class="comp-base comp-input">🔘 Manual Btn</div></td>
                         </tr>
-
-                        <!-- Row 5: Solenoid / Flow -->
+                        <!-- Solenoid / Flow -->
                         <tr>
-                            <td>
-                                <div class="comp-base comp-actuator">💨 Solenoid</div>
-                            </td>
-                            <td>
-                                <div class="wire-line">
-                                    <div class="wire-dot dot-left"></div>
-                                </div>
-                            </td>
+                            <td><div class="comp-base comp-actuator">💨 Solenoid</div></td>
+                            <td><div class="wire-line"><div class="wire-dot dot-left"></div></div></td>
                             <td class="board-body-left">GPIO 10</td>
                             <td class="board-body-right">GPIO 18</td>
-                            <td>
-                                <div class="wire-line">
-                                    <div class="wire-dot dot-right"></div>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="comp-base comp-sensor">🌊 Flow Sens</div>
-                            </td>
+                            <td><div class="wire-line"><div class="wire-dot dot-right"></div></div></td>
+                            <td><div class="comp-base comp-sensor">🌊 Flow Sens</div></td>
                         </tr>
-
-                        <!-- Row 6: RGB LED / Footer -->
+                        <!-- RGB LED -->
                         <tr>
-                            <td>
-                                <div class="comp-base comp-actuator">🌈 RGB LED</div>
-                            </td>
-                            <td>
-                                <div class="wire-line">
-                                    <div class="wire-dot dot-left"></div>
-                                </div>
-                            </td>
+                            <td><div class="comp-base comp-actuator">🌈 RGB LED</div></td>
+                            <td><div class="wire-line"><div class="wire-dot dot-left"></div></div></td>
                             <td class="board-body-left">GPIO 48</td>
                             <td class="board-body-right">---</td>
-                            <td>
-                                <div class="wire-line">
-                                    <div class="wire-dot dot-right"></div>
-                                </div>
-                            </td>
-                            <td>
-                                <div style="width: 90px; height: 10px;"></div>
-                            </td>
+                            <td><div class="wire-line"></div></td>
+                            <td><div style="width:95px;height:10px;"></div></td>
                         </tr>
-
                         <!-- Footer -->
                         <tr>
-                            <td></td>
-                            <td></td>
+                            <td></td><td></td>
                             <td colspan="2" class="board-footer"></td>
-                            <td></td>
-                            <td></td>
+                            <td></td><td></td>
                         </tr>
                     </table>
                 </div>
-
             </div>
 
-        </div>
+        </div><!-- /grid -->
 
-        <p style="margin-top: 30px;">Developed by <strong>Aung Moe Khine</strong></p>
-
-    </div>
-
+        <p class="page-footer">Developed by <strong>Aung Moe Khine</strong></p>
+    </div><!-- /container -->
 </body>
 
 </html>
