@@ -148,8 +148,13 @@
         }
 
         @keyframes shimmer {
-            0% { left: -100%; }
-            100% { left: 200%; }
+            0% {
+                left: -100%;
+            }
+
+            100% {
+                left: 200%;
+            }
         }
 
         .btn:hover:not(:disabled) {
@@ -180,6 +185,7 @@
             background: linear-gradient(135deg, #28a745, #20c997) !important;
             box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3) !important;
         }
+
         .btn-green:hover:not(:disabled) {
             box-shadow: 0 6px 20px rgba(40, 167, 69, 0.5) !important;
         }
@@ -188,6 +194,7 @@
             background: linear-gradient(135deg, #dc3545, #ff6b6b) !important;
             box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3) !important;
         }
+
         .btn-red:hover:not(:disabled) {
             box-shadow: 0 6px 20px rgba(220, 53, 69, 0.5) !important;
         }
@@ -196,6 +203,7 @@
             background: linear-gradient(135deg, #6f42c1, #a958a5) !important;
             box-shadow: 0 4px 15px rgba(111, 66, 193, 0.3) !important;
         }
+
         .btn-purple:hover:not(:disabled) {
             box-shadow: 0 6px 20px rgba(111, 66, 193, 0.5) !important;
         }
@@ -824,6 +832,29 @@
                     <option value="1">Myanmar (မြန်မာ)</option>
                 </select>
                 <hr>
+                <div class="lbl-wrap"><label>System Role (Pairing)</label></div>
+                <select id="sysRole" onchange="toggleRole(); markDirty('sysRole')">
+                    <option value="0">Standalone</option>
+                    <option value="1">Master (Sump Tank)</option>
+                    <option value="2">Slave (Upper Tank)</option>
+                </select>
+                <div id="masterOpts" style="display:none;">
+                    <div class="lbl-wrap"><label>Master Settling Time</label><span class="range">0 - 30 min</span></div>
+                    <select id="setM" onchange="markDirty('setM')">
+                        <option value="0">No Settling</option>
+                        <option value="5">5 Minutes</option>
+                        <option value="10">10 Minutes</option>
+                        <option value="15">15 Minutes</option>
+                        <option value="20">20 Minutes</option>
+                        <option value="30">30 Minutes</option>
+                    </select>
+                </div>
+                <div id="slaveOpts" style="display:none;">
+                    <div class="lbl-wrap"><label>Linked Master ID</label></div>
+                    <input type="text" id="linkID" placeholder="Enter Master's Cloud ID"
+                        style="text-transform:uppercase; margin-top:5px;" oninput="markDirty('linkID')">
+                </div>
+                <hr>
                 <div class="lbl-wrap"><label>Operating Mode</label></div>
                 <select id="opM" onchange="toggleVDly(); markDirty('opM')">
                     <option value="0">Water Pump</option>
@@ -947,6 +978,12 @@
         const dict = { "Device: Online": "စက် အွန်လိုင်း", "Device: Offline": "စက် အော့ဖ်လိုင်း", "Connecting...": "ချိတ်ဆက်နေသည်...", "NORMAL": "ပုံမှန်", "OVER": "ကျော်လွန်", "UNDER": "လျော့နည်း", "ON": "ဖွင့်", "OFF": "ပိတ်", "PUMPING": "ရေတင်နေသည်", "STANDBY": "အသင့်အနေအထား", "DRY ALRM": "ရေမရှိ အချက်ပေး", "LOCKED": "ပိတ်သိမ်းထားသည်", "EXPIRED": "သက်တမ်းကုန်ပြီ", "Active": "အသက်ဝင်သည်", "days left": "ရက် ကျန်သည်" };
         const tr = (t) => (sysLang == 1 && dict[t]) ? dict[t] : t;
 
+        function toggleRole() {
+            let r = document.getElementById('sysRole').value;
+            document.getElementById('masterOpts').style.display = (r == "1") ? "block" : "none";
+            document.getElementById('slaveOpts').style.display = (r == "2") ? "block" : "none";
+        }
+
         const vibe = () => {
             try {
                 if (window.AndroidBridge && window.AndroidBridge.triggerVibration) {
@@ -981,6 +1018,13 @@
                     .replace("WiFi Password", "ဝိုင်ဖိုင် စကားဝှက်")
                     .replace("Device PIN (for Cloud)", "လုံခြုံရေး ပင်နံပါတ်")
                     .replace("Interface Language", "ဘာသာစကား")
+                    .replace("System Role (Pairing)", "စနစ် အမျိုးအစား (ချိတ်ဆက်ရန်)")
+                    .replace("Standalone", "တစ်လုံးတည်း သုံးမည်")
+                    .replace("Master (Sump Tank)", "ပင်မစက် (ရေစုပ်ကန်)")
+                    .replace("Slave (Upper Tank)", "အရန်စက် (အပေါ်ကန်)")
+                    .replace("Master Settling Time", "ရေအနည်ထိုင်ရန် စောင့်ချိန်")
+                    .replace("Linked Master ID", "ချိတ်ဆက်မည့် ပင်မစက် အိုင်ဒီ")
+                    .replace("No Settling", "မစောင့်ပါ")
                     .replace("Operating Mode", "စက် အမျိုးအစား")
                     .replace("Compressor Valve Delay", "အဆို့ရှင် ဖွင့်ချိန်")
                     .replace(">Water Pump<", ">ရေမော်တာ<")
@@ -1226,6 +1270,7 @@
             activeTab = 'saving';
             sendCmd({
                 save: 1, ssid: ssid, pass: document.getElementById('wifiPass').value, newPin: document.getElementById('newPin').value || devicePin,
+                sysRole: parseInt(document.getElementById('sysRole').value), linkID: document.getElementById('linkID').value.trim().toUpperCase(), setM: parseInt(document.getElementById('setM').value),
                 opM: parseInt(document.getElementById('opM').value), vDly: parseInt(document.getElementById('vDly').value),
                 uH: parseFloat(document.getElementById('uH').value), lowTank: parseInt(document.getElementById('lowTank').value), fullTank: parseInt(document.getElementById('fullTank').value), vH: parseInt(document.getElementById('vH').value), vL: parseInt(document.getElementById('vL').value), vG: parseInt(document.getElementById('vG').value),
                 dD: parseInt(document.getElementById('dD').value), rstM: parseInt(document.getElementById('rstM').value), rM: parseInt(document.getElementById('rM').value),
@@ -1316,7 +1361,8 @@
             let vS = d.vStat || "--"; let iF = d.info || "--"; let pS = d.pStat || "--"; let tS = d.tStr || (d.tank !== undefined ? d.tank + '%' : "-- %");
             if (sysLang == 1) {
                 if (vS == "NORMAL") vS = "ပုံမှန်"; else if (vS == "OVER") vS = "ကျော်လွန်"; else if (vS == "UNDER") vS = "လျော့နည်း"; else if (vS == "DELAY") vS = "စောင့်ဆိုင်း";
-                if (iF == "DRY_RUN_ALARM!") iF = "ရေမရှိ အချက်ပေး!"; else if (iF == "PUMP_LOCKED!") iF = "ပိတ်သိမ်းထားသည်!"; else if (iF == "WAITING_RETRY!") iF = "ပြန်စရန်စောင့်နေသည်!"; else if (iF == "SENSOR_ERROR!") iF = "ဆင်ဆာ ချို့ယွင်းချက်!"; else if (iF == "SYSTEM_STANDBY!") iF = "အသင့်အနေအထား!"; else if (iF == "FLOW_DETECTED!") iF = "ရေစီးဆင်းမှုရှိသည်!"; else if (iF == "FLOW_CHECKING!") iF = "ရေစီးဆင်းမှုစစ်ဆေးနေ!"; else if (iF == "COOLING_DOWN!") iF = "အအေးခံနေသည်!"; else if (iF == "VENTING_VALVE!") iF = "လေလျှော့နေသည်!"; else if (iF == "OVER_VOLTAGE!") iF = "ဗို့အားကျော်လွန်နေသည်!"; else if (iF == "UNDER_VOLTAGE!") iF = "ဗို့အားလျော့နည်းနေသည်!"; else if (iF.startsWith("VOLT_DELAY")) { let secs = iF.replace("VOLT_DELAY", "").replace(/[()s]/g, "").trim(); iF = "ဗို့အားပြန်တည်ငြိမ်ရန်စောင့်ချိန်! (" + secs + ")"; }
+                if (iF == "DRY_RUN_ALARM!") iF = "ရေမရှိ အချက်ပေး!"; else if (iF == "PUMP_LOCKED!") iF = "ပိတ်သိမ်းထားသည်!"; else if (iF == "WAITING_RETRY!") iF = "ပြန်စရန်စောင့်နေသည်!"; else if (iF == "SENSOR_ERROR!") iF = "ဆင်ဆာ ချို့ယွင်းချက်!"; else if (iF == "SYSTEM_STANDBY!") iF = "အသင့်အနေအထား!"; else if (iF == "FLOW_DETECTED!") iF = "ရေစီးဆင်းမှုရှိသည်!"; else if (iF == "FLOW_CHECKING!") iF = "ရေစီးဆင်းမှုစစ်ဆေးနေ!"; else if (iF == "COOLING_DOWN!") iF = "အအေးခံနေသည်!"; else if (iF == "VENTING_VALVE!") iF = "လေလျှော့နေသည်!"; else if (iF == "OVER_VOLTAGE!") iF = "ဗို့အားကျော်လွန်နေသည်!"; else if (iF == "UNDER_VOLTAGE!") iF = "ဗို့အားလျော့နည်းနေသည်!"; else if (iF.startsWith("VOLT_DELAY")) { let secs = iF.replace("VOLT_DELAY", "").replace(/[()s]/g, "").trim(); iF = "ဗို့အားပြန်တည်ငြိမ်ရန်စောင့်ချိန်! (" + secs + "s)"; }
+                else if (iF.startsWith("SETTLING_WATER!")) { let mins = iF.replace("SETTLING_WATER!", "").replace(/[()m]/g, "").trim(); iF = "ရေအနည်ထိုင်ရန်စောင့်ချိန်! (" + mins + "m)"; }
                 if (d.pStat == "ON") pS = "ဖွင့်"; else if (d.pStat == "OFF") pS = "ပိတ်"; else if (d.pStat == "PUMPING") pS = "ရေတင်နေသည်"; else if (d.pStat == "STANDBY") pS = "အသင့်အနေအထား"; else if (d.pStat == "DRY ALRM") pS = "ရေမရှိ အချက်ပေး"; else if (d.pStat == "LOCKED") pS = "ပိတ်သိမ်းထားသည်";
                 if (d.tStr == "FULL") tS = "ပြည့်"; else if (d.tStr == "LOW") tS = "နည်း"; else if (d.tStr == "ERR") tS = "ချို့";
             }
@@ -1331,7 +1377,7 @@
 
             let iType = 'info';
             if (d.info && (d.info.includes("ALARM") || d.info.includes("ERROR"))) iType = 'danger';
-            else if (d.info && (d.info.includes("WAITING") || d.info.includes("LOCKED") || d.info.includes("COOLING") || d.info.includes("VENTING"))) iType = 'warning';
+            else if (d.info && (d.info.includes("WAITING") || d.info.includes("LOCKED") || d.info.includes("COOLING") || d.info.includes("VENTING") || d.info.includes("SETTLING"))) iType = 'warning';
             else if (d.info && d.info.includes("FLOW_DETECTED")) iType = 'success';
             setBadge('info', iF, iType);
 
@@ -1373,6 +1419,10 @@
             [document.getElementById('otaHub'), document.getElementById('otaHubS')].forEach(h => { if (h) h.style.display = d.ota ? 'block' : 'none'; });
             [document.getElementById('otaMsg'), document.getElementById('otaMsgS')].forEach(m => { if (m) m.innerText = sysLang == 1 ? 'ဗားရှင်းသစ် v' + (d.nVer || "") + ' ရနိုင်ပါပြီ!' : 'New Version v' + (d.nVer || "") + ' Available!'; });
 
+
+            if (d.sysRole !== undefined) { safeUpdate('sysRole', d.sysRole); toggleRole(); }
+            if (d.setM !== undefined) safeUpdate('setM', d.setM);
+            if (d.linkID !== undefined) safeUpdate('linkID', d.linkID);
 
             if (d.opM !== undefined) { safeUpdate('opM', d.opM); toggleVDly(); }
             if (d.vDly !== undefined) safeUpdate('vDly', d.vDly, "Seconds");
