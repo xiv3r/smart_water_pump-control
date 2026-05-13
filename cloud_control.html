@@ -691,14 +691,33 @@
         <div id="homeView">
             <div class="card">
                 <button id="refreshBtn" class="refresh-btn" onclick="requestData()" title="Refresh Data">🔄</button>
-                <div style="font-size:0.8rem;text-align:left;margin-bottom:10px;"><span id="statusDot"
-                        class="conn-dot"></span><span id="statusTxt" style="color:#aaa;">Connecting...</span></div>
-                <h2 style="color:#03ef;margin:0; text-align: center; font-weight:800; letter-spacing:-0.5px;">
-                    <img src="logo.png" alt="Logo" class="logo"><br>💧Tank Water Level
+
+                <!-- 1. Top Row: Connection Status (Left Aligned) -->
+                <div style="font-size:0.8rem; text-align:left; margin-bottom:15px;">
+                    <span id="statusDot" class="conn-dot"></span>
+                    <span id="statusTxt" style="color:#aaa;">Connecting...</span>
+                </div>
+
+                <!-- 2. Header Section (All Centered) -->
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <!-- The Logo -->
+                    <img src="logo.png" alt="Logo" class="logo">
+
+                    <!-- Role Badge (Your Yellow Box Area) -->
+                    <div id="roleBadgeC" class="badge"
+                        style="display:none; width:fit-content; margin: 0 auto 15px auto; font-size:0.75rem; letter-spacing: 1px; border-radius: 12px; padding: 5px 12px;">
+                    </div>
+
+                    <!-- Main Title -->
+                    <h2 style="color:#03ef; margin:0; font-weight:800; letter-spacing:-0.5px;">💧Tank Water Level</h2>
+
+                    <!-- DND Badge -->
                     <div id="dndBadgeC"
                         style="display:none; font-size: 0.8rem; background: rgba(111,66,193,0.2); border: 1px solid rgba(111,66,193,0.6); color: #d8b4fe; padding: 4px 12px; border-radius: 20px; margin: 8px auto 0 auto; width: fit-content; text-transform: uppercase; font-weight: bold; letter-spacing: 1px;">
                         🌙 DND Active</div>
-                </h2>
+                </div>
+
+                <!-- 3. Tank Graphic -->
                 <div class="tank-wrap">
                     <div class="tank-inner">
                         <div id="tankFill" class="tank-fill"></div>
@@ -1048,6 +1067,26 @@
 
             if (document.getElementById('dndBadgeC')) {
                 document.getElementById('dndBadgeC').style.display = (d.dndAct == 1) ? 'block' : 'none';
+            }
+
+            // --- Update Role Badge (Center Area) ---
+            let rb = document.getElementById('roleBadgeC');
+            if (rb) {
+                if (d.sysRole == 1) {
+                    // MASTER: Blue Glow
+                    rb.innerText = sysLang == 1 ? "📥 အောက်တိုင်ကီ (MASTER)" : "📥 MASTER (SUMP)";
+                    rb.className = "badge bg-info";
+                    rb.style.display = "block";
+                    rb.style.color = "#17a2b8"; // Glowing Cyan Text
+                } else if (d.sysRole == 2) {
+                    // SLAVE: Yellow Glow
+                    rb.innerText = sysLang == 1 ? "📤 အပေါ်တိုင်ကီ (SLAVE)" : "📤 SLAVE (ROOF)";
+                    rb.className = "badge bg-warning";
+                    rb.style.display = "block";
+                    rb.style.color = "#ffc107"; // Glowing Amber Text
+                } else {
+                    rb.style.display = "none";
+                }
             }
 
             isExpired = d.expired ? true : false;
