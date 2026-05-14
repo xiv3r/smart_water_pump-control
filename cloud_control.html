@@ -660,10 +660,23 @@
     <!-- LOGIN SCREEN -->
     <div id="loginScreen" class="card">
         <img src="logo.png" alt="Logo" class="logo">
-        <h1 style="color:white; margin: 10px 0 5px 0; text-align: center; font-size: 1.6rem; letter-spacing: -0.5px;">
+        <h1 style="color:white; margin: 10px 0 5px 0; text-align: center; font-size: 1.5rem; letter-spacing: -0.5px;">
             Smart Pump Cloud</h1>
-        <p style="color:#888; text-align: center; font-size:1.1rem; margin: 0 0 25px 0; font-weight: 300;">Enter Device
-            ID and PIN</p>
+
+        <!-- KEYCHAIN SECTION -->
+        <div id="keychainSection" style="display:none; margin-bottom:20px;">
+            <p
+                style="color:#888; font-size:0.85rem; margin-bottom:10px; text-align:left; font-weight:bold; text-transform:uppercase;">
+                Saved Devices:</p>
+            <div id="keychainList"
+                style="display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; padding-right:5px;">
+                <!-- Devices injected here -->
+            </div>
+            <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin:20px 0 10px 0;">
+        </div>
+
+        <p id="manualLabel" style="color:#888; text-align: center; font-size:0.9rem; margin-bottom: 15px;">Connect New
+            Device</p>
         <div style="max-width: 280px; margin: 0 auto;">
             <div id="loginError"
                 style="color: #ff6b6b; font-size: 0.85rem; margin-bottom: 10px; display: none; font-weight: bold;">
@@ -671,7 +684,7 @@
             <input type="text" id="devID" placeholder="DEVICE ID" style="text-transform:uppercase;">
             <input type="password" id="devPin" placeholder="••••••">
             <button id="btnLogin" class="btn" onclick="connect()"
-                style="margin-top: 15px; border-radius: 10px; padding: 18px; font-size: 1.2rem; background: #007bff;">Connect</button>
+                style="margin-top: 15px; border-radius: 10px; padding: 16px; font-size: 1.1rem; background: #007bff;">Connect</button>
         </div>
     </div>
 
@@ -928,17 +941,75 @@
         function toggleRole() { let r = document.getElementById('sysRole').value; document.getElementById('masterOpts').style.display = (r == "1") ? "block" : "none"; document.getElementById('slaveOpts').style.display = (r == "2") ? "block" : "none"; }
         function toggleVDly() { let op = document.getElementById('opM').value; let vW = document.getElementById('vWrap'), vD = document.getElementById('vDly'); if (op == "1") { vW.style.display = 'flex'; vD.style.display = 'block'; } else { vW.style.display = 'none'; vD.style.display = 'none'; } }
 
+        // --- KEYCHAIN LOGIC ---
+        function getKeychain() { return JSON.parse(localStorage.getItem("pumpKeychain") || "[]"); }
+        function updateKeychainUI() {
+            const devices = getKeychain();
+            const section = document.getElementById('keychainSection');
+            const list = document.getElementById('keychainList');
+            const label = document.getElementById('manualLabel');
+            if (devices.length === 0) { section.style.display = 'none'; label.innerText = (sysLang == 1 ? "စက်အသစ်ချိတ်ဆက်ရန်" : "Connect New Device"); return; }
+            section.style.display = 'block';
+            label.innerText = (sysLang == 1 ? "သို့မဟုတ် အခြားစက်ဖြင့်ချိတ်မည်" : "Or Connect Another ID");
+            list.innerHTML = '';
+            devices.forEach(dev => {
+                // Roles defined as Authority vs Worker
+                let icon = "🏠";
+                let labelTxt = "Standalone";
+                let iconColor = "#888"; // Grey for standalone
+
+                if (dev.role == 1) {
+                    icon = "👑";      // Master: The Crown (The Decision Maker)
+                    labelTxt = "System Master";
+                    iconColor = "#ffc107"; // Gold for the Crown
+                }
+                if (dev.role == 2) {
+                    icon = "👷";      // Slave: The Worker (The Performer)
+                    labelTxt = "System Worker";
+                    iconColor = "#17a2b8"; // Cyan for the Worker
+                }
+
+                // Myanmar Translation
+                if (sysLang == 1) {
+                    if (dev.role == 0) labelTxt = "သီးသန့်စက်";
+                    if (dev.role == 1) labelTxt = "အဓိကအမိန့်ပေးစက် (Master)";
+                    if (dev.role == 2) labelTxt = "အလုပ်လုပ်ပေးမည့်စက် (Worker)";
+                }
+
+                const div = document.createElement('div');
+                div.style = "display:flex; align-items:center; background:rgba(255,255,255,0.05); padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); cursor:pointer; margin-bottom:5px;";
+                div.innerHTML = `
+                    <div onclick="quickConnect('${dev.id}', '${dev.pin}')" style="flex:1; text-align:left; display:flex; align-items:center; gap:15px; overflow:hidden;">
+                        <div style="font-size:1.6rem; min-width:35px; text-align:center; color:${iconColor}; text-shadow: 0 0 10px ${iconColor}44;">${icon}</div>
+                        <div style="overflow:hidden;">
+                            <div style="font-weight:bold; color:white; white-space:nowrap; text-overflow:ellipsis; overflow:hidden; font-size:1rem;">${dev.id}</div>
+                            <div style="font-size:0.75rem; color:${iconColor}; font-weight:bold; text-transform:uppercase; letter-spacing:0.5px; margin-top:2px;">${labelTxt}</div>
+                        </div>
+                    </div>
+                    <button onclick="deleteFromKeychain('${dev.id}')" style="background:none; border:none; color:#ff6b6b; font-size:1.6rem; padding:0 10px; cursor:pointer; opacity:0.4;">&times;</button>
+                `;
+                list.appendChild(div);
+            });
+        }
+        function saveToKeychain(id, pin, role) {
+            let devices = getKeychain();
+            const idx = devices.findIndex(d => d.id === id);
+            if (idx > -1) { devices[idx].pin = pin; devices[idx].role = role; }
+            else { devices.push({ id, pin, role }); }
+            localStorage.setItem("pumpKeychain", JSON.stringify(devices));
+            updateKeychainUI();
+        }
+        function quickConnect(id, pin) { vibe(); document.getElementById('devID').value = id; document.getElementById('devPin').value = pin; connect(); }
+        function deleteFromKeychain(id) { vibe(); if (confirm(sysLang == 1 ? "ဤစက်ကို စာရင်းမှပယ်ဖျက်မလား?" : "Delete this saved device?")) { let devices = getKeychain().filter(d => d.id !== id); localStorage.setItem("pumpKeychain", JSON.stringify(devices)); updateKeychainUI(); } }
+
         document.addEventListener("DOMContentLoaded", () => {
             if (sysLang == 1) {
-                // Myanmar translation logic (simplified placeholder - your original replace logic works fine)
                 document.getElementById('btnLogin').innerText = "ချိတ်ဆက်ပါ";
                 document.getElementById('tabHome').innerText = "🏠 ပင်မစာမျက်နှာ";
                 document.getElementById('tabSettings').innerText = "⚙️ ဆက်တင်များ";
             }
             if (document.getElementById('appLang')) document.getElementById('appLang').value = sysLang;
-            const savedID = localStorage.getItem("cloudPumpID"), savedPin = localStorage.getItem("cloudPumpPin");
-            if (savedID) document.getElementById('devID').value = savedID;
-            if (savedPin) document.getElementById('devPin').value = savedPin;
+            updateKeychainUI(); // Initial keychain render
         });
 
         let client, deviceID, devicePin, pollInterval, watchdog;
@@ -997,7 +1068,13 @@
                         } else { showModal(data.reason || data.alert); if (data.alert === "Access Denied") setTimeout(() => location.reload(), 3000); }
                         return;
                     }
-                    if (!dataReceived) { dataReceived = true; document.getElementById('loginScreen').style.display = 'none'; document.getElementById('dashboard').style.display = 'block'; if (pollInterval) { clearInterval(pollInterval); pollInterval = null; } }
+                    if (!dataReceived) {
+                        dataReceived = true;
+                        saveToKeychain(deviceID, devicePin, data.sysRole); // Save/Update Keychain
+                        document.getElementById('loginScreen').style.display = 'none';
+                        document.getElementById('dashboard').style.display = 'block';
+                        if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
+                    }
                     updateUI(data); resetWatchdog();
                 } catch (e) { console.error("Parse error", e); }
             };
@@ -1010,7 +1087,18 @@
         }
 
         function requestData() { vibe();[document.getElementById('refreshBtn'), document.getElementById('refreshBtnS')].forEach(b => b && b.classList.add('spinning')); if (client && client.isConnected()) { sendCmd({ get: 1 }); } else { connect(); } }
-        function logout() { vibe(); if (confirm("Logout?")) { localStorage.removeItem("cloudPumpPin"); location.reload(); } }
+        function logout() {
+            vibe();
+            if (confirm(sysLang == 1 ? "စက်ပြောင်းမည်လား?" : "Switch Device?")) {
+                if (client) client.disconnect();
+                dataReceived = false;
+                document.getElementById('dashboard').style.display = 'none';
+                document.getElementById('loginScreen').style.display = 'block';
+                document.getElementById('btnLogin').innerText = (sysLang == 1 ? "ချိတ်ဆက်ပါ" : "Connect");
+                document.getElementById('btnLogin').disabled = false;
+                updateKeychainUI();
+            }
+        }
         function sendReset() { vibe(); sendCmd({ reset: 1 }); }
         function sendToggle() { vibe(); sendCmd({ toggle: 1 }); }
         function sendCmd(p) { if (!client || !client.isConnected()) return; p.pin = devicePin; let msg = new Paho.MQTT.Message(JSON.stringify(p)); msg.destinationName = `smartpump/${deviceID}/set`; client.send(msg); }
