@@ -1117,12 +1117,28 @@
             document.getElementById('dispCid').innerText = d.id || "---";
             document.getElementById('volt').innerText = (d.volt || "--") + " V";
 
-            setBadge('vstat', vS, (d.vStat == "NORMAL") ? 'success' : (d.vStat == "DELAY" ? 'warning' : 'danger'));
-            setBadge('pstate', pS, (d.pStat == "ON") ? 'success' : (d.pStat == "DRY ALRM" || d.pStat == "LOCKED" ? 'danger' : 'secondary'));
+            // 1. Voltage Status Colors
+            let vType = 'secondary';
+            if (d.vStat === "NORMAL") vType = 'success';
+            else if (d.vStat === "DELAY") vType = 'warning';
+            else if (d.vStat === "OVER" || d.vStat === "UNDER") vType = 'danger';
+            setBadge('vstat', vS, vType);
 
+            // 2. Pump Status Colors
+            let pType = 'secondary';
+            if (d.pStat === "ON") pType = 'success';
+            else if (d.pStat === "DRY ALRM" || d.pStat === "LOCKED") pType = 'danger';
+            setBadge('pstate', pS, pType);
+
+            // 3. System Info Colors (Synchronized with .ino)
             let iType = 'info';
-            if (d.info && (d.info.includes("ALARM") || d.info.includes("ERROR"))) iType = 'danger';
-            else if (d.info && (d.info.includes("WAITING") || d.info.includes("LOCKED") || d.info.includes("COOLING") || d.info.includes("VENTING") || d.info.includes("SETTLING"))) iType = 'warning';
+            if (iF.includes("ALARM") || iF.includes("ERROR")) {
+                iType = 'danger';
+            } else if (iF.includes("WAITING") || iF.includes("LOCKED") || iF.includes("COOLING") || iF.includes("VENTING") || iF.includes("SETTLING") || iF.includes("DELAY")) {
+                iType = 'warning';
+            } else if (iF.includes("FLOW_DETECTED")) {
+                iType = 'success'; // Fixed: Changes badge to Green
+            }
             setBadge('info', iF, iType);
 
             const tankFill = document.getElementById('tankFill');
