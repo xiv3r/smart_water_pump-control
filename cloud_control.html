@@ -644,6 +644,53 @@
             color: #ffc107;
             border: 1px solid rgba(255, 193, 7, 0.5);
         }
+
+        /* Myanmar Text Scaling Fix */
+        .lang-mm {
+            line-height: 1.6;
+            /* Prevents top/bottom vowels from cutting off */
+        }
+
+        .lang-mm .tab {
+            font-size: 0.85rem;
+            /* Shrinks tab text to fit */
+            letter-spacing: 0;
+        }
+
+        .lang-mm .row {
+            font-size: 0.92rem;
+            /* Shrinks row labels */
+        }
+
+        .lang-mm label {
+            font-size: 0.85rem;
+        }
+
+        .lang-mm h2 {
+            font-size: 1.25rem;
+            /* Rescales "Tank Water Level" */
+        }
+
+        .lang-mm .badge {
+            font-size: 0.75rem;
+            letter-spacing: 0;
+        }
+
+        @media screen and (max-width: 440px) {
+            .lang-mm .tab {
+                font-size: 0.72rem;
+                padding: 12px 2px;
+            }
+
+            .lang-mm .row {
+                font-size: 0.82rem;
+            }
+
+            .lang-mm .btn {
+                font-size: 0.95rem;
+                padding: 14px 4px;
+            }
+        }
     </style>
 </head>
 
@@ -1039,6 +1086,7 @@
 
         document.addEventListener("DOMContentLoaded", () => {
             if (sysLang == 1) {
+                document.body.classList.add('lang-mm'); // Applies scaling immediately
                 document.getElementById('btnLogin').innerText = "ချိတ်ဆက်ပါ";
                 document.getElementById('tabHome').innerText = "🏠 ပင်မစာမျက်နှာ";
                 document.getElementById('tabSettings').innerText = "⚙️ ဆက်တင်များ";
@@ -1064,7 +1112,10 @@
 
                 // 4. Translate Headings and Specific Buttons
                 const h2Title = document.querySelector('h2');
-                if (h2Title) h2Title.innerHTML = h2Title.innerHTML.replace("Tank Water Level", "ရေတိုင်ကီ ရေအမှတ်");
+                if (h2Title) {
+                    h2Title.style.fontSize = "1.3rem"; // Scale down the main title
+                    h2Title.innerHTML = h2Title.innerHTML.replace("Tank Water Level", "ရေတိုင်ကီ ရေအမှတ်");
+                }
 
                 document.querySelector('button[onclick="sendSave()"]').innerText = "သိမ်းဆည်း၍ ပြန်ဖွင့်မည်";
                 document.querySelector('button[onclick="logout()"]').innerText = "ထွက်မည်";
