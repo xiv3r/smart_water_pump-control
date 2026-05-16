@@ -932,8 +932,43 @@
         const PASS = "My_password123";
 
         let sysLang = localStorage.getItem('cloudLang') ? parseInt(localStorage.getItem('cloudLang')) : 0;
-        const dict = { "Device: Online": "စက် အွန်လိုင်း", "Device: Offline": "စက် အော့ဖ်လိုင်း", "Connecting...": "ချိတ်ဆက်နေသည်...", "NORMAL": "ပုံမှန်", "OVER": "ကျော်လွန်", "UNDER": "လျော့နည်း", "ON": "ဖွင့်", "OFF": "ပိတ်", "PUMPING": "ရေတင်နေသည်", "STANDBY": "အသင့်အနေအထား", "DRY ALRM": "ရေမရှိ အချက်ပေး", "LOCKED": "ပိတ်သိမ်းထားသည်", "EXPIRED": "သက်တမ်းကုန်ပြီ", "Active": "အသက်ဝင်သည်", "days left": "ရက် ကျန်သည်" };
-        const tr = (t) => (sysLang == 1 && dict[t]) ? dict[t] : t;
+        const dict = {
+            "Device: Online": "စက် အွန်လိုင်း", "Device: Offline": "စက် အော့ဖ်လိုင်း", "Connecting...": "ချိတ်ဆက်နေသည်...",
+            "NORMAL": "ပုံမှန်", "OVER": "ကျော်လွန်", "UNDER": "လျော့နည်း", "DELAY": "စောင့်ဆိုင်း",
+            "ON": "ဖွင့်", "OFF": "ပိတ်", "DRY_RUN_ALARM!": "ရေမရှိ အချက်ပေး!",
+            "PUMP_LOCKED!": "ပိတ်သိမ်းထားသည်!", "WAITING_RETRY!": "ပြန်စရန်စောင့်နေသည်!",
+            "SENSOR_ERROR!": "ဆင်ဆာ ချို့ယွင်းချက်!", "SYSTEM_STANDBY!": "အသင့်အနေအထား!",
+            "FLOW_DETECTED!": "ရေစီးဆင်းမှုရှိသည်!", "FLOW_CHECKING!": "ရေစီးဆင်းမှုစစ်နေ!",
+            "COOLING_DOWN!": "အအေးခံနေသည်!", "VENTING_VALVE!": "လေလျှော့နေသည်!",
+            "SETTLING_WATER!": "ရေအနည်ထိုင်ရန်စောင့်ချိန်!", "Voltage:": "လျှပ်စစ်အား-",
+            "Volt Status:": "ဗို့အား အခြေအနေ-", "Pump:": "ရေမော်တာ-", "System Info:": "စက် အချက်အလက်-",
+            "Retry in:": "ပြန်လည်စတင်ရန်-", "Start Pump": "ရေမော်တာ ဖွင့်မည်", "Stop Pump": "ရေမော်တာ ပိတ်မည်",
+            "LICENSE EXPIRED": "သက်တမ်းကုန်ဆုံးပြီ", "WiFi SSID": "ဝိုင်ဖိုင် အမည်", "WiFi Password": "ဝိုင်ဖိုင် စကားဝှက်",
+            "Device PIN (for Cloud)": "လုံခြုံရေး ပင်နံပါတ်", "Interface Language": "ဘာသာစကား",
+            "Operating Mode": "စက် အမျိုးအစား", "Compressor Valve Delay": "အဆို့ရှင် ဖွင့်ချိန်",
+            "Tank Height": "ရေတိုင်ကီ အမြင့်", "Low Tank Start Level": "ရေမော်တာစတင်မည့် ရေမှတ်",
+            "High Voltage Set": "ဗို့အားလွန် သတ်မှတ်ချက်", "Low Voltage Set": "ဗို့အားလျော့ သတ်မှတ်ချက်",
+            "Voltage Resume Gap": "ဗို့အားပြန်ဖွင့် ကွာဟချက်", "Dry-Run Delay": "ရေမရှိ အချက်ပေးချိန်",
+            "Pump Cool-down (After 1Hr)": "၁နာရီမောင်းပြီး အနားပေးချိန်", "Auto-Retry Wait": "ပြန်လည်စတင်ရန် စောင့်ချိန်",
+            "🌙 Smart Scheduling (DND)": "🌙 ညဘက် အသံပိတ်စနစ် (DND)", "Start Hour": "စတင်ရန် အချိန်",
+            "End Hour": "ပြီးဆုံးရန် အချိန်", "Home Time Zone (GMT)": "အချိန်ဇုန် (GMT)",
+            "Cloud ID:": "ကလောက် အိုင်ဒီ-", "Device IP:": "စက် အိုင်ပီ-", "System Role (Pairing)": "စနစ် အဆင့်အတန်း (Role)",
+            "Master Settling Time": "ရေအနည်ထိုင်ချိန်", "Linked Master ID": "ချိတ်ဆက်ထားသော Master ID",
+            "High Tank Stop Level": "ရေမော်တာရပ်မည့် ရေမှတ်", "🔑 License Management": "🔑 လိုင်စင် စီမံခန့်ခွဲမှု",
+            "🛠️ Maintenance": "🛠️ ပြုပြင်ထိန်းသိမ်းမှု", "Check for Updates": "ဗားရှင်း အသစ်စစ်ရန်",
+            "User Guide": "အသုံးပြုနည်း လမ်းညွှန်", "Current Version:": "လက်ရှိ ဗားရှင်း-",
+            "Upload Token File (.key)": "လိုင်စင်တိုကင်ဖိုင်တင်ရန် (.key)", "Paste Token String": "တိုကင် စာသား ထည့်ပါ",
+            "Choose File": "ဖိုင်ရွေးမည်", "Upload File": "ဖိုင် တင်မည်", "Activate via Text": "စာသားဖြင့် သက်တမ်းတိုးမည်",
+            "Status:": "အခြေအနေ-",
+        };
+        const tr = (t) => {
+            if (sysLang != 1 || !t) return t;
+            let s = String(t);
+            if (s.includes("VOLT_DELAY")) return s.replace("VOLT_DELAY", "ဗို့အားပြန်တည်ငြိမ်ရန်စောင့်ချိန်!");
+            if (s.includes("SETTLING_WATER")) return s.replace("SETTLING_WATER", "ရေအနည်ထိုင်ရန်စောင့်ချိန်!");
+            for (let key in dict) { if (s.includes(key.replace('!', ''))) return dict[key]; }
+            return dict[s] || s;
+        };
 
         const vibe = () => { try { if (window.AndroidBridge && window.AndroidBridge.triggerVibration) { window.AndroidBridge.triggerVibration(100); } else if (window.navigator && window.navigator.vibrate) { window.navigator.vibrate(100); } } catch (e) { } };
         function setAppLang() { sysLang = parseInt(document.getElementById('appLang').value); localStorage.setItem('cloudLang', sysLang); location.reload(); }
@@ -1007,6 +1042,51 @@
                 document.getElementById('btnLogin').innerText = "ချိတ်ဆက်ပါ";
                 document.getElementById('tabHome').innerText = "🏠 ပင်မစာမျက်နှာ";
                 document.getElementById('tabSettings').innerText = "⚙️ ဆက်တင်များ";
+
+                // 1. Translate Labels, Rows and H3 Headings
+                document.querySelectorAll('.row span:first-child, .lbl-wrap label, label, h3').forEach(el => {
+                    let txt = el.innerText.trim();
+                    if (dict[txt]) el.innerText = dict[txt];
+                });
+
+                // 2. Translate Dropdown Options (Sub-lists)
+                document.querySelectorAll('select option').forEach(opt => {
+                    if (opt.text.includes("Standalone")) opt.text = "သီးသန့်စက်";
+                    if (opt.text.includes("Master (Sump Tank)")) opt.text = "အဓိကစက် (အောက်တိုင်ကီ)";
+                    if (opt.text.includes("Slave (Upper Tank)")) opt.text = "လက်အောက်ခံစက် (အပေါ်တိုင်ကီ)";
+                    if (opt.text.includes("Water Pump")) opt.text = "ရေမော်တာ";
+                    if (opt.text.includes("Air Compressor")) opt.text = "လေကွန်ပရက်ဆာ";
+                });
+
+                // 3. Translate Placeholders
+                document.getElementById('wifiPass').placeholder = "လက်ရှိအတိုင်းထားရန် အလွတ်ထားပါ";
+                document.getElementById('licText').placeholder = "ဖုန်းဖြင့်ရသော တိုကင်စာသားကို ဤနေရာတွင် ထည့်ပါ";
+
+                // 4. Translate Headings and Specific Buttons
+                const h2Title = document.querySelector('h2');
+                if (h2Title) h2Title.innerHTML = h2Title.innerHTML.replace("Tank Water Level", "ရေတိုင်ကီ ရေအမှတ်");
+
+                document.querySelector('button[onclick="sendSave()"]').innerText = "သိမ်းဆည်း၍ ပြန်ဖွင့်မည်";
+                document.querySelector('button[onclick="logout()"]').innerText = "ထွက်မည်";
+                document.querySelector('button[onclick="uploadLicenseFile()"]').innerText = "ဖိုင် တင်မည်";
+                document.querySelector('button[onclick="uploadLicenseText()"]').innerText = "စာသားဖြင့် သက်တမ်းတိုးမည်";
+                document.querySelector('button[onclick="checkOTA(this)"]').innerText = "ဗားရှင်း အသစ်စစ်ရန်";
+                document.querySelector('button[onclick*="user_guide"]').innerHTML = "📖 အသုံးပြုနည်း လမ်းညွှန်";
+
+                const curVerLabel = document.getElementById('curVer').parentNode;
+                if (curVerLabel) curVerLabel.innerHTML = curVerLabel.innerHTML.replace("Current Version:", "လက်ရှိ ဗားရှင်း-");
+
+                document.getElementById('fileName').innerText = "ဖိုင်ရွေးချယ်ထားခြင်းမရှိပါ";
+                const chooseFileSpan = document.querySelector('span[style*="background:#007bff"]');
+                if (chooseFileSpan) chooseFileSpan.innerText = "ဖိုင်ရွေးမည်";
+
+                // 5. Translate Footer (Cloud ID, IP, Sync Msg)
+                const lastMsg = document.getElementById('lastMsg');
+                if (lastMsg) lastMsg.innerText = "ပထမဆုံး ချိတ်ဆက်မှုကို စောင့်နေပါသည်...";
+                document.querySelectorAll('.footer span').forEach(el => {
+                    if (el.innerHTML.includes("Cloud ID:")) el.innerHTML = el.innerHTML.replace("Cloud ID:", "ကလောက် အိုင်ဒီ-");
+                    if (el.innerHTML.includes("Device IP:")) el.innerHTML = el.innerHTML.replace("Device IP:", "စက် အိုင်ပီ-");
+                });
             }
             if (document.getElementById('appLang')) document.getElementById('appLang').value = sysLang;
             updateKeychainUI(); // Initial keychain render
@@ -1195,9 +1275,10 @@
             let vS = d.vStat || "--", iF = d.info || "--", pS = d.pStat || "--", tS = d.tStr || (d.tank !== undefined ? d.tank + '%' : "-- %");
 
             if (sysLang == 1) {
-                if (vS == "NORMAL") vS = "ပုံမှန်"; else if (vS == "OVER") vS = "ကျော်လွန်"; else if (vS == "UNDER") vS = "လျော့နည်း"; else if (vS == "DELAY") vS = "စောင့်ဆိုင်း";
-                if (iF == "DRY_RUN_ALARM!") iF = "ရေမရှိ အချက်ပေး!"; else if (iF == "PUMP_LOCKED!") iF = "ပိတ်သိမ်းထားသည်!"; else if (iF == "WAITING_RETRY!") iF = "ပြန်စရန်စောင့်နေသည်!";
-                if (d.pStat == "ON") pS = "ဖွင့်"; else if (d.pStat == "OFF") pS = "ပိတ်";
+                vS = tr(vS); pS = tr(pS); iF = tr(iF);
+                if (d.tStr == "FULL") tS = "ပြည့်";
+                else if (d.tStr == "LOW") tS = "နည်း";
+                else if (d.tStr == "ERR") tS = "ချို့ယွင်းချက်";
             }
 
             document.getElementById('tankVal').innerText = tS;
@@ -1267,11 +1348,12 @@
             } else {
                 btn.style.display = 'block'; rst.style.display = 'none';
                 if (isExpired) {
-                    btn.innerText = "LICENSE EXPIRED";
+                    btn.innerText = tr("LICENSE EXPIRED");
                     btn.className = "btn btn-grey"; btn.disabled = true;
                 } else {
                     btn.disabled = false;
-                    btn.innerText = (d.pStat == "ON" ? 'Stop Pump' : 'Start Pump');
+                    let btnTxt = (d.pStat == "ON" ? 'Stop Pump' : 'Start Pump');
+                    btn.innerText = tr(btnTxt);
                     btn.className = "btn " + (d.pStat == "ON" ? "btn-red" : "btn-green");
                 }
             }
