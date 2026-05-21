@@ -1176,6 +1176,36 @@
             <b>🌊 ရေပြတ်လပ်မှု ကာကွယ်ခြင်း -</b> ရေပြတ်လပ်မှု စောင့်ဆိုင်းချိန် <span class="highlight-my">(စက္ကန့် ၆၀ မှ ၁၈၀)</span> နှင့် အလိုအလျောက် ပြန်လည်စမ်းသပ်မည့်အချိန် <span class="highlight-my">(မိနစ် ၃၀ သို့မဟုတ် ၆၀)</span> တို့ကို စိတ်ကြိုက် ရွေးချယ်နိုင်ပါသည်။
         </div>
 
+        <h2 class="sub-title">Automatic Retry & Alarm Sequence</h2>
+        <div class="alert alert-warning">
+            <div class="alert-icon">⚠️</div>
+            <div class="alert-body">
+                <b>Two-Stage Dry-Run Protection Cycle:</b>
+                <ol>
+                    <li><strong>Stage 1: Active Alarm (DRY ALRM - 60 seconds):</strong> If the flow sensor detects no water for the configured Dry-Run Delay, the pump stops immediately. The LED flashes red, the LCD displays <span class="tech-val">DRY ALRM</span>, and the buzzer beeps urgently (500ms intervals) for exactly <strong>60 seconds</strong>.</li>
+                    <li><strong>Stage 2: Lockout / Waiting Retry (LOCKED / WAITING_RETRY!):</strong> After 60 seconds, the buzzer stops beep patterns.
+                        <ul>
+                            <li>If <strong>Auto-Retry is enabled</strong> (e.g., 30 or 60 minutes): The LCD shows <span class="tech-val">LOCKED</span> and status reads <span class="tech-val">WAITING_RETRY!</span>. A countdown will run on the screen. Once the minutes expire, the system automatically clears the error and restarts the pump to test for water.</li>
+                            <li>If <strong>Auto-Retry is set to OFF</strong>: The system enters permanent lockout (<span class="tech-val">PUMP_LOCKED!</span>). The motor will not restart automatically and must be reset manually.</li>
+                        </ul>
+                    </li>
+                </ol>
+                <p><strong>How to Reset Manually:</strong> Press the physical button once or send a Reset command via the MQTT Cloud API or Local Web UI to instantly clear the dry-run error and restart operation.</p>
+            </div>
+        </div>
+
+        <div class="my-block">
+            <b>🔄 ရေပြတ်လပ်မှု အလိုအလျောက် ပြန်လည်စမ်းသပ်ခြင်းနှင့် အချက်ပေးစနစ် -</b><br><br>
+            ၁။ <b>အဆင့် ၁ - အချက်ပေးအဆင့် (DRY ALRM - ၆၀ စက္ကန့်):</b> ရေပြတ်လပ်သွားလျှင် မော်တာချက်ချင်းရပ်သွားပြီး LED အနီရောင်ဖလက်ရှ် လင်းပါမည်။ LCD မျက်နှာပြင်တွင် <span class="highlight-my">DRY ALRM</span> ဟုပြသပြီး ဘတ်ဇာမှ ၆၀ စက္ကန့်တိတိ အသံလှိုင်းတိုဖြင့် အချက်ပေးမြည်ပါမည်။<br>
+            ၂။ <b>အဆင့် ၂ - စောင့်ဆိုင်း/ပိတ်ဆို့အဆင့် (LOCKED / WAITING_RETRY!):</b> ၆၀ စက္ကန့်ပြည့်ပါက ဘတ်ဇာရပ်သွားပါမည်။
+            <ul>
+                <li><b>Auto-Retry ဖွင့်ထားပါက (မိနစ် ၃၀ သို့မဟုတ် ၆၀):</b> LCD တွင် <span class="highlight-my">LOCKED</span> ဟုပြပြီး ပြန်လည်စမ်းသပ်ရန် စက္ကန့်/မိနစ် Countdown ပြေးနေပါမည်။ အချိန်စေ့ပါက မော်တာကို အလိုအလျောက် ပြန်လည်မောင်းနှင် စမ်းသပ်ပါမည်။</li>
+                <li><b>Auto-Retry ပိတ်ထားပါက (OFF):</b> စက်သည် လုံးဝရပ်တန့်နေမည်ဖြစ်ပြီး (<span class="highlight-my">PUMP_LOCKED!</span>) အလိုအလျောက် ပြန်မလည်ပါ။</li>
+            </ul>
+            <b>လက်ဖြင့် ပြန်လည်စတင်ပုံ (Reset):</b> စက်ရှိ Manual ခလုတ်ကို တစ်ချက်နှိပ်ခြင်းဖြင့်သော်လည်းကောင်း၊ Web Dashboard သို့မဟုတ် MQTT Cloud မှ Reset ပေးခြင်းဖြင့်သော်လည်းကောင်း အမှားကို ချက်ချင်းဖြေရှင်းပြီး မော်တာကို ပြန်လည်ပတ်စေနိုင်ပါသည်။
+        </div>
+
+
         <h2 class="sub-title">2. Manual Button Control (Industrial Logic)</h2>
         <p>The physical button on <strong>GPIO 9</strong> provides a robust multi-state interface for local control.
             <br><br>
