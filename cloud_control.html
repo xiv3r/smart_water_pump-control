@@ -1092,10 +1092,23 @@
                 document.getElementById('tabHome').innerText = "🏠 ပင်မစာမျက်နှာ";
                 document.getElementById('tabSettings').innerText = "⚙️ ဆက်တင်များ";
 
-                // 1. Translate Labels, Rows and H3 Headings
-                document.querySelectorAll('.row span:first-child, .lbl-wrap label, label, h3').forEach(el => {
+                document.querySelectorAll('.row span:first-child, .lbl-wrap label, h3, .show-pass').forEach(el => {
                     let txt = el.innerText.trim();
-                    if (dict[txt]) el.innerText = dict[txt];
+                    if (!dict[txt]) return;
+
+                    // keep checkbox input inside .show-pass label
+                    if (el.classList.contains('show-pass')) {
+                        const cb = el.querySelector('input[type="checkbox"]');
+                        if (cb) {
+                            el.innerHTML = '';
+                            el.appendChild(cb);
+                            el.appendChild(document.createTextNode(' ' + dict[txt]));
+                        } else {
+                            el.innerText = dict[txt];
+                        }
+                    } else {
+                        el.innerText = dict[txt];
+                    }
                 });
 
                 // 2. Translate Dropdown Options (Sub-lists)
