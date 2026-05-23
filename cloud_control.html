@@ -1012,10 +1012,19 @@
         const tr = (t) => {
             if (sysLang != 1 || !t) return t;
             let s = String(t);
+
+            // System Info voltage text (exact)
+            if (s === "OVER_VOLTAGE!") return "ဗို့အားကျော်လွန်နေသည်!";
+            if (s === "UNDER_VOLTAGE!") return "ဗို့အားလျော့နည်းနေသည်!";
             if (s.includes("VOLT_DELAY")) return s.replace("VOLT_DELAY", "ဗို့အားပြန်တည်ငြိမ်ရန်စောင့်ချိန်!");
             if (s.includes("SETTLING_WATER")) return s.replace("SETTLING_WATER", "ရေအနည်ထိုင်ရန်စောင့်ချိန်!");
+
+            // exact dict first
+            if (dict[s]) return dict[s];
+
+            // fallback partial match
             for (let key in dict) { if (s.includes(key.replace('!', ''))) return dict[key]; }
-            return dict[s] || s;
+            return s;
         };
 
         const vibe = () => { try { if (window.AndroidBridge && window.AndroidBridge.triggerVibration) { window.AndroidBridge.triggerVibration(100); } else if (window.navigator && window.navigator.vibrate) { window.navigator.vibrate(100); } } catch (e) { } };
