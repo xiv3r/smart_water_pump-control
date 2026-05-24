@@ -580,11 +580,15 @@
     }
 
     async function verifyToken(token) {
+        const body = new URLSearchParams();
+        body.append("token", token);
+        body.append("deviceId", getDeviceId());
+
         const res = await fetch(TOKEN_API_URL, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ token, deviceId: getDeviceId() })
+            body: body
         });
+
         return res.json();
     }
 
