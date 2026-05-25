@@ -596,37 +596,49 @@
         const tokenInput = document.getElementById("tokenInput");
         const tokenMsg = document.getElementById("tokenMsg");
         const installBtn = document.getElementById("installBtn");
+        const realBtn = installBtn.querySelector('button[slot="activate"]');
+
+        let tokenApproved = false;
+        let installUsed = false;
 
         installBtn.style.pointerEvents = "none";
         installBtn.style.opacity = "0.45";
 
-        tokenInput.addEventListener("blur", async () => {
+        async function runTokenCheck() {
             const token = tokenInput.value.trim();
             if (!token) {
                 tokenMsg.textContent = "Please enter token.";
-                return;
+                tokenMsg.style.color = "#ffb020";
+                tokenApproved = false;
+                installBtn.style.pointerEvents = "none";
+                installBtn.style.opacity = "0.45";
+                return false;
             }
 
             tokenMsg.textContent = "Checking token...";
-            try {
-                const result = await verifyToken(token);
-                if (result.allow) {
-                    tokenMsg.textContent = "Token accepted. You can install now.";
-                    tokenMsg.style.color = "#00e87a";
-                    installBtn.style.pointerEvents = "auto";
-                    installBtn.style.opacity = "1";
-                } else {
-                    tokenMsg.textContent = "Denied: " + (result.message || "Invalid token");
-                    tokenMsg.style.color = "#ff3b5c";
-                    installBtn.style.pointerEvents = "none";
-                    installBtn.style.opacity = "0.45";
-                }
-            } catch (e) {
-                tokenMsg.textContent = "Cannot reach token server.";
-                tokenMsg.style.color = "#ffb020";
+            tokenMsg.style.color = "#ffb020";
+
+            const result = await verifyToken(token);
+
+            if (result.allow) {
+                tokenApproved = true;
+                tokenMsg.textContent = "Token accepted. You can install now.";
+                tokenMsg.style.color = "#00e87a";
+                installBtn.style.pointerEvents = "auto";
+                installBtn.style.opacity = "1";
+                return true;
+            } else {
+                tokenApproved = false;
+                tokenMsg.textContent = "Denied: " + (result.message || "Invalid token");
+                tokenMsg.style.color = "#ff3b5c";
                 installBtn.style.pointerEvents = "none";
                 installBtn.style.opacity = "0.45";
+                return false;
             }
+        }
+
+        tokenInput.addEventListener("blur", async () => {
+            try { await runTokenCheck(); } catch { }
         });
 
         tokenInput.addEventListener("keydown", (ev) => {
@@ -634,6 +646,36 @@
             ev.preventDefault();
             tokenInput.blur();
         });
+
+        realBtn.addEventListener("click", async (ev) => {
+            if (installUsed) {
+                ev.preventDefault();
+                ev.stopPropagation();
+                tokenMsg.textContent = "This token session is already used.";
+                tokenMsg.style.color = "#ff3b5c";
+                return;
+            }
+
+            try {
+                const ok = await runTokenCheck();
+                if (!ok) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    return;
+                }
+
+                installUsed = true;
+                installBtn.style.pointerEvents = "none";
+                installBtn.style.opacity = "0.45";
+                tokenMsg.textContent = "Install started. Token session closed.";
+                tokenMsg.style.color = "#00e87a";
+            } catch (e) {
+                ev.preventDefault();
+                ev.stopPropagation();
+                tokenMsg.textContent = "Cannot reach token server.";
+                tokenMsg.style.color = "#ffb020";
+            }
+        }, true);
     });
 </script>
 
