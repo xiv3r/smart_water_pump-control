@@ -754,8 +754,8 @@
 
                 <!-- 1. Top Row: Connection Status (Left Aligned) -->
                 <div style="font-size:0.8rem; text-align:left; margin-bottom:15px;">
-                    <span id="statusDot" class="conn-dot"></span>
-                    <span id="statusTxt" style="color:#aaa;">Connecting...</span>
+                    <span id="statusDot" class="conn-dot"></span><span id="statusTxt"
+                        style="color:#aaa;">Connecting...</span>
                 </div>
 
                 <!-- 2. Header Section (All Centered) -->
@@ -818,9 +818,9 @@
         <div id="settingsView" style="display:none;">
             <div class="card">
                 <button id="refreshBtnS" class="refresh-btn" onclick="requestData()" title="Refresh Data">🔄</button>
-                <div style="font-size:0.8rem;text-align:left;margin-bottom:10px;">
-                    <div><span id="statusDotS" class="conn-dot"></span><span id="statusTxtS"
-                            style="color:#aaa;">Connecting...</span></div>
+                <div style="font-size:0.8rem; text-align:left; margin-bottom:15px;">
+                    <span id="statusDotS" class="conn-dot"></span><span id="statusTxtS"
+                        style="color:#aaa;">Connecting...</span>
                 </div>
                 <img src="logo.png" class="logo">
                 <div class="lbl-wrap"><label>WiFi SSID</label></div><input type="text" id="ssid"
