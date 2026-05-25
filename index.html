@@ -598,7 +598,8 @@
         const installBtn = document.getElementById("installBtn");
         const realBtn = installBtn.querySelector('button[slot="activate"]');
 
-        let installUsed = false;
+        let installStarted = false;
+        let sessionClosed = false;
 
         function lockInstall() {
             installBtn.style.pointerEvents = "none";
@@ -608,15 +609,25 @@
         }
 
         function unlockInstall() {
+            if (sessionClosed) return;
             installBtn.style.pointerEvents = "auto";
             installBtn.style.opacity = "1";
             realBtn.disabled = false;
             realBtn.style.pointerEvents = "auto";
         }
 
+        function closeSessionWithMessage(msg, color) {
+            sessionClosed = true;
+            lockInstall();
+            tokenMsg.textContent = msg;
+            tokenMsg.style.color = color || "#00e87a";
+        }
+
         lockInstall();
 
         async function runTokenCheck() {
+            if (sessionClosed) return false;
+
             const token = tokenInput.value.trim();
             if (!token) {
                 tokenMsg.textContent = "Please enter token.";
@@ -654,18 +665,9 @@
         });
 
         realBtn.addEventListener("click", async (ev) => {
-            if (realBtn.disabled) {
+            if (sessionClosed || realBtn.disabled) {
                 ev.preventDefault();
                 ev.stopPropagation();
-                return;
-            }
-
-            if (installUsed) {
-                ev.preventDefault();
-                ev.stopPropagation();
-                tokenMsg.textContent = "This token session is already used.";
-                tokenMsg.style.color = "#ff3b5c";
-                lockInstall();
                 return;
             }
 
@@ -677,10 +679,9 @@
                     return;
                 }
 
-                installUsed = true;
-                tokenMsg.textContent = "Install started. Token session closed.";
-                tokenMsg.style.color = "#00e87a";
-                lockInstall();
+                // Start one installation session only
+                installStarted = true;
+                closeSessionWithMessage("Installation started. Please finish the popup steps.", "#00e87a");
             } catch (e) {
                 ev.preventDefault();
                 ev.stopPropagation();
@@ -690,21 +691,31 @@
             }
         }, true);
 
+        // When install flow reaches success, close page session politely.
+        function handleInstallSuccess() {
+            closeSessionWithMessage("Installation complete. Session closed.", "#00e87a");
+            setTimeout(() => {
+                window.location.reload();
+            }, 2200);
+        }
+
         installBtn.addEventListener("state-changed", (ev) => {
             const st = ev && ev.detail ? ev.detail.state : "";
             if (st === "FINISHED" || st === "installed") {
-                lockInstall();
-                tokenMsg.textContent = "Installation complete. Session closed.";
-                tokenMsg.style.color = "#00e87a";
-                setTimeout(() => window.location.reload(), 1200);
+                handleInstallSuccess();
             }
         });
 
         installBtn.addEventListener("installation-success", () => {
-            lockInstall();
-            tokenMsg.textContent = "Installation complete. Session closed.";
-            tokenMsg.style.color = "#00e87a";
-            setTimeout(() => window.location.reload(), 1200);
+            handleInstallSuccess();
+        });
+
+        // If popup is closed/cancelled after start, keep session closed.
+        installBtn.addEventListener("state-changed", (ev) => {
+            const st = ev && ev.detail ? ev.detail.state : "";
+            if (installStarted && (st === "ERROR" || st === "idle" || st === "INITIAL")) {
+                closeSessionWithMessage("Install session closed. Refresh and use a new token if needed.", "#ffb020");
+            }
         });
     });
 </script>
