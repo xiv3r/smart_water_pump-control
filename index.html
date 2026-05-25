@@ -598,20 +598,30 @@
         const installBtn = document.getElementById("installBtn");
         const realBtn = installBtn.querySelector('button[slot="activate"]');
 
-        let tokenApproved = false;
         let installUsed = false;
 
-        installBtn.style.pointerEvents = "none";
-        installBtn.style.opacity = "0.45";
+        function lockInstall() {
+            installBtn.style.pointerEvents = "none";
+            installBtn.style.opacity = "0.45";
+            realBtn.disabled = true;
+            realBtn.style.pointerEvents = "none";
+        }
+
+        function unlockInstall() {
+            installBtn.style.pointerEvents = "auto";
+            installBtn.style.opacity = "1";
+            realBtn.disabled = false;
+            realBtn.style.pointerEvents = "auto";
+        }
+
+        lockInstall();
 
         async function runTokenCheck() {
             const token = tokenInput.value.trim();
             if (!token) {
                 tokenMsg.textContent = "Please enter token.";
                 tokenMsg.style.color = "#ffb020";
-                tokenApproved = false;
-                installBtn.style.pointerEvents = "none";
-                installBtn.style.opacity = "0.45";
+                lockInstall();
                 return false;
             }
 
@@ -621,18 +631,14 @@
             const result = await verifyToken(token);
 
             if (result.allow) {
-                tokenApproved = true;
                 tokenMsg.textContent = "Token accepted. You can install now.";
                 tokenMsg.style.color = "#00e87a";
-                installBtn.style.pointerEvents = "auto";
-                installBtn.style.opacity = "1";
+                unlockInstall();
                 return true;
             } else {
-                tokenApproved = false;
                 tokenMsg.textContent = "Denied: " + (result.message || "Invalid token");
                 tokenMsg.style.color = "#ff3b5c";
-                installBtn.style.pointerEvents = "none";
-                installBtn.style.opacity = "0.45";
+                lockInstall();
                 return false;
             }
         }
@@ -648,11 +654,18 @@
         });
 
         realBtn.addEventListener("click", async (ev) => {
+            if (realBtn.disabled) {
+                ev.preventDefault();
+                ev.stopPropagation();
+                return;
+            }
+
             if (installUsed) {
                 ev.preventDefault();
                 ev.stopPropagation();
                 tokenMsg.textContent = "This token session is already used.";
                 tokenMsg.style.color = "#ff3b5c";
+                lockInstall();
                 return;
             }
 
@@ -665,15 +678,15 @@
                 }
 
                 installUsed = true;
-                installBtn.style.pointerEvents = "none";
-                installBtn.style.opacity = "0.45";
                 tokenMsg.textContent = "Install started. Token session closed.";
                 tokenMsg.style.color = "#00e87a";
+                lockInstall();
             } catch (e) {
                 ev.preventDefault();
                 ev.stopPropagation();
                 tokenMsg.textContent = "Cannot reach token server.";
                 tokenMsg.style.color = "#ffb020";
+                lockInstall();
             }
         }, true);
     });
