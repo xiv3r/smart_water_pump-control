@@ -522,7 +522,7 @@ const char index_html[] PROGMEM = R"rawliteral(
       💧Tank Water Level
       <div id="dndBadge" style="display:none; font-size: 0.8rem; background: rgba(111,66,193,0.2); border: 1px solid rgba(111,66,193,0.6); color: #d8b4fe; padding: 4px 12px; border-radius: 20px; margin: 8px auto; width: fit-content; text-transform: uppercase; font-weight: bold; letter-spacing: 1px;">🌙 DND Active</div>
     </h2>
-    <div class="tank-wrap"><div class="tank-inner"><div class="tank-fill" id="tankFill"></div><div class="tank-glaze"></div></div><div class="tank-ruler" id="tankRuler" aria-hidden="true"></div><div class="tank-ridges"></div><div class="tank-guides" id="tankGuides"><div class="tank-guide-line low-marker" id="lowTankMarker" style="bottom: 30%;"><span class="tank-guide-label" id="lowTankMarkerLabel">LOW 30%</span></div><div class="tank-guide-line full-marker" id="fullTankMarker" style="bottom: 100%;"><span class="tank-guide-label" id="fullTankMarkerLabel">FULL 100%</span></div></div><div class="tank-text" id="tankVal">-- %</div></div>
+    <div class="tank-wrap"><div class="tank-inner"><div class="tank-fill" id="tankFill"></div><div class="tank-glaze"></div></div><div class="tank-ruler" id="tankRuler" aria-hidden="true"></div><div class="tank-ridges"></div><div class="tank-guides" id="tankGuides"><div class="tank-guide-line low-marker" id="lowTankMarker" style="bottom: 50%;"><span class="tank-guide-label" id="lowTankMarkerLabel">LOW 50%</span></div><div class="tank-guide-line full-marker" id="fullTankMarker" style="bottom: 100%;"><span class="tank-guide-label" id="fullTankMarkerLabel">FULL 100%</span></div></div><div class="tank-text" id="tankVal">-- %</div></div>
     
     <div class="row"><span>Voltage:</span><span id="volt" style="font-weight:bold; font-size:1.2rem;">-- V</span></div>
     <div class="row"><span>Volt Status:</span><span id="vstat" class="badge bg-secondary">--</span></div>
@@ -554,7 +554,7 @@ const char index_html[] PROGMEM = R"rawliteral(
   let lastWebAlert = "";
 
   const renderTankRulerTicks = () => { const ruler = document.getElementById('tankRuler'); if (!ruler || ruler.dataset.ready === '1') return; let html = ''; for (let v = 0; v <= 100; v += 5) { const cls = (v % 25 === 0) ? 'tank-ruler-tick major' : 'tank-ruler-tick'; html += '<div class="' + cls + '" style="bottom:' + v + '%;"></div>'; } ruler.innerHTML = html; ruler.dataset.ready = '1'; };
-  const setTankGuides = (d) => { const low = parseInt(d.lowTank, 10) || 30; const full = parseInt(d.fullPoint || d.fullTank, 10) || 100; const lowMarker = document.getElementById('lowTankMarker'); const fullMarker = document.getElementById('fullTankMarker'); if (lowMarker) lowMarker.style.bottom = low + '%'; if (fullMarker) fullMarker.style.bottom = full + '%'; document.getElementById('lowTankMarkerLabel').innerText = (d.lang == 1 ? 'စတင် ' : 'LOW ') + low + '%'; document.getElementById('fullTankMarkerLabel').innerText = (d.lang == 1 ? 'ပြည့် ' : 'FULL ') + full + '%'; };
+  const setTankGuides = (d) => { const low = parseInt(d.lowTank, 10) || 50; const full = parseInt(d.fullPoint || d.fullTank, 10) || 100; const lowMarker = document.getElementById('lowTankMarker'); const fullMarker = document.getElementById('fullTankMarker'); if (lowMarker) lowMarker.style.bottom = low + '%'; if (fullMarker) fullMarker.style.bottom = full + '%'; document.getElementById('lowTankMarkerLabel').innerText = (d.lang == 1 ? 'စတင် ' : 'LOW ') + low + '%'; document.getElementById('fullTankMarkerLabel').innerText = (d.lang == 1 ? 'ပြည့် ' : 'FULL ') + full + '%'; };
 
   const dict = { "Smart Pump Dashboard": "ရေမော်တာ ထိန်းချုပ်စနစ်", "🏠 Home": "🏠 ပင်မစာမျက်နှာ", "⚙️ Settings": "⚙️ ဆက်တင်များ", "💧Tank Water Level": "💧ရေတိုင်ကီ ရေအမှတ်", "Voltage:": "လျှပ်စစ်အား-", "Volt Status:": "ဗို့အား အခြေအနေ-", "Pump:": "ရေမော်တာ-", "System Info:": "စက် အချက်အလက်-", "Cloud ID:": "ကလောက် အိုင်ဒီ-", "Device IP:": "စက် အိုင်ပီ-", "Update Now": "ယခု အဆင့်မြှင့်မည်", "System Notice": "စနစ် အသိပေးချက်", "System processing...": "စနစ် အလုပ်လုပ်နေပါသည်...", "Understood": "နားလည်ပါသည်" };
   const applyDict = () => { if(window.lSet) return; document.title = dict["Smart Pump Dashboard"]; const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false); let n; while(n = w.nextNode()){ let t=n.nodeValue.trim(); if(dict[t]) n.nodeValue = n.nodeValue.replace(t, dict[t]); } document.getElementById('expiryBanner').innerHTML="⚠️ စနစ် သက်တမ်းကုန်ဆုံးသွားပါပြီ ⚠️<br><span style='font-size:0.8rem; font-weight:normal; color:#ddd;'>ရေမော်တာ အသုံးပြုခွင့် ပိတ်ထားပါသည်။</span>"; document.getElementById('warnBanner').innerHTML="⚠️ သက်တမ်းကုန်ဆုံးရန် နီးကပ်နေပါပြီ ⚠️<br><span style='font-size:0.8rem; font-weight:normal; color:#ddd;' id='warnMsg'></span>"; window.lSet = true; };
@@ -587,7 +587,7 @@ let vS = d.vStat; let iF = d.info; let tS = d.tStr; let pS = d.pStat;
       if (d.lang==1) {
         if(vS=="NORMAL") vS="ပုံမှန်"; else if(vS=="OVER") vS="ကျော်လွန်"; else if(vS=="UNDER") vS="လျော့နည်း"; else if(vS=="DELAY") vS="စောင့်ဆိုင်း";
         if(iF=="DRY_RUN_ALARM!") iF="ရေမရှိ အချက်ပေး!"; else if(iF=="PUMP_LOCKED!") iF="ပိတ်သိမ်းထားသည်!"; else if(iF=="WAITING_RETRY!") iF="ပြန်စရန်စောင့်နေသည်!"; else if(iF=="SENSOR_ERROR!") iF="ဆင်ဆာ ချို့ယွင်းချက်!"; else if(iF=="SYSTEM_STANDBY!") iF="အသင့်အနေအထား!"; else if(iF=="FLOW_DETECTED!") iF="ရေစီးဆင်းမှုရှိသည်!"; else if(iF=="FLOW_CHECKING!") iF="ရေစီးဆင်းမှုစစ်နေ!"; else if(iF=="COOLING_DOWN!") iF="အအေးခံနေသည်!"; else if(iF=="VENTING_VALVE!") iF="လေလျှော့နေသည်!"; else if(iF=="OVER_VOLTAGE!") iF="ဗို့အားကျော်လွန်နေသည်!"; else if(iF=="UNDER_VOLTAGE!") iF="ဗို့အားလျော့နည်းနေသည်!"; else if(iF.startsWith("VOLT_DELAY")) { let secs = iF.replace(/[^\d]/g, ""); iF = "ဗို့အားပြန်တည်ငြိမ်ရန်စောင့်ချိန်! (" + secs + "s)"; } else if(iF.startsWith("SETTLING_WATER!")) { let mins = iF.replace(/[^\d]/g, ""); iF = "ရေအနည်ထိုင်ရန်စောင့်ချိန်! (" + mins + "m)"; }
-else if(iF.startsWith("SETTLING_WATER!")) { let mins = iF.replace(/[^\d]/g, ""); iF = "ရေအနည်ထိုင်ရန်စောင့်ချိန်! (" + mins + "m)"; }
+
         if(tS=="FULL") tS="ပြည့်"; else if(tS=="LOW") tS="နည်း"; else if(tS=="ERR") tS="ချို့";
         if(pS=="ON") pS="ဖွင့်"; else if(pS=="OFF") pS="ပိတ်"; else if(pS=="PUMPING") pS="ရေတင်နေသည်"; else if(pS=="STANDBY") pS="အသင့်အနေအထား"; else if(pS=="DRY ALRM") pS="ရေမရှိ အချက်ပေး"; else if(pS=="LOCKED") pS="ပိတ်သိမ်းထားသည်";
       }
@@ -1312,7 +1312,7 @@ void networkTask(void* parameter) {
         }
 
         if (pendingMqttPublish && (now - lastPublish >= 500)) {
-          if (xSemaphoreTakeRecursive(systemMutex, pdMS_TO_TICKS(100))) {
+          if (xSemaphoreTakeRecursive(systemMutex, pdMS_TO_TICKS(500))) {
             publishState();
             pendingMqttPublish = false;
             xSemaphoreGiveRecursive(systemMutex);
@@ -2467,7 +2467,7 @@ void handleSettings() {
 }
 
 void handleConfig() {
-  if (xSemaphoreTakeRecursive(systemMutex, pdMS_TO_TICKS(100))) {
+  if (xSemaphoreTakeRecursive(systemMutex, pdMS_TO_TICKS(500))) {
     DynamicJsonDocument doc(2048);
     doc["ssid"] = ssid_saved;
     doc["uH"] = tankConfig.upperHeight;
@@ -2706,7 +2706,7 @@ void handleLocalOtaUpload() {
 }
 
 void handleStatus() {
-  if (xSemaphoreTakeRecursive(systemMutex, pdMS_TO_TICKS(100))) {
+  if (xSemaphoreTakeRecursive(systemMutex, pdMS_TO_TICKS(500))) {
     String json = generateStatusJson();
     xSemaphoreGiveRecursive(systemMutex);
     server.send(200, "application/json", json);
@@ -2841,7 +2841,7 @@ String generateStatusJson() {
 void publishState() {
   if (WiFi.status() == WL_CONNECTED && mqttClient.connected()) {
     String json = "";
-    if (xSemaphoreTakeRecursive(systemMutex, pdMS_TO_TICKS(100))) {
+    if (xSemaphoreTakeRecursive(systemMutex, pdMS_TO_TICKS(500))) {
       json = generateStatusJson();
       xSemaphoreGiveRecursive(systemMutex);
     }
@@ -2862,7 +2862,7 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
   // --- NEW: Intercept Master's Status Update ---
   if (msConfig.sysRole == 2 && msConfig.linkedID != "") {
     if (String(topic).indexOf(msConfig.linkedID) != -1) {
-      if (xSemaphoreTakeRecursive(systemMutex, pdMS_TO_TICKS(100))) {
+      if (xSemaphoreTakeRecursive(systemMutex, pdMS_TO_TICKS(500))) {
         msConfig.masterInfo = doc["info"].as<String>();
         msConfig.masterPStat = doc["pStat"].as<String>();
         msConfig.lastMasterUpdate = millis();
