@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -6,14 +6,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description"
-        content="Smart Pump Control Premium Installer — ESP32-S3 firmware flasher and setup guide.">
+        content="Smart Pump Control Premium Installer â€” ESP32-S3 firmware flasher and setup guide.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap"
         rel="stylesheet">
     <style>
-        /* ─── DESIGN TOKENS ─────────────────────────────────────── */
+        /* â”€â”€â”€ DESIGN TOKENS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         :root {
             --bg-deep: #080c17;
             --bg-card: #0e1525;
@@ -30,7 +30,7 @@
             --glow-blue: rgba(0, 180, 240, 0.35);
         }
 
-        /* ─── RESET & BASE ──────────────────────────────────────── */
+        /* â”€â”€â”€ RESET & BASE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         *,
         *::before,
         *::after {
@@ -66,7 +66,7 @@
             z-index: 0;
         }
 
-        /* ─── TYPOGRAPHY ────────────────────────────────────────── */
+        /* â”€â”€â”€ TYPOGRAPHY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         h1 {
             background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
             -webkit-background-clip: text;
@@ -113,7 +113,7 @@
             text-decoration: underline;
         }
 
-        /* ─── MAIN CONTAINER ────────────────────────────────────── */
+        /* â”€â”€â”€ MAIN CONTAINER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         .container {
             position: relative;
             z-index: 1;
@@ -158,7 +158,7 @@
             border-radius: 1px;
         }
 
-        /* ─── LOGO ──────────────────────────────────────────────── */
+        /* â”€â”€â”€ LOGO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         .logo {
             width: 96px;
             height: auto;
@@ -181,7 +181,7 @@
             }
         }
 
-        /* ─── BADGE / VERSION CHIP ──────────────────────────────── */
+        /* â”€â”€â”€ BADGE / VERSION CHIP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         .version-chip {
             display: inline-block;
             background: rgba(0, 180, 240, 0.1);
@@ -196,7 +196,7 @@
             margin-bottom: 14px;
         }
 
-        /* ─── BUTTONS ───────────────────────────────────────────── */
+        /* â”€â”€â”€ BUTTONS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         .button {
             border: none;
             color: white;
@@ -275,14 +275,14 @@
             box-shadow: 0 8px 35px rgba(255, 176, 32, 0.55);
         }
 
-        /* ─── DIVIDER ───────────────────────────────────────────── */
+        /* â”€â”€â”€ DIVIDER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         .section-divider {
             border: none;
             border-top: 1px solid rgba(255, 255, 255, 0.06);
             margin: 28px 0;
         }
 
-        /* ─── GRID LAYOUT ───────────────────────────────────────── */
+        /* â”€â”€â”€ GRID LAYOUT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         .grid-container {
             display: grid;
             grid-template-columns: 1fr;
@@ -302,7 +302,7 @@
             }
         }
 
-        /* ─── CARDS ─────────────────────────────────────────────── */
+        /* â”€â”€â”€ CARDS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         .card {
             background: rgba(10, 16, 30, 0.7);
             border: 1px solid rgba(0, 180, 240, 0.1);
@@ -379,7 +379,7 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* ─── WIRING WRAPPER ────────────────────────────────────── */
+        /* â”€â”€â”€ WIRING WRAPPER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         .wiring-wrapper {
             overflow-x: auto;
             background: rgba(4, 10, 20, 0.8);
@@ -532,7 +532,7 @@
             left: 0;
         }
 
-        /* ─── FOOTER ────────────────────────────────────────────── */
+        /* â”€â”€â”€ FOOTER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         .page-footer {
             margin-top: 28px;
             font-size: 0.82rem;
@@ -543,7 +543,7 @@
             color: var(--text-muted);
         }
 
-        /* ─── COMPAT NOTE ───────────────────────────────────────── */
+        /* â”€â”€â”€ COMPAT NOTE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         .compat-note {
             display: inline-block;
             background: rgba(255, 176, 32, 0.08);
@@ -713,38 +713,38 @@
 
         <!-- Title -->
         <h1>Smart Pump Control</h1>
-        <div class="version-chip">Premium Edition &nbsp;·&nbsp; v1.2.0</div>
+        <div class="version-chip">Premium Edition &nbsp;Â·&nbsp; v1.2.0</div>
         <h2>Pump &amp; Compressor Dual-Mode Controller</h2>
 
         <p>
             Advanced <b>Voltage Protection</b>, <b>Dry-Run Auto-Retry</b>,
-            <b>Solenoid Venting</b>, and <b>Cloud MQTT Tracking</b> — all in one firmware.
+            <b>Solenoid Venting</b>, and <b>Cloud MQTT Tracking</b> â€” all in one firmware.
         </p>
 
         <!-- Token Gate -->
-        <div style="max-width:360px; margin:16px auto 12px; text-align:left;">
+        <div style="max-width:360px; margin:16px auto 12px; text-align:center;">
             <label for="tokenInput"
                 style="display:block; margin-bottom:8px; color:var(--text-primary); font-weight:600;">Install
                 Token</label>
             <input id="tokenInput" type="text" placeholder="Enter your token"
-                style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border); background:var(--bg-surface); color:var(--text-primary);">
+                style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border); background:var(--bg-surface); color:var(--text-primary); text-align:center;">
             <p id="tokenMsg" style="margin:10px 0 0; font-size:0.9rem; color:var(--text-muted);"></p>
         </div>
 
         <!-- Flash Button -->
         <esp-web-install-button id="installBtn" manifest="installer_manifest.json">
-            <button slot="activate" class="button button-v1">⚡ CONNECT &amp; INSTALL</button>
+            <button slot="activate" class="button button-v1">âš¡ CONNECT &amp; INSTALL</button>
         </esp-web-install-button>
-        <div><span class="compat-note">🔌 Compatible with ESP32-S3 · Connect via USB</span></div>
+        <div><span class="compat-note">ðŸ”Œ Compatible with ESP32-S3 Â· Connect via USB</span></div>
 
         <!-- Dashboard & Guide Links -->
         <hr class="section-divider">
 
-        <p style="font-weight:600; color:var(--text-primary); margin-bottom:18px;">📘 Documentation &amp; Cloud Access
+        <p style="font-weight:600; color:var(--text-primary); margin-bottom:18px;">ðŸ“˜ Documentation &amp; Cloud Access
         </p>
         <div class="btn-row">
-            <a href="cloud_control.html" class="button button-cloud">☁️ CLOUD DASHBOARD</a>
-            <a href="user_guide_premium.html" target="_blank" class="button button-premium">📖 TECHNICAL MANUAL</a>
+            <a href="cloud_control.html" class="button button-cloud">â˜ï¸ CLOUD DASHBOARD</a>
+            <a href="user_guide_premium.html" target="_blank" class="button button-premium">ðŸ“– TECHNICAL MANUAL</a>
         </div>
 
         <!-- Info Cards -->
@@ -752,7 +752,7 @@
 
             <!-- Setup Guide -->
             <div class="card card-blue">
-                <h3>🚀 Quick Setup</h3>
+                <h3>ðŸš€ Quick Setup</h3>
                 <ol>
                     <li><b>WiFi Setup:</b> Connect to hotspot <code>Auto-Pump-Config</code> (Password:
                         <code>12345678</code>).
@@ -767,7 +767,7 @@
 
             <!-- Features -->
             <div class="card card-amber">
-                <h3>🛡️ Safety &amp; Features</h3>
+                <h3>ðŸ›¡ï¸ Safety &amp; Features</h3>
                 <ul>
                     <li><b>Dual-Mode:</b> Switch between <b>Water Pump</b> and <b>Air Compressor</b> operations.</li>
                     <li><b>Solenoid Venting:</b> Automatic pressure release valve for compressor reliability.</li>
@@ -778,12 +778,12 @@
                 </ul>
             </div>
 
-            <!-- Wiring Guide — spans full width -->
+            <!-- Wiring Guide â€” spans full width -->
             <div class="card"
                 style="grid-column: 1 / -1; background: rgba(5,10,22,0.6); border-color: rgba(0,255,136,0.12);">
                 <h3
                     style="background: linear-gradient(90deg,#00ff88,#00e5d1); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;">
-                    🔌 Wiring Guide (ESP32-S3)</h3>
+                    ðŸ”Œ Wiring Guide (ESP32-S3)</h3>
 
                 <div class="wiring-wrapper">
                     <table class="wiring-table">
@@ -791,14 +791,14 @@
                         <tr>
                             <td></td>
                             <td></td>
-                            <td colspan="2" class="board-header">⚙ ESP32-S3</td>
+                            <td colspan="2" class="board-header">âš™ ESP32-S3</td>
                             <td></td>
                             <td></td>
                         </tr>
                         <!-- LCD SDA / SCL -->
                         <tr>
                             <td>
-                                <div class="comp-base comp-display">🖥️ LCD (SDA)</div>
+                                <div class="comp-base comp-display">ðŸ–¥ï¸ LCD (SDA)</div>
                             </td>
                             <td>
                                 <div class="wire-line">
@@ -813,13 +813,13 @@
                                 </div>
                             </td>
                             <td>
-                                <div class="comp-base comp-display">🖥️ LCD (SCL)</div>
+                                <div class="comp-base comp-display">ðŸ–¥ï¸ LCD (SCL)</div>
                             </td>
                         </tr>
                         <!-- Volt / Trig -->
                         <tr>
                             <td>
-                                <div class="comp-base comp-sensor">⚡ Volt Sensor</div>
+                                <div class="comp-base comp-sensor">âš¡ Volt Sensor</div>
                             </td>
                             <td>
                                 <div class="wire-line">
@@ -834,13 +834,13 @@
                                 </div>
                             </td>
                             <td>
-                                <div class="comp-base comp-sensor">📏 Ultra Trig</div>
+                                <div class="comp-base comp-sensor">ðŸ“ Ultra Trig</div>
                             </td>
                         </tr>
                         <!-- Echo / Buzzer -->
                         <tr>
                             <td>
-                                <div class="comp-base comp-sensor">📏 Ultra Echo</div>
+                                <div class="comp-base comp-sensor">ðŸ“ Ultra Echo</div>
                             </td>
                             <td>
                                 <div class="wire-line">
@@ -855,13 +855,13 @@
                                 </div>
                             </td>
                             <td>
-                                <div class="comp-base comp-actuator">🔔 Buzzer</div>
+                                <div class="comp-base comp-actuator">ðŸ”” Buzzer</div>
                             </td>
                         </tr>
                         <!-- Motor / Manual Btn -->
                         <tr>
                             <td>
-                                <div class="comp-base comp-actuator">⚙️ Motor</div>
+                                <div class="comp-base comp-actuator">âš™ï¸ Motor</div>
                             </td>
                             <td>
                                 <div class="wire-line">
@@ -876,13 +876,13 @@
                                 </div>
                             </td>
                             <td>
-                                <div class="comp-base comp-input">🔘 Manual Btn</div>
+                                <div class="comp-base comp-input">ðŸ”˜ Manual Btn</div>
                             </td>
                         </tr>
                         <!-- Solenoid / Flow -->
                         <tr>
                             <td>
-                                <div class="comp-base comp-actuator">💨 Solenoid</div>
+                                <div class="comp-base comp-actuator">ðŸ’¨ Solenoid</div>
                             </td>
                             <td>
                                 <div class="wire-line">
@@ -897,13 +897,13 @@
                                 </div>
                             </td>
                             <td>
-                                <div class="comp-base comp-sensor">🌊 Flow Sens</div>
+                                <div class="comp-base comp-sensor">ðŸŒŠ Flow Sens</div>
                             </td>
                         </tr>
                         <!-- RGB LED -->
                         <tr>
                             <td>
-                                <div class="comp-base comp-actuator">🌈 RGB LED</div>
+                                <div class="comp-base comp-actuator">ðŸŒˆ RGB LED</div>
                             </td>
                             <td>
                                 <div class="wire-line">
