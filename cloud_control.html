@@ -786,8 +786,8 @@
                     <div class="tank-ruler" id="tankRuler" aria-hidden="true"></div>
                     <div class="tank-ridges"></div>
                     <div class="tank-guides" id="tankGuides">
-                        <div class="tank-guide-line low-marker" id="lowTankMarker" style="bottom: 30%;"><span
-                                class="tank-guide-label" id="lowTankMarkerLabel">LOW 30%</span></div>
+                        <div class="tank-guide-line low-marker" id="lowTankMarker" style="bottom: 50%;"><span
+                                class="tank-guide-label" id="lowTankMarkerLabel">LOW 50%</span></div>
                         <div class="tank-guide-line full-marker" id="fullTankMarker" style="bottom: 100%;"><span
                                 class="tank-guide-label" id="fullTankMarkerLabel">FULL 100%</span></div>
                     </div>
@@ -1193,7 +1193,7 @@
         function updateOnlineStatus(o) { [document.getElementById('statusDot'), document.getElementById('statusDotS')].forEach(d => { if (d) d.className = "conn-dot " + (o ? "" : "off"); });[document.getElementById('statusTxt'), document.getElementById('statusTxtS')].forEach(t => { if (t) t.innerText = o ? tr("Device: Online") : tr("Device: Offline"); }); if (o) resetWatchdog(); }
         function resetWatchdog() { if (watchdog) clearTimeout(watchdog); watchdog = setTimeout(() => updateOnlineStatus(false), 90000); }
         function renderTankRulerTicks() { const ruler = document.getElementById('tankRuler'); if (!ruler || ruler.dataset.ready === '1') return; let html = ''; for (let v = 0; v <= 100; v += 5) { const cls = (v % 25 === 0) ? 'tank-ruler-tick major' : 'tank-ruler-tick'; html += '<div class="' + cls + '" style="bottom:' + v + '%;"></div>'; } ruler.innerHTML = html; ruler.dataset.ready = '1'; }
-        function setTankGuides(d) { const low = parseInt(d.lowTank, 10) || 30; const full = parseInt(d.fullPoint || d.fullTank, 10) || 100; const lowMarker = document.getElementById('lowTankMarker'); const fullMarker = document.getElementById('fullTankMarker'); if (lowMarker) lowMarker.style.bottom = low + '%'; if (fullMarker) fullMarker.style.bottom = full + '%'; if (document.getElementById('lowTankMarkerLabel')) document.getElementById('lowTankMarkerLabel').innerText = (sysLang == 1 ? 'စတင် ' : 'LOW ') + low + '%'; if (document.getElementById('fullTankMarkerLabel')) document.getElementById('fullTankMarkerLabel').innerText = (sysLang == 1 ? 'ပြည့် ' : 'FULL ') + full + '%'; }
+        function setTankGuides(d) { const low = parseInt(d.lowTank, 10) || 50; const full = parseInt(d.fullPoint || d.fullTank, 10) || 100; const lowMarker = document.getElementById('lowTankMarker'); const fullMarker = document.getElementById('fullTankMarker'); if (lowMarker) lowMarker.style.bottom = low + '%'; if (fullMarker) fullMarker.style.bottom = full + '%'; if (document.getElementById('lowTankMarkerLabel')) document.getElementById('lowTankMarkerLabel').innerText = (sysLang == 1 ? 'စတင် ' : 'LOW ') + low + '%'; if (document.getElementById('fullTankMarkerLabel')) document.getElementById('fullTankMarkerLabel').innerText = (sysLang == 1 ? 'ပြည့် ' : 'FULL ') + full + '%'; }
 
         // MQTT Logic
         function connect() {
@@ -1401,7 +1401,7 @@
             if (tankFill && activeTab !== 'saving') {
                 setTankGuides(d);
                 tankFill.style.height = (d.tank || 0) + '%';
-                if (d.tank <= (d.lowTank || 30)) tankFill.classList.add('low-water'); else tankFill.classList.remove('low-water');
+                if (d.tank <= (d.lowTank || 50)) tankFill.classList.add('low-water'); else tankFill.classList.remove('low-water');
                 if (d.pStat == "ON") tankFill.classList.add('pumping'); else tankFill.classList.remove('pumping');
             }
 
@@ -1450,7 +1450,10 @@
             if (cdRow) {
                 if ((d.err == 2 && d.rM > 0) || d.isDR || (d.info && d.info.includes("COOLING"))) {
                     cdRow.style.display = 'flex';
-                    document.getElementById('cd').innerText = (d.cd || d.rCd || d.rstCd || 0) + "s";
+                    let totalSecs = (d.cd || d.rCd || d.rstCd || 0);
+                    let m = Math.floor(totalSecs / 60);
+                    let s = totalSecs % 60;
+                    document.getElementById('cd').innerText = m + "m " + s + "s";
                 } else {
                     cdRow.style.display = 'none';
                 }
