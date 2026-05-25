@@ -586,7 +586,7 @@
 
         const res = await fetch(TOKEN_API_URL, {
             method: "POST",
-            body: body
+            body
         });
 
         return res.json();
@@ -598,29 +598,25 @@
         const installBtn = document.getElementById("installBtn");
         const realBtn = installBtn.querySelector('button[slot="activate"]');
 
-        let installStarted = false;
         let sessionClosed = false;
+        let successHandled = false;
 
         function lockInstall() {
             installBtn.style.pointerEvents = "none";
             installBtn.style.opacity = "0.45";
-            realBtn.disabled = true;
-            realBtn.style.pointerEvents = "none";
         }
 
         function unlockInstall() {
             if (sessionClosed) return;
             installBtn.style.pointerEvents = "auto";
             installBtn.style.opacity = "1";
-            realBtn.disabled = false;
-            realBtn.style.pointerEvents = "auto";
         }
 
-        function closeSessionWithMessage(msg, color) {
+        function closeSession(msg, color = "#00e87a") {
             sessionClosed = true;
             lockInstall();
             tokenMsg.textContent = msg;
-            tokenMsg.style.color = color || "#00e87a";
+            tokenMsg.style.color = color;
         }
 
         lockInstall();
@@ -665,7 +661,7 @@
         });
 
         realBtn.addEventListener("click", async (ev) => {
-            if (sessionClosed || realBtn.disabled) {
+            if (sessionClosed) {
                 ev.preventDefault();
                 ev.stopPropagation();
                 return;
@@ -679,9 +675,8 @@
                     return;
                 }
 
-                // Start one installation session only
-                installStarted = true;
-                closeSessionWithMessage("Installation started. Please finish the popup steps.", "#00e87a");
+                // keep flow open so user can complete install popup
+                closeSession("Install session started. Complete installation in popup.", "#00e87a");
             } catch (e) {
                 ev.preventDefault();
                 ev.stopPropagation();
@@ -691,31 +686,22 @@
             }
         }, true);
 
-        // When install flow reaches success, close page session politely.
-        function handleInstallSuccess() {
-            closeSessionWithMessage("Installation complete. Session closed.", "#00e87a");
-            setTimeout(() => {
-                window.location.reload();
-            }, 2200);
+        function handleInstallSuccessOnce() {
+            if (successHandled) return;
+            successHandled = true;
+            closeSession("Installation complete. Session closed.", "#00e87a");
+            setTimeout(() => window.location.reload(), 1800);
         }
 
         installBtn.addEventListener("state-changed", (ev) => {
             const st = ev && ev.detail ? ev.detail.state : "";
             if (st === "FINISHED" || st === "installed") {
-                handleInstallSuccess();
+                handleInstallSuccessOnce();
             }
         });
 
         installBtn.addEventListener("installation-success", () => {
-            handleInstallSuccess();
-        });
-
-        // If popup is closed/cancelled after start, keep session closed.
-        installBtn.addEventListener("state-changed", (ev) => {
-            const st = ev && ev.detail ? ev.detail.state : "";
-            if (installStarted && (st === "ERROR" || st === "idle" || st === "INITIAL")) {
-                closeSessionWithMessage("Install session closed. Refresh and use a new token if needed.", "#ffb020");
-            }
+            handleInstallSuccessOnce();
         });
     });
 </script>
