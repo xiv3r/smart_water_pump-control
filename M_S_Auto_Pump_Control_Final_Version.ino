@@ -670,16 +670,21 @@ const char settings_html[] PROGMEM = R"rawliteral(
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#121212"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>
-  body{font-family:sans-serif;background:#121212;background-image:radial-gradient(circle at 50% 0%, #2a2a2a 0%, #121212 70%);color:white;text-align:center;padding:15px;margin:0;min-height:100vh;}
+  body{font-family:sans-serif;background:#121212;background-image:radial-gradient(circle at 50% 0%, #2a2a2a 0%, #121212 70%);color:white;text-align:center;padding:20px;margin:0;min-height:100vh;}
   .card{background:rgba(30, 30, 30, 0.7);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:16px;padding:20px;max-width:420px;margin:auto;box-shadow:0 8px 32px rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.08);position:relative;text-align:left;}
-  .tabs { display: flex; max-width: 440px; margin: 0 auto 15px auto; gap: 8px; }
+  .conn-dot{width:10px;height:10px;background:#28a745;border-radius:50%;display:inline-block;margin-right:5px;box-shadow:0 0 8px #28a745;}
+  .off{background:#dc3545;box-shadow:0 0 8px #dc3545;}
+  .badge { padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+  .bg-info { background: rgba(23,162,184,0.2); color: #17a2b8; border: 1px solid rgba(23,162,184,0.5); box-shadow: 0 0 12px rgba(23,162,184,0.4), inset 0 0 8px rgba(23,162,184,0.2); }
+  .bg-warning { background: rgba(255,193,7,0.15); color: #ffc107; border: 1px solid rgba(255,193,7,0.5); box-shadow: 0 0 12px rgba(255,193,7,0.3), inset 0 0 8px rgba(255,193,7,0.15); }
+  .tabs { display: flex; max-width: 440px; margin: 0 auto 15px auto; gap: 10px; }
   .tab { flex: 1; padding: 12px; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 1rem; transition: 0.3s; border: 1px solid transparent; text-align: center; }
   .tab-active { background: rgba(30, 30, 30, 0.8); color: #fff; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
   .tab-inactive { background: transparent; color: #888; }
   .tab-inactive:hover { background: rgba(255,255,255,0.05); color: #ccc; }
   .lbl-wrap { display: flex; justify-content: space-between; align-items: center; margin: 15px 0 5px; flex-wrap: wrap; gap: 5px; }
   label{font-weight:bold;color:#aaa; font-size: 0.9rem;}
-  .logo { width: 80px; height: auto; margin: 0 auto 20px; display: block; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+  .logo { width: 80px; height: auto; margin: 0 auto 10px; display: block; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
   .range { color: #555; font-size: 0.75rem; }
   input, select{width:100%;padding:12px;background:rgba(42, 42, 42, 0.8);border:1px solid rgba(255, 255, 255, 0.1);color:white;border-radius:8px;box-sizing:border-box; font-size: 1rem;}
   .show-pass { margin-top: 10px; font-size: 0.85rem; color: #888; display: flex; align-items: center; cursor: pointer; justify-content: flex-start; text-align: left; width: 100%; }
@@ -689,17 +694,26 @@ const char settings_html[] PROGMEM = R"rawliteral(
   .btn-purple{background:linear-gradient(135deg, #6f42c1, #a958a5) !important;}
   .btn-red{background:linear-gradient(135deg, #dc3545, #ff6b6b) !important;}
   hr { border: 0; border-top: 1px solid rgba(255, 255, 255, 0.1); margin: 25px 0; }
-  @media screen and (min-width: 600px) { body { padding: 40px 20px; } .card { padding: 30px; } }
+  .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(5px); }
+  .modal-content { background: rgba(30, 30, 30, 0.9); position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 25px; border-left: 5px solid #ffc107; border-radius: 12px; width: 85%; max-width: 320px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); text-align: left; box-sizing: border-box; }
+  .modal-title { color: #ffc107; font-size: 1.3rem; margin: 0 0 10px 0; display: flex; align-items: center; gap: 8px; }
+  .modal-text { color: #ddd; margin-bottom: 25px; font-size: 1.05rem; line-height: 1.5; }
+  .modal-close { background: #333; color: white; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 1.1rem; transition: background 0.2s; }
   @media screen and (max-width: 440px) { 
       .lang-mm .tab { font-size: 0.7rem; padding: 12px 1px; white-space: nowrap; } 
       .lang-mm .btn { font-size: 0.8rem !important; padding: 14px 2px; }
       .lang-mm label { font-size: 0.82rem; }
-      #fileName { font-size: 0.72rem !important; }
-      .lang-mm input::placeholder { font-size: 0.68rem !important; }
   }
 </style></head><body>
+  <div id="warnModal" class="modal"><div class="modal-content"><h3 class="modal-title"><span>🔔</span> System Notice</h3><div id="warnText" class="modal-text">System processing...</div><button class="modal-close" onclick="closeModal()">Understood</button></div></div>
+  <div id="expiryBanner" style="display:none;"></div>
+  <div id="warnBanner" style="display:none;"></div>
   <div class="tabs"><a href="/" class="tab tab-inactive">🏠 Home</a><a href="/settings" class="tab tab-active">⚙️ Settings</a></div>
   <div class="card">
+    <div style="font-size:0.8rem; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+      <div><span id="dot" class="conn-dot"></span><span id="cStat" style="color:#aaa;">Device: Online</span></div>
+      <div id="roleBadge" class="badge" style="font-size:0.65rem; padding: 3px 8px; display:none;"></div>
+    </div>
     <img src="/logo.png" class="logo">
     <form action="/save" method="POST">
       <div class="lbl-wrap"><label>WiFi SSID</label><button type="button" onclick="scn()" style="font-size:0.7rem; color:#03ef; background:none; border:1px solid rgba(255,255,255,0.2); border-radius:4px; cursor:pointer; padding:4px 8px; white-space:nowrap;">Scan for Networks</button></div>
@@ -765,11 +779,30 @@ const char settings_html[] PROGMEM = R"rawliteral(
     Device IP: <span id="dip_footer" style="color:#888;">--</span>
   </div>
 <script>
+  const closeModal = () => { document.getElementById('warnModal').style.display = 'none'; };
   function toggleRole() { let r = document.getElementById('sysRole').value; document.getElementById('masterOpts').style.display = (r=="1")?"block":"none"; document.getElementById('slaveOpts').style.display = (r=="2")?"block":"none"; }
   function toggleVDly() { let m = document.getElementById('opM').value; document.getElementById('vWrap').style.display = (m=="1")?"flex":"none"; document.getElementById('vDly').style.display = (m=="1")?"block":"none"; }
   const togglePass = (id) => { let x = document.getElementById(id); x.type = x.type==="password"?"text":"password"; };
   const chSS = (s) => { let m = document.getElementById('mi'); if(s.value === '__man__') { m.style.display='block'; m.required=true; } else { m.style.display='none'; m.required=false; } };
   const scn = () => { if(navigator.vibrate) navigator.vibrate(20); fetch('/scan').then(()=>alert('Scan started...')).then(()=>setTimeout(()=>location.reload(),6000)); };
+  const updStatus = () => { 
+    fetch('/status').then(r=>r.json()).then(d=>{
+      document.getElementById('dot').className='conn-dot'; 
+      document.getElementById('cStat').innerText=d.lang==1?'စက် အွန်လိုင်း':'Device: Online';
+      let rb = document.getElementById('roleBadge');
+      if (d.sysRole == 1) {
+          rb.innerText = d.lang == 1 ? "📥 အဓိကစက်" : "📥 MASTER (SUMP)";
+          rb.className = "badge bg-info"; rb.style.display = "block";
+      } else if (d.sysRole == 2) {
+          rb.innerText = d.lang == 1 ? "📤 လက်အောက်ခံစက်" : "📤 SLAVE (ROOF)";
+          rb.className = "badge bg-warning"; rb.style.display = "block"; rb.style.color = "#ffc107";
+      } else rb.style.display = "none";
+    }).catch(e=>{
+      document.getElementById('dot').className='conn-dot off'; 
+      document.getElementById('cStat').innerText=document.body.classList.contains('lang-mm')?'စက် အော့ဖ်လိုင်း':'Device: Offline';
+    });
+  };
+  setInterval(updStatus, 2000);
   const confirmFwUpload = () => { return confirm(document.body.classList.contains('lang-mm') ? "ဖမ်းဝဲ တင်ပြီး စက်ကို ယခုပြန်ဖွင့်မလား?" : "Upload firmware and reboot now?"); };
   const dict = { "⚙️ Settings": "⚙️ ဆက်တင်များ", "🏠 Home": "🏠 ပင်မစာမျက်နှာ", "WiFi SSID": "ဝိုင်ဖိုင် အမည်", "High Tank Stop Level": "ရေမော်တာရပ်မည့် ရေမှတ်", "WiFi Password": "ဝိုင်ဖိုင် စကားဝှက်", "Device PIN (for Cloud)": "လုံခြုံရေး ပင်နံပါတ်", "Interface Language": "ဘာသာစကား", "Tank Height": "ရေတိုင်ကီ အမြင့်", "Low Tank Start Level": "ရေမော်တာစတင်မည့် ရေမှတ်", "High Voltage Set": "ဗို့အားလွန် သတ်မှတ်ချက်", "Low Voltage Set": "ဗို့အားလျော့ သတ်မှတ်ချက်", "Voltage Resume Gap": "ဗို့အားပြန်ဖွင့် ကွာဟချက်", "Dry-Run Delay": "ရေမရှိ အချက်ပေးချိန်", "Operating Mode": "စက် အမျိုးအစား", "Compressor Valve Delay": "အဆို့ရှင် ဖွင့်ချိန်", "Water Pump": "ရေမော်တာ", "Air Compressor": "လေကွန်ပရက်ဆာ", "Pump Cool-down (After 1Hr)": "၁နာရီမောင်းပြီး အနားပေးချိန်", "Auto-Retry Wait": "ပြန်လည်စတင်ရန် စောင့်ချိန်", "🌙 Smart Scheduling (DND)": "ညဘက် အသံပိတ်စနစ် (DND)", "Start Hour": "စတင်ရန် အချိန်", "End Hour": "ပြီးဆုံးရန် အချိန်", "📍 Home Time Zone (GMT)": "အချိန်ဇုန် (GMT)", "Save & Reboot": "သိမ်းဆည်း၍ ပြန်ဖွင့်မည်", "🛠️ Maintenance": "🛠️ ပြုပြင်ထိန်းသိမ်းမှု", "Check for Updates": "ဗားရှင်း အသစ်စစ်ရန်", "📖 User Guide": "📖 အသုံးပြုနည်း လမ်းညွှန်", "🔑 License Management": "🔑 လိုင်စင် စီမံခန့်ခွဲမှု", "Upload Token File": "ဖိုင်ဖြင့် သက်တမ်းတိုးမည်", "Activate via Text": "စာသားဖြင့် သက်တမ်းတိုးမည်", "Leave empty to keep current": "မပြောင်းလိုပါက အလွတ်ထားပါ", "Show WiFi Password": "ဝိုင်ဖိုင် စကားဝှက် ပြမည်", "Show PIN": "ပင်နံပါတ် ပြမည်", "Scan for Networks": "ဝိုင်ဖိုင် ရှာမည်", "Type Network Name": "ဝိုင်ဖိုင် အမည် ရိုက်ထည့်ပါ", "Choose File": "ဖိုင်ရွေးမည်", "No file chosen": "ဖိုင်ရွေးချယ်ထားခြင်းမရှိပါ", "Paste Token String (MTc...)": "ဖုန်းဖြင့်ရသော တိုကင်စာသားကို ဤနေရာတွင် ထည့်ပါ", "Firmware Update": "ဖမ်းဝဲ အပ်ဒိတ်", "Update Firmware": "ဖမ်းဝဲ အပ်ဒိတ်တင်မည်", "Upload firmware and reboot now?": "ဖမ်းဝဲ တင်ပြီး စက်ကို ယခုပြန်ဖွင့်မလား?", "Cloud ID:": "ကလောက် အိုင်ဒီ-", "Device IP:": "စက် အိုင်ပီ-", "System Role (Pairing)": "စနစ် အဆင့်အတန်း (Role)", "Standalone": "သီးသန့်စက်", "Master (Sump Tank)": "အဓိကစက် (အောက်တိုင်ကီ)", "Slave (Upper Tank)": "လက်အောက်ခံစက် (အပေါ်တိုင်ကီ)", "Device ID:": "စက် အိုင်ဒီ-" };
   window.onload = () => {
@@ -801,13 +834,11 @@ const char settings_html[] PROGMEM = R"rawliteral(
        document.getElementById('dndS_s').innerHTML = h; document.getElementById('dndS_s').value = c.dndS;
        document.getElementById('dndE_s').innerHTML = h; document.getElementById('dndE_s').value = c.dndE;
        let tz=""; for(let f=-12.0; f<=14.0; f+=0.5) tz+=`<option value="${f}" ${Math.abs(c.tzOf-f)<0.1?"selected":""}>GMT ${f>=0?'+':''}${f}</option>`; document.getElementById('tz_s').innerHTML = tz;
-       
        document.getElementById('did').innerText = c.did;
        document.getElementById('did_footer').innerText = c.did;
        document.getElementById('dip').innerText = c.ip;
        document.getElementById('dip_footer').innerText = c.ip;
        toggleVDly();
-
        if(c.lang==1) {
           document.body.classList.add('lang-mm');
           const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
