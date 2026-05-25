@@ -108,8 +108,8 @@ byte bar8[8] = { B11111, B11111, B00000, B00000, B00000, B00000, B00000, B00000 
 
 const char* mqtt_server = "210195b635414206adcd944325fe6f59.s1.eu.hivemq.cloud";
 const int mqtt_port = 8883;
-const char* mqtt_user = "my_switch";
-const char* mqtt_pass = "My_password123";
+const char* mqtt_user = "Smart_Pump";
+const char* mqtt_pass = "Sm@rt_Pump_2026";
 
 static const char MQTT_ROOT_CA[] PROGMEM = R"EOF(
 -----BEGIN CERTIFICATE-----
