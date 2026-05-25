@@ -671,7 +671,7 @@ const char settings_html[] PROGMEM = R"rawliteral(
 <meta name="theme-color" content="#121212"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>
   body{font-family:sans-serif;background:#121212;background-image:radial-gradient(circle at 50% 0%, #2a2a2a 0%, #121212 70%);color:white;text-align:center;padding:20px;margin:0;min-height:100vh;}
-  .card{background:rgba(30, 30, 30, 0.7);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:16px;padding:20px;max-width:420px;margin:auto;box-shadow:0 8px 32px rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.08);position:relative;text-align:left;}
+  .card{background:rgba(30, 30, 30, 0.7);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:16px;padding:20px;max-width:400px;margin:auto;box-shadow:0 8px 32px rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.08);position:relative;text-align:left;}
   .conn-dot{width:10px;height:10px;background:#28a745;border-radius:50%;display:inline-block;margin-right:5px;box-shadow:0 0 8px #28a745;}
   .off{background:#dc3545;box-shadow:0 0 8px #dc3545;}
   .badge { padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
