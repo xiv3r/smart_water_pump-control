@@ -689,6 +689,23 @@
                 lockInstall();
             }
         }, true);
+
+        installBtn.addEventListener("state-changed", (ev) => {
+            const st = ev && ev.detail ? ev.detail.state : "";
+            if (st === "FINISHED" || st === "installed") {
+                lockInstall();
+                tokenMsg.textContent = "Installation complete. Session closed.";
+                tokenMsg.style.color = "#00e87a";
+                setTimeout(() => window.location.reload(), 1200);
+            }
+        });
+
+        installBtn.addEventListener("installation-success", () => {
+            lockInstall();
+            tokenMsg.textContent = "Installation complete. Session closed.";
+            tokenMsg.style.color = "#00e87a";
+            setTimeout(() => window.location.reload(), 1200);
+        });
     });
 </script>
 
