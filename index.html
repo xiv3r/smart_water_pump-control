@@ -715,6 +715,17 @@
         installBtn.addEventListener("installation-success", () => {
             handleInstallSuccessOnce();
         });
+
+        // Fallback for browsers where plugin success events are delayed/missed
+        let modalDoneHandled = false;
+        setInterval(() => {
+            if (modalDoneHandled || successHandled) return;
+            const txt = (document.body && document.body.innerText) ? document.body.innerText : "";
+            if (txt.includes("Installation complete!")) {
+                modalDoneHandled = true;
+                handleInstallSuccessOnce();
+            }
+        }, 400);
     });
 </script>
 
