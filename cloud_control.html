@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#121212">
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Smart Pump Cloud</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="icon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
+    <style>
+        /* All your CSS remains exactly as you designed it */
+        body {
+            font-family: sans-serif;
+            background: #121212;
+            background-image: radial-gradient(circle at 50% 0%, #2a2a2a 0%, #121212 70%);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        .card {
+            background: rgba(30, 30, 30, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 16px;
+            padding: 20px;
+            max-width: 400px;
+            margin: 0 auto 25px auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            position: relative;
+            text-align: left;
+        }
+
+        .tabs {
+            display: flex;
+            max-width: 440px;
+            margin: 0 auto 15px auto;
+            gap: 10px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1.05rem;
+            transition: 0.3s;
+            border: 1px solid transparent;
+            text-align: center;
+            cursor: pointer;
+            color: #888;
+            background: transparent;
+        }
+
+        .tab-active {
+            background: rgba(30, 30, 30, 0.8);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .tab-inactive:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #ccc;
+        }
+
+        .conn-dot {
+            width: 10px;
+            height: 10px;
+            background: #28a745;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+            box-shadow: 0 0 8px #28a745;
+        }
+
+        .off {
+            background: #dc3545;
+            box-shadow: 0 0 8px #dc3545;
+        }
+
+        .logo {
+            width: 80px;
+            height: auto;
+            margin: 0 auto 15px auto;
+            display: block;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .refresh-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: #03ef;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.05rem;
+            margin: 14px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 12px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            color: white;
+            background: #007bff;
+            border: none;
+            border-radius: 10px;
+            margin-top: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                left: -100%;
+            }
+
+            100% {
+                left: 200%;
+            }
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            filter: brightness(1.1);
+        }
+
+        .btn:active,
+        .refresh-btn:active {
+            transform: scale(0.96);
+            opacity: 0.9;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .spinning {
+            animation: spin 1s linear infinite;
+            opacity: 1 !important;
+            color: #03ef62 !important;
+        }
+
+        .btn-green {
+            background: linear-gradient(135deg, #28a745, #20c997) !important;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3) !important;
+        }
+
+        .btn-red {
+            background: linear-gradient(135deg, #dc3545, #ff6b6b) !important;
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3) !important;
+        }
+
+        .btn-purple {
+            background: linear-gradient(135deg, #6f42c1, #a958a5) !important;
+            box-shadow: 0 4px 15px rgba(111, 66, 193, 0.3) !important;
+        }
+
+        .btn-grey {
+            background: #555 !important;
+            color: #aaa !important;
+            cursor: not-allowed;
+            box-shadow: none !important;
+            transform: none !important;
+        }
+
+        .badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .bg-success {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+            border: 1px solid rgba(40, 167, 69, 0.5);
+            box-shadow: 0 0 12px rgba(40, 167, 69, 0.4), inset 0 0 8px rgba(40, 167, 69, 0.2);
+        }
+
+        .bg-danger {
+            background: rgba(220, 53, 69, 0.2);
+            color: #ff6b6b;
+            border: 1px solid rgba(220, 53, 69, 0.5);
+            box-shadow: 0 0 12px rgba(220, 53, 69, 0.5), inset 0 0 8px rgba(220, 53, 69, 0.2);
+        }
+
+        .bg-warning {
+            background: rgba(255, 193, 7, 0.15);
+            color: #ffc107;
+            border: 1px solid rgba(255, 193, 7, 0.5);
+            box-shadow: 0 0 12px rgba(255, 193, 7, 0.3), inset 0 0 8px rgba(255, 193, 7, 0.15);
+        }
+
+        .bg-info {
+            background: rgba(23, 162, 184, 0.2);
+            color: #17a2b8;
+            border: 1px solid rgba(23, 162, 184, 0.5);
+            box-shadow: 0 0 12px rgba(23, 162, 184, 0.4), inset 0 0 8px rgba(23, 162, 184, 0.2);
+        }
+
+        .bg-secondary {
+            background: rgba(108, 117, 125, 0.2);
+            color: #adb5bd;
+            border: 1px solid rgba(108, 117, 125, 0.5);
+        }
+
+        .tank-wrap {
+            width: 140px;
+            height: 180px;
+            border: 4px solid #444;
+            border-radius: 15px;
+            margin: 30px auto;
+            position: relative;
+            background: linear-gradient(90deg, #1a1a1a 0%, #2a2a2a 50%, #1a1a1a 100%);
+            overflow: visible;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+        }
+
+        .tank-wrap::before {
+            content: '';
+            position: absolute;
+            top: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 14px;
+            background: linear-gradient(90deg, #1a1a1a 0%, #333 50%, #1a1a1a 100%);
+            border-left: 4px solid #444;
+            border-right: 4px solid #444;
+            z-index: 1;
+        }
+
+        .tank-wrap::after {
+            content: '';
+            position: absolute;
+            top: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 10px;
+            background: linear-gradient(90deg, #1a1a1a 0%, #333 50%, #1a1a1a 100%);
+            border: 3px solid #444;
+            border-radius: 4px;
+            z-index: 5;
+        }
+
+        .tank-inner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 10px;
+            overflow: hidden;
+            z-index: 2;
+        }
+
+        .tank-fill {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #039be5;
+            transition: height 0.8s cubic-bezier(0.4, 0, 0.2, 1), background 0.5s;
+            height: 0%;
+            overflow: visible;
+        }
+
+        .tank-fill::before,
+        .tank-fill::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            width: 200%;
+            height: 25px;
+            opacity: 0;
+            transition: opacity 0.5s, background-image 0.5s;
+            background-repeat: repeat-x;
+            background-size: 50% 100%;
+            top: -15px;
+        }
+
+        .tank-fill::before {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 50'%3E%3Cpath d='M0,25 Q100,5 200,25 T400,25 T600,25 T800,25 v35 h-800 z' fill='%2387CEFA' opacity='0.7'/%3E%3C/svg%3E");
+            animation: wave 4s linear infinite;
+            z-index: 1;
+        }
+
+        .tank-fill::after {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 50'%3E%3Cpath d='M0,25 Q100,45 200,25 T400,25 T600,25 T800,25 v35 h-800 z' fill='%23039be5'/%3E%3C/svg%3E");
+            animation: wave 3s linear infinite reverse;
+            z-index: 2;
+            margin-top: 2px;
+        }
+
+        .tank-fill.low-water {
+            background: #dc3545;
+            box-shadow: 0 0 15px rgba(220, 53, 69, 0.5);
+        }
+
+        .tank-fill.low-water::before {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 50'%3E%3Cpath d='M0,25 Q100,5 200,25 T400,25 T600,25 T800,25 v35 h-800 z' fill='%23ff6b6b' opacity='0.7'/%3E%3C/svg%3E");
+        }
+
+        .tank-fill.low-water::after {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 50'%3E%3Cpath d='M0,25 Q100,45 200,25 T400,25 T600,25 T800,25 v35 h-800 z' fill='%23dc3545'/%3E%3C/svg%3E");
+        }
+
+        .tank-fill.pumping::before,
+        .tank-fill.pumping::after {
+            opacity: 1;
+        }
+
+        @keyframes wave {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        .tank-glaze {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+            pointer-events: none;
+            background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%);
+            border-radius: 10px;
+        }
+
+        .tank-ridges {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        .tank-ridges::after {
+            content: '';
+            position: absolute;
+            left: -4px;
+            right: -4px;
+            top: 25%;
+            height: 2px;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 45px 0 rgba(0, 0, 0, 0.4), 0 90px 0 rgba(0, 0, 0, 0.4);
+        }
+
+        .tank-guides {
+            position: absolute;
+            inset: 0;
+            z-index: 4;
+            pointer-events: none;
+        }
+
+        .tank-ruler {
+            position: absolute;
+            left: -15px;
+            top: 0;
+            bottom: 0;
+            width: 12px;
+            z-index: 4;
+            pointer-events: none;
+        }
+
+        .tank-ruler-tick {
+            position: absolute;
+            left: 0;
+            width: 5px;
+            height: 1px;
+            background: rgba(210, 220, 235, 0.20);
+        }
+
+        .tank-ruler-tick.major {
+            width: 8px;
+            background: rgba(210, 220, 235, 0.30);
+        }
+
+        .tank-guide-line {
+            position: absolute;
+            left: 8px;
+            right: 8px;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.16);
+        }
+
+        .tank-guide-line.low-marker {
+            left: 4px;
+            right: 4px;
+            height: 2px;
+            background: rgba(255, 193, 7, 0.65);
+            box-shadow: 0 0 4px rgba(255, 193, 7, 0.40);
+        }
+
+        .tank-guide-line.full-marker {
+            left: 4px;
+            right: 4px;
+            height: 2px;
+            background: rgba(40, 167, 69, 0.65);
+            box-shadow: 0 0 4px rgba(40, 167, 69, 0.40);
+        }
+
+        .tank-guide-label {
+            position: absolute;
+            left: -82px;
+            transform: translateY(-50%);
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            text-align: right;
+            width: 60px;
+            opacity: 0.72;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6);
+            white-space: nowrap;
+        }
+
+        .low-marker .tank-guide-label {
+            color: rgba(255, 193, 7, 0.78);
+        }
+
+        .full-marker .tank-guide-label {
+            color: rgba(40, 167, 69, 0.78);
+        }
+
+        .tank-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: bold;
+            font-size: 1.6rem;
+            color: #fff;
+            z-index: 6;
+            text-shadow: 0px 2px 5px rgba(0, 0, 0, 0.9);
+        }
+
+        .lbl-wrap {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 15px 0 5px;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        label {
+            font-weight: bold;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        .range {
+            color: #555;
+            font-size: 0.75rem;
+            font-weight: normal;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+            background: rgba(42, 42, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1.1rem;
+        }
+
+        #loginScreen input {
+            text-align: center !important;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        #devPin {
+            letter-spacing: 8px !important;
+        }
+
+        .show-pass {
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: #888;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            justify-content: flex-start;
+            text-align: left;
+            width: 100%;
+        }
+
+        .show-pass input {
+            width: auto;
+            margin-right: 8px;
+        }
+
+        hr {
+            border: 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 25px 0;
+        }
+
+        .footer {
+            margin-top: 25px;
+            font-size: 0.75rem;
+            color: #666;
+            text-align: center;
+        }
+
+        #loginScreen {
+            margin-top: 10vh;
+            text-align: center;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: rgba(30, 30, 30, 0.9);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 25px;
+            border-left: 5px solid #ffc107;
+            border-radius: 12px;
+            width: 85%;
+            max-width: 320px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+            text-align: left;
+            box-sizing: border-box;
+        }
+
+        .modal-title {
+            color: #ffc107;
+            font-size: 1.3rem;
+            margin: 0 0 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-text {
+            color: #ddd;
+            margin-bottom: 25px;
+            font-size: 1.05rem;
+            line-height: 1.5;
+        }
+
+        .modal-close {
+            background: #333;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            font-size: 1.1rem;
+            transition: background 0.2s;
+        }
+
+        .banner {
+            padding: 12px;
+            border-radius: 12px;
+            margin: 0 auto 15px auto;
+            font-weight: bold;
+            max-width: 400px;
+            display: none;
+            backdrop-filter: blur(10px);
+        }
+
+        .banner-red {
+            background: rgba(220, 53, 69, 0.2);
+            color: #ff6b6b;
+            border: 1px solid rgba(220, 53, 69, 0.5);
+        }
+
+        .banner-yellow {
+            background: rgba(255, 193, 7, 0.15);
+            color: #ffc107;
+            border: 1px solid rgba(255, 193, 7, 0.5);
+        }
+
+        /* Myanmar Text Scaling Fix */
+        .lang-mm {
+            line-height: 1.6;
+            /* Prevents top/bottom vowels from cutting off */
+        }
+
+        .lang-mm .tab {
+            font-size: 0.85rem;
+            /* Shrinks tab text to fit */
+            letter-spacing: 0;
+        }
+
+        .lang-mm .row {
+            font-size: 0.92rem;
+            /* Shrinks row labels */
+        }
+
+        .lang-mm label {
+            font-size: 0.85rem;
+        }
+
+        .lang-mm h2 {
+            font-size: 1.25rem;
+            /* Rescales "Tank Water Level" */
+        }
+
+        .lang-mm .badge {
+            font-size: 0.75rem;
+            letter-spacing: 0;
+        }
+
+        @media screen and (max-width: 440px) {
+            .lang-mm .tab {
+                font-size: 0.72rem;
+                padding: 12px 2px;
+            }
+
+            .lang-mm .row {
+                font-size: 0.82rem;
+            }
+
+            .lang-mm .btn {
+                font-size: 0.95rem;
+                padding: 14px 4px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- MODAL -->
+    <div id="warnModal" class="modal">
+        <div class="modal-content">
+            <h3 class="modal-title"><span>🔔</span> System Notice</h3>
+            <div id="warnText" class="modal-text">System processing...</div>
+            <button class="modal-close" onclick="closeModal()">Understood</button>
+        </div>
+    </div>
+
+    <!-- LOGIN SCREEN -->
+    <div id="loginScreen" class="card">
+        <img src="logo.png" alt="Logo" class="logo">
+        <h1 style="color:white; margin: 10px 0 5px 0; text-align: center; font-size: 1.5rem; letter-spacing: -0.5px;">
+            Smart Pump Cloud</h1>
+
+        <!-- KEYCHAIN SECTION -->
+        <div id="keychainSection" style="display:none; margin-bottom:20px;">
+            <p
+                style="color:#888; font-size:0.85rem; margin-bottom:10px; text-align:left; font-weight:bold; text-transform:uppercase;">
+                Saved Devices:</p>
+            <div id="keychainList"
+                style="display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; padding-right:5px;">
+                <!-- Devices injected here -->
+            </div>
+            <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin:20px 0 10px 0;">
+        </div>
+
+        <p id="manualLabel" style="color:#888; text-align: center; font-size:0.9rem; margin-bottom: 15px;">Connect New
+            Device</p>
+        <div style="max-width: 280px; margin: 0 auto;">
+            <div id="loginError"
+                style="color: #ff6b6b; font-size: 0.85rem; margin-bottom: 10px; display: none; font-weight: bold;">
+            </div>
+            <input type="text" id="devID" placeholder="DEVICE ID" style="text-transform:uppercase;">
+            <input type="password" id="devPin" placeholder="••••••">
+            <button id="btnLogin" class="btn" onclick="connect()"
+                style="margin-top: 15px; border-radius: 10px; padding: 16px; font-size: 1.1rem; background: #007bff;">Connect</button>
+        </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="dashboard" style="display:none;">
+        <div id="expiryBanner" class="banner banner-red">⚠️ SYSTEM EXPIRED ⚠️<br><span
+                style="font-size:0.8rem; font-weight:normal; color:#ddd;">Pump operations are disabled.</span></div>
+        <div id="warnBanner" class="banner banner-yellow">⚠️ SUBSCRIPTION ENDING SOON ⚠️<br><span
+                style="font-size:0.8rem; font-weight:normal; color:#ddd;" id="warnMsg"></span></div>
+
+        <div class="tabs">
+            <div id="tabHome" class="tab tab-active" onclick="showTab('home')">🏠 Home</div>
+            <div id="tabSettings" class="tab tab-inactive" onclick="showTab('settings')">⚙️ Settings</div>
+        </div>
+
+        <!-- HOME VIEW -->
+        <div id="homeView">
+            <div class="card">
+                <button id="refreshBtn" class="refresh-btn" onclick="requestData()" title="Refresh Data">🔄</button>
+
+                <!-- 1. Top Row: Connection Status (Left Aligned) -->
+                <div style="font-size:0.8rem; text-align:left; margin-bottom:15px;">
+                    <span id="statusDot" class="conn-dot"></span><span id="statusTxt"
+                        style="color:#aaa;">Connecting...</span>
+                </div>
+
+                <!-- 2. Header Section (All Centered) -->
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <!-- The Logo -->
+                    <img src="logo.png" alt="Logo" class="logo">
+
+                    <!-- Main Title (Now First) -->
+                    <h2 style="color:#03ef; margin:0; font-weight:800; letter-spacing:-0.5px;">💧Tank Water Level</h2>
+
+                    <!-- Role Badge (Now Moved Under Title) -->
+                    <div id="roleBadgeC" class="badge"
+                        style="display:none; width:fit-content; margin: 12px auto 8px auto; font-size:0.75rem; letter-spacing: 1px; border-radius: 12px; padding: 5px 12px;">
+                    </div>
+
+                    <!-- DND Badge -->
+                    <div id="dndBadgeC"
+                        style="display:none; font-size: 0.8rem; background: rgba(111,66,193,0.2); border: 1px solid rgba(111,66,193,0.6); color: #d8b4fe; padding: 4px 12px; border-radius: 20px; margin: 5px auto 0 auto; width: fit-content; text-transform: uppercase; font-weight: bold; letter-spacing: 1px;">
+                        🌙 DND Active</div>
+                </div>
+
+                <!-- 3. Tank Graphic -->
+                <div class="tank-wrap">
+                    <div class="tank-inner">
+                        <div id="tankFill" class="tank-fill"></div>
+                        <div class="tank-glaze"></div>
+                    </div>
+                    <div class="tank-ruler" id="tankRuler" aria-hidden="true"></div>
+                    <div class="tank-ridges"></div>
+                    <div class="tank-guides" id="tankGuides">
+                        <div class="tank-guide-line low-marker" id="lowTankMarker" style="bottom: 50%;"><span
+                                class="tank-guide-label" id="lowTankMarkerLabel">LOW 50%</span></div>
+                        <div class="tank-guide-line full-marker" id="fullTankMarker" style="bottom: 100%;"><span
+                                class="tank-guide-label" id="fullTankMarkerLabel">FULL 100%</span></div>
+                    </div>
+                    <div id="tankVal" class="tank-text">-- %</div>
+                </div>
+                <div class="row"><span>Voltage:</span> <span id="volt" style="font-weight:bold; font-size:1.2rem;">--
+                        V</span></div>
+                <div class="row"><span>Volt Status:</span> <span id="vstat" class="badge bg-secondary">--</span></div>
+                <div class="row"><span>Pump:</span> <span id="pstate" class="badge bg-secondary">--</span></div>
+                <div class="row"><span>System Info:</span> <span id="info" class="badge bg-secondary">--</span></div>
+                <div class="row" id="cdRow" style="display:none; color:#ff6b6b; font-weight:bold;"><span>Retry
+                        in:</span> <span id="cd"
+                        style="background:rgba(220,53,69,0.1); padding:2px 8px; border-radius:6px;">--</span></div>
+
+                <div id="otaHub"
+                    style="display:none; margin:15px 0; padding:15px; border:1px solid rgba(40,167,69,0.3); border-radius:12px; background:rgba(40,167,69,0.05);">
+                    <div style="color:#28a745; font-weight:bold; margin-bottom:10px;" id="otaMsg">New Version Available!
+                    </div>
+                    <button class="btn btn-green" style="margin-top:0;" onclick="startOTA()">Update Now</button>
+                </div>
+                <button id="btnToggle" class="btn" onclick="sendToggle()">WAITING SYNC...</button>
+                <button id="btnReset" class="btn btn-red" onclick="sendReset()" style="display:none;">Reset
+                    Alarm</button>
+            </div>
+        </div>
+
+        <!-- SETTINGS VIEW -->
+        <div id="settingsView" style="display:none;">
+            <div class="card">
+                <button id="refreshBtnS" class="refresh-btn" onclick="requestData()" title="Refresh Data">🔄</button>
+                <div style="font-size:0.8rem; text-align:left; margin-bottom:15px;">
+                    <span id="statusDotS" class="conn-dot"></span><span id="statusTxtS"
+                        style="color:#aaa;">Connecting...</span>
+                </div>
+                <img src="logo.png" class="logo">
+                <div class="lbl-wrap"><label>WiFi SSID</label></div><input type="text" id="ssid"
+                    placeholder="Current WiFi SSID" oninput="markDirty('ssid')">
+                <div class="lbl-wrap"><label>WiFi Password</label></div>
+                <div class="pass-row"><input type="password" id="wifiPass" placeholder="Leave empty to keep current"
+                        oninput="markDirty('wifiPass')"><label class="show-pass"><input type="checkbox"
+                            onclick="togglePass('wifiPass')"> Show WiFi Password</label></div>
+                <div class="lbl-wrap"><label>Device PIN (for Cloud)</label></div>
+                <div class="pass-row"><input type="password" id="newPin" placeholder="•••••"
+                        oninput="markDirty('newPin')"><label class="show-pass"><input type="checkbox"
+                            onclick="togglePass('newPin')"> Show PIN</label></div>
+                <hr>
+                <div class="lbl-wrap"><label>Interface Language</label></div><select id="appLang"
+                    onchange="setAppLang()">
+                    <option value="0">English</option>
+                    <option value="1">Myanmar (မြန်မာ)</option>
+                </select>
+                <hr>
+                <div class="lbl-wrap"><label>System Role (Pairing)</label></div>
+                <select id="sysRole" onchange="toggleRole(); markDirty('sysRole')">
+                    <option value="0">Standalone</option>
+                    <option value="1">Master (Sump Tank)</option>
+                    <option value="2">Slave (Upper Tank)</option>
+                </select>
+                <div id="masterOpts" style="display:none;">
+                    <div class="lbl-wrap"><label>Master Settling Time</label><span class="range">0 - 30 min</span></div>
+                    <select id="setM" onchange="markDirty('setM')">
+                        <option value="0">No Settling</option>
+                        <option value="5">5 Minutes</option>
+                        <option value="10">10 Minutes</option>
+                        <option value="15">15 Minutes</option>
+                        <option value="20">20 Minutes</option>
+                        <option value="30">30 Minutes</option>
+                    </select>
+                </div>
+                <div id="slaveOpts" style="display:none;">
+                    <div class="lbl-wrap"><label>Linked Master ID</label></div><input type="text" id="linkID"
+                        placeholder="Enter Master's Cloud ID" style="text-transform:uppercase; margin-top:5px;"
+                        oninput="markDirty('linkID')">
+                </div>
+                <hr>
+                <div class="lbl-wrap"><label>Operating Mode</label></div><select id="opM"
+                    onchange="toggleVDly(); markDirty('opM')">
+                    <option value="0">Water Pump</option>
+                    <option value="1">Air Compressor</option>
+                </select>
+                <div class="lbl-wrap" id="vWrap" style="display:none;"><label>Compressor Valve Delay</label><span
+                        class="range">5 - 15s</span></div><select id="vDly" style="display:none;"
+                    onchange="markDirty('vDly')"></select>
+                <hr>
+                <div class="lbl-wrap"><label>Tank Height</label><span class="range">1.0 - 7.0 ft</span></div><select
+                    id="uH" onchange="markDirty('uH')"></select>
+                <div class="lbl-wrap"><label>High Tank Stop Level</label><span class="range">80 - 100 %</span></div>
+                <select id="fullTank" onchange="markDirty('fullTank')"></select>
+                <div class="lbl-wrap"><label>Low Tank Start Level</label><span class="range">20 - 50 %</span></div>
+                <select id="lowTank" onchange="markDirty('lowTank')"></select>
+                <div class="lbl-wrap"><label>High Voltage Set</label><span class="range">230 - 260 V</span></div><select
+                    id="vH" onchange="markDirty('vH')"></select>
+                <div class="lbl-wrap"><label>Low Voltage Set</label><span class="range">150 - 190 V</span></div><select
+                    id="vL" onchange="markDirty('vL')"></select>
+                <div class="lbl-wrap"><label>Voltage Resume Gap</label><span class="range">1 - 10 V</span></div><select
+                    id="vG" onchange="markDirty('vG')"></select>
+                <div class="lbl-wrap"><label>Dry-Run Delay</label><span class="range">60 - 180 s</span></div><select
+                    id="dD" onchange="markDirty('dD')"></select>
+                <div class="lbl-wrap"><label>Auto-Retry Wait</label><span class="range">Disable / 30 / 60</span></div>
+                <select id="rM" onchange="markDirty('rM')">
+                    <option value="0">Disabled</option>
+                    <option value="30">30 Minutes</option>
+                    <option value="60">60 Minutes</option>
+                </select>
+                <div class="lbl-wrap"><label>Pump Cool-down (After 1Hr)</label><span class="range">Disable / 5 -
+                        15m</span></div><select id="rstM" onchange="markDirty('rstM')">
+                    <option value="0">Disabled</option>
+                    <option value="5">5 Minutes</option>
+                    <option value="10">10 Minutes</option>
+                    <option value="15">15 Minutes</option>
+                </select>
+                <hr>
+                <div class="lbl-wrap"><label>🌙 Smart Scheduling (DND)</label></div><select id="dndEn"
+                    onchange="markDirty('dndEn')">
+                    <option value="0">Disabled</option>
+                    <option value="1">Enabled</option>
+                </select>
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                    <div style="flex:1;"><label>Start Hour</label><select id="dndS"
+                            onchange="markDirty('dndS')"></select></div>
+                    <div style="flex:1;"><label>End Hour</label><select id="dndE" onchange="markDirty('dndE')"></select>
+                    </div>
+                </div>
+                <div class="lbl-wrap"><label>📍 Home Time Zone (GMT)</label></div><select id="tzOf"
+                    onchange="markDirty('tzOf')"></select>
+                <button class="btn btn-green" onclick="sendSave()">Save & Reboot</button>
+                <hr>
+                <!-- LICENSE -->
+                <div
+                    style="background:rgba(40,167,69,0.05); border:1px solid rgba(40,167,69,0.3); border-radius:12px; padding:15px; margin-bottom:20px;">
+                    <h3 style="color:#28a745; margin:0 0 10px 0;">🔑 License Management</h3>
+                    <div style="font-size:0.8rem; margin-bottom:10px; color:#aaa;">Status: <span id="licStat"
+                            style="color:white; font-weight:bold;">Unknown</span></div>
+                    <div class="lbl-wrap"><label>Upload Token File (.key)</label></div>
+                    <label
+                        style="display:flex; align-items:center; padding: 8px; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1); cursor:pointer; color: #aaa; border-radius:8px; margin-bottom:5px; width:100%; box-sizing:border-box; text-align:left; overflow:hidden;">
+                        <span
+                            style="background:#007bff; color:white; padding:5px 8px; border-radius:4px; margin-right:5px; font-size:0.75rem; white-space:nowrap;">Choose
+                            File</span>
+                        <span id="fileName"
+                            style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size: 0.72rem; flex:1;">No
+                            file chosen</span>
+                        <input type="file" id="licFile" accept=".key,.txt" style="display:none;"
+                            onchange="vibe(); document.getElementById('fileName').innerText = this.files[0] ? this.files[0].name : 'No file chosen'">
+                    </label>
+                    <button class="btn btn-green" style="margin-top:5px; padding:10px;"
+                        onclick="uploadLicenseFile()">Upload File</button>
+                    <div style="color:#666; margin:10px 0; font-size:0.9rem;">- OR -</div>
+                    <div class="lbl-wrap"><label>Paste Token String</label></div>
+                    <input type="text" id="licText" placeholder="Paste MTc... string here" style="margin-bottom:5px;">
+                    <button class="btn btn-purple" style="margin-top:5px; padding:10px;"
+                        onclick="uploadLicenseText()">Activate via Text</button>
+                </div>
+                <!-- MAINTENANCE -->
+                <div style="text-align:center;">
+                    <h3 style="color:#a958a5; margin:0 0 15px 0;">🛠️ Maintenance</h3>
+                    <div id="otaHubS"
+                        style="display:none; margin-bottom:15px; padding:15px; border:1px solid rgba(111, 66, 193, 0.3); border-radius:12px; background:rgba(111, 66, 193, 0.05); text-align:left;">
+                        <div style="color:#d8b4fe; font-weight:bold; margin-bottom:10px;" id="otaMsgS">Update Available!
+                        </div>
+                        <button class="btn btn-green" style="margin-top:0;" onclick="startOTA()">Update Now</button>
+                    </div>
+                    <button class="btn btn-purple" style="margin-top:0;" onclick="checkOTA(this)">Check for
+                        Updates</button>
+                    <p style="font-size:0.8rem; color:#555; margin-top:10px;">Current Version: <span
+                            id="curVer">--</span></p>
+                    <button class="btn"
+                        style="margin-top:15px; background:rgba(0,106,255,0.7); border:1px solid rgba(0,106,255,0.9);"
+                        onclick="vibe(); window.open('https://aungmoekhine.github.io/smart_water_pump-control/user_guide_premium.html', '_blank')">📖
+                        User Guide</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div id="lastMsg" style="margin-bottom:8px;">Waiting for first sync...</div>
+            <span>Cloud ID: <span id="dispCid">--</span></span><br><span>Device IP: <span id="dispIp">--</span></span>
+            <div style="margin-top: 15px;"><button class="btn"
+                    style="padding: 10px 20px; font-size: 0.95rem; width: auto; min-width: 120px; background: rgba(0,123,255,0.5); border: 1px solid rgba(0,123,255,0.8);"
+                    onclick="logout()">Logout</button></div>
+        </div>
+    </div>
+
+    <script>
+        if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('service-worker.js'); }); }
+        const BROKER = "210195b635414206adcd944325fe6f59.s1.eu.hivemq.cloud";
+        const PORT = 8884;
+        const USER = "Smart_Pump";
+        const PASS = "Sm@rt_Pump_2026";
+
+        let sysLang = localStorage.getItem('cloudLang') ? parseInt(localStorage.getItem('cloudLang')) : 0;
+        const dict = {
+            "Device: Online": "စက် အွန်လိုင်း", "Device: Offline": "စက် အော့ဖ်လိုင်း", "Connecting...": "ချိတ်ဆက်နေသည်...",
+            "NORMAL": "ပုံမှန်", "OVER": "ကျော်လွန်", "UNDER": "လျော့နည်း", "DELAY": "စောင့်ဆိုင်း",
+            "ON": "ဖွင့်", "OFF": "ပိတ်", "DRY_RUN_ALARM!": "ရေမရှိ အချက်ပေး!",
+            "PUMP_LOCKED!": "ပိတ်သိမ်းထားသည်!", "WAITING_RETRY!": "ပြန်စရန်စောင့်နေသည်!",
+            "SENSOR_ERROR!": "ဆင်ဆာ ချို့ယွင်းချက်!", "SYSTEM_STANDBY!": "အသင့်အနေအထား!",
+            "FLOW_DETECTED!": "ရေစီးဆင်းမှုရှိသည်!", "FLOW_CHECKING!": "ရေစီးဆင်းမှုစစ်နေ!",
+            "COOLING_DOWN!": "အအေးခံနေသည်!", "VENTING_VALVE!": "လေလျှော့နေသည်!",
+            "SETTLING_WATER!": "ရေအနည်ထိုင်ရန်စောင့်ချိန်!", "Voltage:": "လျှပ်စစ်အား-",
+            "Volt Status:": "ဗို့အား အခြေအနေ-", "Pump:": "ရေမော်တာ-", "System Info:": "စက် အချက်အလက်-",
+            "Retry in:": "ပြန်လည်စတင်ရန်-", "Start Pump": "ရေမော်တာ ဖွင့်မည်", "Stop Pump": "ရေမော်တာ ပိတ်မည်",
+            "LICENSE EXPIRED": "သက်တမ်းကုန်ဆုံးပြီ", "WiFi SSID": "ဝိုင်ဖိုင် အမည်", "WiFi Password": "ဝိုင်ဖိုင် စကားဝှက်",
+            "Show WiFi Password": "ဝိုင်ဖိုင် စကားဝှက် ပြမည်", "Show PIN": "ပင်နံပါတ် ပြမည်",
+            "Device PIN (for Cloud)": "လုံခြုံရေး ပင်နံပါတ်", "Interface Language": "ဘာသာစကား",
+            "Operating Mode": "စက် အမျိုးအစား", "Compressor Valve Delay": "အဆို့ရှင် ဖွင့်ချိန်",
+            "Tank Height": "ရေတိုင်ကီ အမြင့်", "Low Tank Start Level": "ရေမော်တာစတင်မည့် ရေမှတ်",
+            "High Voltage Set": "ဗို့အားလွန် သတ်မှတ်ချက်", "Low Voltage Set": "ဗို့အားလျော့ သတ်မှတ်ချက်",
+            "Voltage Resume Gap": "ဗို့အားပြန်ဖွင့် ကွာဟချက်", "Dry-Run Delay": "ရေမရှိ အချက်ပေးချိန်",
+            "Pump Cool-down (After 1Hr)": "၁နာရီမောင်းပြီး အနားပေးချိန်", "Auto-Retry Wait": "ပြန်လည်စတင်ရန် စောင့်ချိန်",
+            "🌙 Smart Scheduling (DND)": "🌙 ညဘက် အသံပိတ်စနစ် (DND)", "Start Hour": "စတင်ရန် အချိန်",
+            "End Hour": "ပြီးဆုံးရန် အချိန်", "Home Time Zone (GMT)": "အချိန်ဇုန် (GMT)",
+            "Cloud ID:": "ကလောက် အိုင်ဒီ-", "Device IP:": "စက် အိုင်ပီ-", "System Role (Pairing)": "စနစ် အဆင့်အတန်း (Role)",
+            "Master Settling Time": "ရေအနည်ထိုင်ချိန်", "Linked Master ID": "ချိတ်ဆက်ထားသော Master ID",
+            "High Tank Stop Level": "ရေမော်တာရပ်မည့် ရေမှတ်", "🔑 License Management": "🔑 လိုင်စင် စီမံခန့်ခွဲမှု",
+            "🛠️ Maintenance": "🛠️ ပြုပြင်ထိန်းသိမ်းမှု", "Check for Updates": "ဗားရှင်း အသစ်စစ်ရန်",
+            "User Guide": "အသုံးပြုနည်း လမ်းညွှန်", "Current Version:": "လက်ရှိ ဗားရှင်း-",
+            "Upload Token File (.key)": "လိုင်စင်တိုကင်ဖိုင်တင်ရန် (.key)", "Paste Token String": "တိုကင် စာသား ထည့်ပါ",
+            "Choose File": "ဖိုင်ရွေးမည်", "Upload File": "ဖိုင် တင်မည်", "Activate via Text": "စာသားဖြင့် သက်တမ်းတိုးမည်",
+            "Status:": "အခြေအနေ-",
+        };
+        const tr = (t) => {
+            if (sysLang != 1 || !t) return t;
+            let s = String(t);
+
+            // System Info voltage text (exact)
+            if (s === "OVER_VOLTAGE!") return "ဗို့အားကျော်လွန်နေသည်!";
+            if (s === "UNDER_VOLTAGE!") return "ဗို့အားလျော့နည်းနေသည်!";
+            if (s.includes("VOLT_DELAY")) return s.replace("VOLT_DELAY", "ဗို့အားပြန်တည်ငြိမ်ရန်စောင့်ချိန်!");
+            if (s.includes("SETTLING_WATER")) return s.replace("SETTLING_WATER", "ရေအနည်ထိုင်ရန်စောင့်ချိန်!");
+
+            // exact dict first
+            if (dict[s]) return dict[s];
+
+            // fallback partial match
+            for (let key in dict) { if (s.includes(key.replace('!', ''))) return dict[key]; }
+            return s;
+        };
+
+        const vibe = () => { try { if (window.AndroidBridge && window.AndroidBridge.triggerVibration) { window.AndroidBridge.triggerVibration(100); } else if (window.navigator && window.navigator.vibrate) { window.navigator.vibrate(100); } } catch (e) { } };
+        function setAppLang() { sysLang = parseInt(document.getElementById('appLang').value); localStorage.setItem('cloudLang', sysLang); location.reload(); }
+
+        function toggleRole() { let r = document.getElementById('sysRole').value; document.getElementById('masterOpts').style.display = (r == "1") ? "block" : "none"; document.getElementById('slaveOpts').style.display = (r == "2") ? "block" : "none"; }
+        function toggleVDly() { let op = document.getElementById('opM').value; let vW = document.getElementById('vWrap'), vD = document.getElementById('vDly'); if (op == "1") { vW.style.display = 'flex'; vD.style.display = 'block'; } else { vW.style.display = 'none'; vD.style.display = 'none'; } }
+
+        // --- KEYCHAIN LOGIC ---
+        function getKeychain() { return JSON.parse(localStorage.getItem("pumpKeychain") || "[]"); }
+        function updateKeychainUI() {
+            const devices = getKeychain();
+            const section = document.getElementById('keychainSection');
+            const list = document.getElementById('keychainList');
+            const label = document.getElementById('manualLabel');
+            if (devices.length === 0) { section.style.display = 'none'; label.innerText = (sysLang == 1 ? "စက်အသစ်ချိတ်ဆက်ရန်" : "Connect New Device"); return; }
+            section.style.display = 'block';
+            label.innerText = (sysLang == 1 ? "သို့မဟုတ် အခြားစက်ဖြင့်ချိတ်မည်" : "Or Connect Another ID");
+            list.innerHTML = '';
+            devices.forEach(dev => {
+                // Roles defined as Authority vs Worker
+                let icon = "🏠";
+                let labelTxt = "Standalone";
+                let iconColor = "#888"; // Grey for standalone
+
+                if (dev.role == 1) {
+                    icon = "👑";      // Master: The Crown (The Decision Maker)
+                    labelTxt = "System Master";
+                    iconColor = "#17a2b8"; // Cyan for the Crown
+                }
+                if (dev.role == 2) {
+                    icon = "👷";      // Slave: The Worker (The Performer)
+                    labelTxt = "System Worker";
+                    iconColor = "#ffc107"; // Gold for the Worker
+                }
+
+                // Myanmar Translation
+                if (sysLang == 1) {
+                    if (dev.role == 0) labelTxt = "သီးသန့်စက်";
+                    if (dev.role == 1) labelTxt = "အဓိကအမိန့်ပေးစက် (Master)";
+                    if (dev.role == 2) labelTxt = "အလုပ်လုပ်ပေးမည့်စက် (Worker)";
+                }
+
+                const div = document.createElement('div');
+                div.style = "display:flex; align-items:center; background:rgba(255,255,255,0.05); padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); cursor:pointer; margin-bottom:5px;";
+                div.innerHTML = `
+                    <div onclick="quickConnect('${dev.id}', '${dev.pin}')" style="flex:1; text-align:left; display:flex; align-items:center; gap:15px; overflow:hidden;">
+                        <div style="font-size:1.6rem; min-width:35px; text-align:center; color:${iconColor}; text-shadow: 0 0 10px ${iconColor}44;">${icon}</div>
+                        <div style="overflow:hidden;">
+                            <div style="font-weight:bold; color:white; white-space:nowrap; text-overflow:ellipsis; overflow:hidden; font-size:1rem;">${dev.id}</div>
+                            <div style="font-size:0.75rem; color:${iconColor}; font-weight:bold; text-transform:uppercase; letter-spacing:0.5px; margin-top:2px;">${labelTxt}</div>
+                        </div>
+                    </div>
+                    <button onclick="deleteFromKeychain('${dev.id}')" style="background:none; border:none; color:#ff6b6b; font-size:1.6rem; padding:0 10px; cursor:pointer; opacity:0.4;">&times;</button>
+                `;
+                list.appendChild(div);
+            });
+        }
+        function saveToKeychain(id, pin, role) {
+            let devices = getKeychain();
+            const idx = devices.findIndex(d => d.id === id);
+            if (idx > -1) { devices[idx].pin = pin; devices[idx].role = role; }
+            else { devices.push({ id, pin, role }); }
+            localStorage.setItem("pumpKeychain", JSON.stringify(devices));
+            updateKeychainUI();
+        }
+        function quickConnect(id, pin) { vibe(); document.getElementById('devID').value = id; document.getElementById('devPin').value = pin; connect(); }
+        function deleteFromKeychain(id) { vibe(); if (confirm(sysLang == 1 ? "ဤစက်ကို စာရင်းမှပယ်ဖျက်မလား?" : "Delete this saved device?")) { let devices = getKeychain().filter(d => d.id !== id); localStorage.setItem("pumpKeychain", JSON.stringify(devices)); updateKeychainUI(); } }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            if (sysLang == 1) {
+                document.body.classList.add('lang-mm'); // Applies scaling immediately
+                document.getElementById('btnLogin').innerText = "ချိတ်ဆက်ပါ";
+                document.getElementById('tabHome').innerText = "🏠 ပင်မစာမျက်နှာ";
+                document.getElementById('tabSettings').innerText = "⚙️ ဆက်တင်များ";
+
+                document.querySelectorAll('.row span:first-child, .lbl-wrap label, h3, .show-pass').forEach(el => {
+                    let txt = el.innerText.trim();
+                    if (!dict[txt]) return;
+
+                    // keep checkbox input inside .show-pass label
+                    if (el.classList.contains('show-pass')) {
+                        const cb = el.querySelector('input[type="checkbox"]');
+                        if (cb) {
+                            el.innerHTML = '';
+                            el.appendChild(cb);
+                            el.appendChild(document.createTextNode(' ' + dict[txt]));
+                        } else {
+                            el.innerText = dict[txt];
+                        }
+                    } else {
+                        el.innerText = dict[txt];
+                    }
+                });
+
+                // 2. Translate Dropdown Options (Sub-lists)
+                document.querySelectorAll('select option').forEach(opt => {
+                    if (opt.text.includes("Standalone")) opt.text = "သီးသန့်စက်";
+                    if (opt.text.includes("Master (Sump Tank)")) opt.text = "အဓိကစက် (အောက်တိုင်ကီ)";
+                    if (opt.text.includes("Slave (Upper Tank)")) opt.text = "လက်အောက်ခံစက် (အပေါ်တိုင်ကီ)";
+                    if (opt.text.includes("Water Pump")) opt.text = "ရေမော်တာ";
+                    if (opt.text.includes("Air Compressor")) opt.text = "လေကွန်ပရက်ဆာ";
+                });
+
+                // 3. Translate Placeholders
+                document.getElementById('wifiPass').placeholder = "လက်ရှိအတိုင်းထားရန် အလွတ်ထားပါ";
+                document.getElementById('licText').placeholder = "ဖုန်းဖြင့်ရသော တိုကင်စာသားကို ဤနေရာတွင် ထည့်ပါ";
+
+                // 4. Translate Headings and Specific Buttons
+                const h2Title = document.querySelector('h2');
+                if (h2Title) {
+                    h2Title.style.fontSize = "1.3rem"; // Scale down the main title
+                    h2Title.innerHTML = h2Title.innerHTML.replace("Tank Water Level", "ရေတိုင်ကီ ရေအမှတ်");
+                }
+
+                document.querySelector('button[onclick="sendSave()"]').innerText = "သိမ်းဆည်း၍ ပြန်ဖွင့်မည်";
+                document.querySelector('button[onclick="logout()"]').innerText = "ထွက်မည်";
+                document.querySelector('button[onclick="uploadLicenseFile()"]').innerText = "ဖိုင် တင်မည်";
+                document.querySelector('button[onclick="uploadLicenseText()"]').innerText = "စာသားဖြင့် သက်တမ်းတိုးမည်";
+                document.querySelector('button[onclick="checkOTA(this)"]').innerText = "ဗားရှင်း အသစ်စစ်ရန်";
+                document.querySelector('button[onclick*="user_guide"]').innerHTML = "📖 အသုံးပြုနည်း လမ်းညွှန်";
+
+                const curVerLabel = document.getElementById('curVer').parentNode;
+                if (curVerLabel) curVerLabel.innerHTML = curVerLabel.innerHTML.replace("Current Version:", "လက်ရှိ ဗားရှင်း-");
+
+                document.getElementById('fileName').innerText = "ဖိုင်ရွေးချယ်ထားခြင်းမရှိပါ";
+                const chooseFileSpan = document.querySelector('span[style*="background:#007bff"]');
+                if (chooseFileSpan) chooseFileSpan.innerText = "ဖိုင်ရွေးမည်";
+
+                // 5. Translate Footer (Cloud ID, IP, Sync Msg)
+                const lastMsg = document.getElementById('lastMsg');
+                if (lastMsg) lastMsg.innerText = "ပထမဆုံး ချိတ်ဆက်မှုကို စောင့်နေပါသည်...";
+                document.querySelectorAll('.footer span').forEach(el => {
+                    if (el.innerHTML.includes("Cloud ID:")) el.innerHTML = el.innerHTML.replace("Cloud ID:", "ကလောက် အိုင်ဒီ-");
+                    if (el.innerHTML.includes("Device IP:")) el.innerHTML = el.innerHTML.replace("Device IP:", "စက် အိုင်ပီ-");
+                });
+            }
+            if (document.getElementById('appLang')) document.getElementById('appLang').value = sysLang;
+            updateKeychainUI(); // Initial keychain render
+        });
+
+        let client, deviceID, devicePin, pollInterval, watchdog;
+        let dataReceived = false; let isConnecting = false; let activeTab = 'home';
+        let localRetryCd = 0; let localCdInterval = null; let isExpired = false;
+
+        // Dropdown Initializers
+        const uH = document.getElementById('uH'); for (let i = 12; i <= 84; i += 6) { let opt = document.createElement('option'); opt.value = i; opt.innerText = (i / 12).toFixed(1) + " ft"; uH.appendChild(opt); }
+        const lowTank = document.getElementById('lowTank'); for (let i = 20; i <= 50; i += 5) { let opt = document.createElement('option'); opt.value = i; opt.innerText = i + " %"; lowTank.appendChild(opt); }
+        const fullTank = document.getElementById('fullTank'); for (let i = 80; i <= 100; i += 5) { let opt = document.createElement('option'); opt.value = i; opt.innerText = i + " %"; fullTank.appendChild(opt); }
+        const vH = document.getElementById('vH'); for (let i = 230; i <= 260; i++) { let opt = document.createElement('option'); opt.value = i; opt.innerText = i + " Volts"; vH.appendChild(opt); }
+        const vL = document.getElementById('vL'); for (let i = 150; i <= 190; i++) { let opt = document.createElement('option'); opt.value = i; opt.innerText = i + " Volts"; vL.appendChild(opt); }
+        const vG = document.getElementById('vG'); for (let i = 1; i <= 10; i++) { let opt = document.createElement('option'); opt.value = i; opt.innerText = i + " Volts"; vG.appendChild(opt); } vG.value = "5";
+        const dD = document.getElementById('dD'); for (let i = 60; i <= 180; i += 5) { let opt = document.createElement('option'); opt.value = i; opt.innerText = i + " Seconds"; dD.appendChild(opt); }
+        const vDly = document.getElementById('vDly'); for (let i = 5; i <= 15; i++) { let opt = document.createElement('option'); opt.value = i; opt.innerText = i + " Seconds"; vDly.appendChild(opt); }
+        const dndS = document.getElementById('dndS'), dndE = document.getElementById('dndE');
+        for (let i = 0; i < 24; i++) { let h = (i < 10 ? '0' : '') + i + ':00';[dndS, dndE].forEach(s => { let opt = document.createElement('option'); opt.value = i; opt.innerText = h; s.appendChild(opt); }); }
+        const tz = document.getElementById('tzOf'); for (let i = -12; i <= 14; i += 0.5) { let opt = document.createElement('option'); opt.value = i; opt.innerText = "GMT " + (i >= 0 ? "+" : "") + (i == 0 ? "0" : i); tz.appendChild(opt); }
+
+        // Helper Functions
+        const setBadge = (id, text, type) => { let el = document.getElementById(id); if (el) { el.innerText = text; el.className = 'badge bg-' + type; } };
+        function togglePass(id) { let x = document.getElementById(id); x.type = x.type === "password" ? "text" : "password"; }
+        function showTab(t) { vibe(); activeTab = t; document.getElementById('homeView').style.display = t === 'home' ? 'block' : 'none'; document.getElementById('settingsView').style.display = t === 'settings' ? 'block' : 'none'; document.getElementById('tabHome').className = 'tab ' + (t === 'home' ? 'tab-active' : 'tab-inactive'); document.getElementById('tabSettings').className = 'tab ' + (t === 'settings' ? 'tab-active' : 'tab-inactive'); }
+        function showModal(msg) { document.getElementById('warnText').innerText = msg; document.getElementById('warnModal').style.display = 'block'; vibe(); }
+        function closeModal() { document.getElementById('warnModal').style.display = 'none'; }
+        function formatTime() { let n = new Date(); return n.getHours().toString().padStart(2, '0') + ":" + n.getMinutes().toString().padStart(2, '0'); }
+        function updateOnlineStatus(o) { [document.getElementById('statusDot'), document.getElementById('statusDotS')].forEach(d => { if (d) d.className = "conn-dot " + (o ? "" : "off"); });[document.getElementById('statusTxt'), document.getElementById('statusTxtS')].forEach(t => { if (t) t.innerText = o ? tr("Device: Online") : tr("Device: Offline"); }); if (o) resetWatchdog(); }
+        function resetWatchdog() { if (watchdog) clearTimeout(watchdog); watchdog = setTimeout(() => updateOnlineStatus(false), 90000); }
+        function renderTankRulerTicks() { const ruler = document.getElementById('tankRuler'); if (!ruler || ruler.dataset.ready === '1') return; let html = ''; for (let v = 0; v <= 100; v += 5) { const cls = (v % 25 === 0) ? 'tank-ruler-tick major' : 'tank-ruler-tick'; html += '<div class="' + cls + '" style="bottom:' + v + '%;"></div>'; } ruler.innerHTML = html; ruler.dataset.ready = '1'; }
+        function setTankGuides(d) { const low = parseInt(d.lowTank, 10) || 50; const full = parseInt(d.fullPoint || d.fullTank, 10) || 100; const lowMarker = document.getElementById('lowTankMarker'); const fullMarker = document.getElementById('fullTankMarker'); if (lowMarker) lowMarker.style.bottom = low + '%'; if (fullMarker) fullMarker.style.bottom = full + '%'; if (document.getElementById('lowTankMarkerLabel')) document.getElementById('lowTankMarkerLabel').innerText = (sysLang == 1 ? 'စတင် ' : 'LOW ') + low + '%'; if (document.getElementById('fullTankMarkerLabel')) document.getElementById('fullTankMarkerLabel').innerText = (sysLang == 1 ? 'ပြည့် ' : 'FULL ') + full + '%'; }
+
+        // MQTT Logic
+        function connect() {
+            vibe(); if (isConnecting) return;
+            deviceID = document.getElementById('devID').value.trim().toUpperCase();
+            devicePin = document.getElementById('devPin').value.trim();
+            if (deviceID.length < 5) { alert("Invalid ID"); return; }
+            isConnecting = true;
+            localStorage.setItem("cloudPumpID", deviceID);
+            localStorage.setItem("cloudPumpPin", devicePin);
+            const btnLogin = document.getElementById('btnLogin');
+            btnLogin.innerText = (sysLang == 1 ? "ချိတ်ဆက်နေသည်..." : "Connecting...");
+            btnLogin.disabled = true;
+            if (client) { try { client.onMessageArrived = null; client.onConnectionLost = null; client.disconnect(); } catch (e) { } }
+            client = new Paho.MQTT.Client(BROKER, PORT, "Web_" + Math.random().toString(16).substr(2, 8));
+            client.onMessageArrived = (msg) => {
+                const topic = msg.destinationName, raw = msg.payloadString;
+                if (topic.endsWith("/online")) { updateOnlineStatus(raw === "1"); return; }
+                [document.getElementById('refreshBtn'), document.getElementById('refreshBtnS')].forEach(b => b && b.classList.remove('spinning'));
+                document.getElementById('lastMsg').innerText = (sysLang == 1 ? "နောက်ဆုံးချိတ်ဆက်မှု- " : "Last sync: ") + formatTime();
+                try {
+                    const data = JSON.parse(raw);
+                    if (data.alert) {
+                        if (data.alert === "Access Denied" && !dataReceived) {
+                            const err = document.getElementById('loginError'); err.innerText = data.reason; err.style.display = 'block'; btnLogin.innerText = (sysLang == 1 ? "ပြန်ချိတ်မည်" : "Connect"); btnLogin.disabled = false; isConnecting = false; client.disconnect();
+                        } else { showModal(data.reason || data.alert); if (data.alert === "Access Denied") setTimeout(() => location.reload(), 3000); }
+                        return;
+                    }
+                    if (!dataReceived) {
+                        dataReceived = true;
+                        saveToKeychain(deviceID, devicePin, data.sysRole); // Save/Update Keychain
+                        document.getElementById('loginScreen').style.display = 'none';
+                        document.getElementById('dashboard').style.display = 'block';
+                        if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
+                    }
+                    updateUI(data); resetWatchdog();
+                } catch (e) { console.error("Parse error", e); }
+            };
+            client.onConnectionLost = (e) => { updateOnlineStatus(false); isConnecting = false;[document.getElementById('refreshBtn'), document.getElementById('refreshBtnS')].forEach(b => b && b.classList.remove('spinning')); if (e.errorCode !== 0) { if (dataReceived) setTimeout(connect, 5000); else { btnLogin.innerText = (sysLang == 1 ? "ပြန်ချိတ်မည်" : "Connect"); btnLogin.disabled = false; } } };
+            client.connect({
+                useSSL: true, userName: USER, password: PASS, timeout: 10,
+                onSuccess: () => { isConnecting = false; btnLogin.innerText = (sysLang == 1 ? "စင့်ခ်လုပ်နေသည်..." : "Syncing..."); client.subscribe(`smartpump/${deviceID}/status`); client.subscribe(`smartpump/${deviceID}/online`); setTimeout(requestData, 500); },
+                onFailure: (e) => { isConnecting = false; const err = document.getElementById('loginError'); err.innerText = "Connection failed: " + e.errorMessage; err.style.display = 'block'; btnLogin.innerText = (sysLang == 1 ? "ပြန်ချိတ်မည်" : "Connect"); btnLogin.disabled = false; }
+            });
+        }
+
+        function requestData() { vibe();[document.getElementById('refreshBtn'), document.getElementById('refreshBtnS')].forEach(b => b && b.classList.add('spinning')); if (client && client.isConnected()) { sendCmd({ get: 1 }); } else { connect(); } }
+        function logout() {
+            vibe();
+            if (confirm(sysLang == 1 ? "စက်ပြောင်းမည်လား?" : "Switch Device?")) {
+                if (client) client.disconnect();
+                dataReceived = false;
+                document.getElementById('dashboard').style.display = 'none';
+                document.getElementById('loginScreen').style.display = 'block';
+                document.getElementById('btnLogin').innerText = (sysLang == 1 ? "ချိတ်ဆက်ပါ" : "Connect");
+                document.getElementById('btnLogin').disabled = false;
+                updateKeychainUI();
+            }
+        }
+        function sendReset() { vibe(); sendCmd({ reset: 1 }); }
+        function sendToggle() { vibe(); sendCmd({ toggle: 1 }); }
+        function sendCmd(p) { if (!client || !client.isConnected()) return; p.pin = devicePin; let msg = new Paho.MQTT.Message(JSON.stringify(p)); msg.destinationName = `smartpump/${deviceID}/set`; client.send(msg); }
+        function startOTA() { vibe(); if (confirm("Start OTA?")) sendCmd({ otaStart: 1 }); }
+        function checkOTA(btn) { vibe(); sendCmd({ otaCheck: 1 }); }
+
+        function sendSave() {
+            vibe(); if (isExpired) { showModal("License Expired."); return; }
+            const ssid = document.getElementById('ssid').value.trim(); if (!ssid) { alert("SSID empty!"); return; }
+            if (!confirm("Save and reboot?")) return;
+            activeTab = 'saving';
+            sendCmd({
+                save: 1, ssid: ssid, pass: document.getElementById('wifiPass').value, newPin: document.getElementById('newPin').value || devicePin,
+                sysRole: parseInt(document.getElementById('sysRole').value), linkID: document.getElementById('linkID').value.trim().toUpperCase(), setM: parseInt(document.getElementById('setM').value),
+                opM: parseInt(document.getElementById('opM').value), vDly: parseInt(document.getElementById('vDly').value),
+                uH: parseFloat(document.getElementById('uH').value), lowTank: parseInt(document.getElementById('lowTank').value), fullTank: parseInt(document.getElementById('fullTank').value), vH: parseInt(document.getElementById('vH').value), vL: parseInt(document.getElementById('vL').value), vG: parseInt(document.getElementById('vG').value),
+                dD: parseInt(document.getElementById('dD').value), rstM: parseInt(document.getElementById('rstM').value), rM: parseInt(document.getElementById('rM').value),
+                dndEn: parseInt(document.getElementById('dndEn').value), dndS: parseInt(document.getElementById('dndS').value), dndE: parseInt(document.getElementById('dndE').value),
+                tzOf: parseFloat(document.getElementById('tzOf').value)
+            });
+            document.body.innerHTML = '<h2 style="color:white;text-align:center;margin-top:50px;">Settings Saved!<br><span style="font-size:1rem;color:#888;">Rebooting device...</span></h2>';
+            setTimeout(() => location.reload(), 20000);
+        }
+
+        // License functions
+        function uploadLicenseFile() { vibe(); const fileInput = document.getElementById('licFile'); if (fileInput.files.length === 0) { alert("Please select a .key file first."); return; } const file = fileInput.files[0]; const reader = new FileReader(); reader.onload = function (e) { sendLicense(e.target.result.trim()); }; reader.readAsText(file); }
+        function uploadLicenseText() { vibe(); const val = document.getElementById('licText').value.trim(); if (val.length < 10) { alert("Invalid token string."); return; } sendLicense(val); }
+        function sendLicense(token) { if (token.length > 10) { sendCmd({ lic: token }); alert("License Token Sent!"); } }
+
+        // LOGIC FIXES
+        const dirtyFields = new Set();
+        function markDirty(id) { dirtyFields.add(id); }
+
+        function safeUpdate(id, val, suffix) {
+            const el = document.getElementById(id);
+            if (!el || document.activeElement === el || val === undefined || val === null || dirtyFields.has(id)) return;
+            if (el.tagName === 'SELECT') {
+                let exists = Array.from(el.options).some(opt => opt.value == val);
+                if (!exists) {
+                    let opt = document.createElement('option');
+                    opt.value = val;
+                    opt.innerText = val + (suffix ? " " + suffix : "");
+                    el.appendChild(opt);
+                }
+                el.value = val;
+            } else {
+                el.value = val;
+            }
+        }
+
+        function updateUI(d) {
+            renderTankRulerTicks();
+            if (sysLang == 1) document.body.classList.add('lang-mm'); else document.body.classList.remove('lang-mm');
+
+            if (document.getElementById('dndBadgeC')) {
+                document.getElementById('dndBadgeC').style.display = (d.dndAct == 1) ? 'block' : 'none';
+            }
+
+            // --- Update Role Badge (Center Area) ---
+            let rb = document.getElementById('roleBadgeC');
+            if (rb) {
+                if (d.sysRole == 1) {
+                    // MASTER: Blue Glow
+                    rb.innerText = sysLang == 1 ? "👑 အောက်တိုင်ကီ (MASTER)" : "👑 MASTER (SUMP)";
+                    rb.className = "badge bg-info";
+                    rb.style.display = "block";
+                    rb.style.color = "#17a2b8"; // Glowing Cyan Text
+                } else if (d.sysRole == 2) {
+                    // SLAVE: Yellow Glow
+                    rb.innerText = sysLang == 1 ? "👷 အပေါ်တိုင်ကီ (SLAVE)" : "👷 SLAVE (ROOF)";
+                    rb.className = "badge bg-warning";
+                    rb.style.display = "block";
+                    rb.style.color = "#ffc107"; // Glowing Amber Text
+                } else {
+                    rb.style.display = "none";
+                }
+            }
+
+            isExpired = d.expired ? true : false;
+            const expBanner = document.getElementById('expiryBanner'), warnBanner = document.getElementById('warnBanner'), licStat = document.getElementById('licStat');
+
+            if (isExpired) {
+                expBanner.style.display = 'block'; warnBanner.style.display = 'none';
+                licStat.innerHTML = '<span style="color:#ff6b6b">' + (sysLang == 1 ? "သက်တမ်းကုန်ပြီ" : "EXPIRED") + '</span>';
+            } else {
+                expBanner.style.display = 'none';
+                if (d.daysLeft <= 7 && d.daysLeft >= 0) {
+                    warnBanner.style.display = 'block';
+                    document.getElementById('warnMsg').innerText = sysLang == 1 ? d.daysLeft + " ရက် ကျန်ပါသေးသည်။" : d.daysLeft + " days remaining.";
+                } else warnBanner.style.display = 'none';
+                licStat.innerHTML = sysLang == 1 ? `<span style="color:#28a745">အသက်ဝင်သည် (${d.daysLeft} ရက် ကျန်သည်)</span>` : `<span style="color:#28a745">Active (${d.daysLeft} days left)</span>`;
+            }
+
+            const rawInfo = d.info || "";
+            let vS = d.vStat || "--", iF = d.info || "--", pS = d.pStat || "--", tS = d.tStr || (d.tank !== undefined ? d.tank + '%' : "-- %");
+
+            if (sysLang == 1) {
+                vS = tr(vS); pS = tr(pS); iF = tr(iF);
+                if (d.tStr == "FULL") tS = "ပြည့်";
+                else if (d.tStr == "LOW") tS = "နည်း";
+                else if (d.tStr == "ERR") tS = "ချို့ယွင်းချက်";
+            }
+
+            document.getElementById('tankVal').innerText = tS;
+            document.getElementById('dispIp').innerText = d.ip || "---";
+            document.getElementById('dispCid').innerText = d.id || "---";
+            document.getElementById('volt').innerText = (d.volt || "--") + " V";
+
+            // 1. Voltage Status Colors
+            let vType = 'secondary';
+            if (d.vStat === "NORMAL") vType = 'success';
+            else if (d.vStat === "DELAY") vType = 'warning';
+            else if (d.vStat === "OVER" || d.vStat === "UNDER") vType = 'danger';
+            setBadge('vstat', vS, vType);
+
+            // 2. Pump Status Colors
+            let pType = 'secondary';
+            if (d.pStat === "ON") pType = 'success';
+            else if (d.pStat === "DRY ALRM" || d.pStat === "LOCKED") pType = 'danger';
+            setBadge('pstate', pS, pType);
+
+            // 3. System Info Colors (use rawInfo, not translated iF)
+            let iType = 'success';
+            if (
+                rawInfo.includes("OVER_VOLTAGE") ||
+                rawInfo.includes("UNDER_VOLTAGE") ||
+                rawInfo.includes("ALARM") ||
+                rawInfo.includes("ERROR")
+            ) {
+                iType = 'danger';
+            } else if (
+                rawInfo.includes("VOLT_DELAY") ||
+                rawInfo.includes("WAITING") ||
+                rawInfo.includes("LOCKED") ||
+                rawInfo.includes("COOLING") ||
+                rawInfo.includes("VENTING") ||
+                rawInfo.includes("SETTLING")
+            ) {
+                iType = 'warning';
+            } else if (rawInfo.includes("FLOW_CHECKING")) {
+                iType = 'info';
+            }
+            setBadge('info', iF, iType);
+
+            const tankFill = document.getElementById('tankFill');
+            if (tankFill && activeTab !== 'saving') {
+                setTankGuides(d);
+                tankFill.style.height = (d.tank || 0) + '%';
+                if (d.tank <= (d.lowTank || 50)) tankFill.classList.add('low-water'); else tankFill.classList.remove('low-water');
+                if (d.pStat == "ON") tankFill.classList.add('pumping'); else tankFill.classList.remove('pumping');
+            }
+
+            if (activeTab !== 'saving') {
+                if (d.sysRole !== undefined) { safeUpdate('sysRole', d.sysRole); toggleRole(); }
+                if (d.setM !== undefined) safeUpdate('setM', d.setM);
+                if (d.linkID !== undefined) safeUpdate('linkID', d.linkID);
+                if (d.opM !== undefined) { safeUpdate('opM', d.opM); toggleVDly(); }
+                if (d.vDly !== undefined) safeUpdate('vDly', d.vDly, "Seconds");
+                if (d.uH !== undefined) safeUpdate('uH', d.uH);
+                if (d.lowTank !== undefined) safeUpdate('lowTank', d.lowTank);
+                if (d.fullTank !== undefined) safeUpdate('fullTank', d.fullTank);
+                if (d.vH !== undefined) safeUpdate('vH', d.vH, "Volts");
+                if (d.vL !== undefined) safeUpdate('vL', d.vL, "Volts");
+                if (d.vG !== undefined) safeUpdate('vG', d.vG, "Volts");
+                if (d.dD !== undefined) safeUpdate('dD', d.dD, "Seconds");
+                if (d.rstM !== undefined) safeUpdate('rstM', d.rstM);
+                if (d.rM !== undefined) safeUpdate('rM', d.rM);
+                if (d.ssid !== undefined) safeUpdate('ssid', d.ssid);
+                if (d.dndEn !== undefined) safeUpdate('dndEn', d.dndEn);
+                if (d.dndS !== undefined) safeUpdate('dndS', d.dndS);
+                if (d.dndE !== undefined) safeUpdate('dndE', d.dndE);
+                if (d.tzOf !== undefined) safeUpdate('tzOf', d.tzOf);
+                if (d.ver) document.getElementById('curVer').innerText = 'v' + d.ver;
+            }
+
+            updateOnlineStatus(true);
+            const btn = document.getElementById('btnToggle'), rst = document.getElementById('btnReset');
+            if (d.err) {
+                btn.style.display = 'none'; rst.style.display = 'block'; rst.innerText = "Reset Alarm";
+            } else {
+                btn.style.display = 'block'; rst.style.display = 'none';
+                if (isExpired) {
+                    btn.innerText = tr("LICENSE EXPIRED");
+                    btn.className = "btn btn-grey"; btn.disabled = true;
+                } else {
+                    btn.disabled = false;
+                    let btnTxt = (d.pStat == "ON" ? 'Stop Pump' : 'Start Pump');
+                    btn.innerText = tr(btnTxt);
+                    btn.className = "btn " + (d.pStat == "ON" ? "btn-red" : "btn-green");
+                }
+            }
+
+            // Countdown Logic
+            const cdRow = document.getElementById('cdRow');
+            if (cdRow) {
+                if ((d.err == 2 && d.rM > 0) || d.isDR || (d.info && d.info.includes("COOLING"))) {
+                    cdRow.style.display = 'flex';
+                    let totalSecs = (d.cd || d.rCd || d.rstCd || 0);
+                    let m = Math.floor(totalSecs / 60);
+                    let s = totalSecs % 60;
+                    document.getElementById('cd').innerText = m + "m " + s + "s";
+                } else {
+                    cdRow.style.display = 'none';
+                }
+            }
+            [document.getElementById('otaHub'), document.getElementById('otaHubS')].forEach(h => { if (h) h.style.display = d.ota ? 'block' : 'none'; });
+        }
+    </script>
+</body>
+
+</html>
