@@ -740,8 +740,8 @@ const char settings_html[] PROGMEM = R"rawliteral(
       <div class="lbl-wrap"><label>Low Voltage Set</label><span class="range">150 - 190 V</span></div><select name="vL" id="vL_s"></select>
       <div class="lbl-wrap"><label>Voltage Resume Gap</label><span class="range">1 - 10 V</span></div><select name="vG" id="vG_s"></select>
       <div class="lbl-wrap"><label>Dry-Run Delay</label><span class="range">60 - 180 s</span></div><select name="dD" id="dD_s"></select>
-      <div class="lbl-wrap"><label>Pump Cool-down (After 1Hr)</label><span class="range">Disable / 5 - 15m</span></div><select name="rstM" id="rstM_s"></select>
       <div class="lbl-wrap"><label>Auto-Retry Wait</label><span class="range">Disable / 30 / 60</span></div><select name="rM" id="rM_s"></select>
+      <div class="lbl-wrap"><label>Pump Cool-down (After 1Hr)</label><span class="range">Disable / 5 - 15m</span></div><select name="rstM" id="rstM_s"></select>
       <hr>
       <div class="lbl-wrap"><label>🌙 Smart Scheduling (DND)</label></div><select name="dndEn" id="dndEn_s"><option value="0">Disabled</option><option value="1">Enabled</option></select>
       <div style="display:flex; gap:10px; margin-top:10px;"><div style="flex:1;"><label>Start Hour</label><select name="dndS" id="dndS_s"></select></div><div style="flex:1;"><label>End Hour</label><select name="dndE" id="dndE_s"></select></div></div>
