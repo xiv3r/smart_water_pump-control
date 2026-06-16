@@ -786,8 +786,8 @@
                     <div class="tank-ruler" id="tankRuler" aria-hidden="true"></div>
                     <div class="tank-ridges"></div>
                     <div class="tank-guides" id="tankGuides">
-                        <div class="tank-guide-line low-marker" id="lowTankMarker" style="bottom: 50%;"><span
-                                class="tank-guide-label" id="lowTankMarkerLabel">LOW 50%</span></div>
+                        <div class="tank-guide-line low-marker" id="lowTankMarker" style="bottom: 30%;"><span
+                                class="tank-guide-label" id="lowTankMarkerLabel">LOW 30%</span></div>
                         <div class="tank-guide-line full-marker" id="fullTankMarker" style="bottom: 100%;"><span
                                 class="tank-guide-label" id="fullTankMarkerLabel">FULL 100%</span></div>
                     </div>
@@ -886,8 +886,7 @@
                     id="vG" onchange="markDirty('vG')"></select>
                 <div class="lbl-wrap"><label>Dry-Run Delay</label><span class="range">60 - 180 s</span></div><select
                     id="dD" onchange="markDirty('dD')"></select>
-                <div class="lbl-wrap"><label>Fill Progress Timeout</label><span class="range">5 - 30 m</span></div><select
-                    id="pLckM" onchange="markDirty('pLckM')"></select>
+
                 <div class="lbl-wrap"><label>Auto-Retry Wait</label><span class="range">Disable / 30 / 60</span></div>
                 <select id="rM" onchange="markDirty('rM')">
                     <option value="0">Disabled</option>
@@ -999,7 +998,6 @@
             "Tank Height": "ရေတိုင်ကီ အမြင့်", "Low Tank Start Level": "ရေမော်တာစတင်မည့် ရေမှတ်",
             "High Voltage Set": "ဗို့အားလွန် သတ်မှတ်ချက်", "Low Voltage Set": "ဗို့အားလျော့ သတ်မှတ်ချက်",
             "Voltage Resume Gap": "ဗို့အားပြန်ဖွင့် ကွာဟချက်", "Dry-Run Delay": "ရေမရှိ အချက်ပေးချိန်",
-            "Fill Progress Timeout": "ရေမတက်ဘဲ ကြန့်ကြာချိန်",
             "Pump Cool-down (After 1Hr)": "၁နာရီမောင်းပြီး အနားပေးချိန်", "Auto-Retry Wait": "ပြန်လည်စတင်ရန် စောင့်ချိန်",
             "🌙 Smart Scheduling (DND)": "🌙 ညဘက် အသံပိတ်စနစ် (DND)", "Start Hour": "စတင်ရန် အချိန်",
             "End Hour": "ပြီးဆုံးရန် အချိန်", "Home Time Zone (GMT)": "အချိန်ဇုန် (GMT)",
@@ -1011,7 +1009,6 @@
             "Upload Token File (.key)": "လိုင်စင်တိုကင်ဖိုင်တင်ရန် (.key)", "Paste Token String": "တိုကင် စာသား ထည့်ပါ",
             "Choose File": "ဖိုင်ရွေးမည်", "Upload File": "ဖိုင် တင်မည်", "Activate via Text": "စာသားဖြင့် သက်တမ်းတိုးမည်",
             "Status:": "အခြေအနေ-",
-            "STAGNANT_LOCKED!": "ရေအမှတ်မတက်သဖြင့် ပိတ်ထားသည်!",
         };
         const tr = (t) => {
             if (sysLang != 1 || !t) return t;
@@ -1182,7 +1179,6 @@
         const vL = document.getElementById('vL'); for (let i = 150; i <= 190; i++) { let opt = document.createElement('option'); opt.value = i; opt.innerText = i + " Volts"; vL.appendChild(opt); }
         const vG = document.getElementById('vG'); for (let i = 1; i <= 10; i++) { let opt = document.createElement('option'); opt.value = i; opt.innerText = i + " Volts"; vG.appendChild(opt); } vG.value = "5";
         const dD = document.getElementById('dD'); for (let i = 60; i <= 180; i += 5) { let opt = document.createElement('option'); opt.value = i; opt.innerText = i + " Seconds"; dD.appendChild(opt); }
-        const pLckM = document.getElementById('pLckM'); for (let i of [5, 10, 15, 20, 25, 30]) { let opt = document.createElement('option'); opt.value = i; opt.innerText = i + " Minutes"; pLckM.appendChild(opt); }
         const vDly = document.getElementById('vDly'); for (let i = 5; i <= 15; i++) { let opt = document.createElement('option'); opt.value = i; opt.innerText = i + " Seconds"; vDly.appendChild(opt); }
         const dndS = document.getElementById('dndS'), dndE = document.getElementById('dndE');
         for (let i = 0; i < 24; i++) { let h = (i < 10 ? '0' : '') + i + ':00';[dndS, dndE].forEach(s => { let opt = document.createElement('option'); opt.value = i; opt.innerText = h; s.appendChild(opt); }); }
@@ -1198,7 +1194,7 @@
         function updateOnlineStatus(o) { [document.getElementById('statusDot'), document.getElementById('statusDotS')].forEach(d => { if (d) d.className = "conn-dot " + (o ? "" : "off"); });[document.getElementById('statusTxt'), document.getElementById('statusTxtS')].forEach(t => { if (t) t.innerText = o ? tr("Device: Online") : tr("Device: Offline"); }); if (o) resetWatchdog(); }
         function resetWatchdog() { if (watchdog) clearTimeout(watchdog); watchdog = setTimeout(() => updateOnlineStatus(false), 90000); }
         function renderTankRulerTicks() { const ruler = document.getElementById('tankRuler'); if (!ruler || ruler.dataset.ready === '1') return; let html = ''; for (let v = 0; v <= 100; v += 5) { const cls = (v % 25 === 0) ? 'tank-ruler-tick major' : 'tank-ruler-tick'; html += '<div class="' + cls + '" style="bottom:' + v + '%;"></div>'; } ruler.innerHTML = html; ruler.dataset.ready = '1'; }
-        function setTankGuides(d) { const low = parseInt(d.lowTank, 10) || 50; const full = parseInt(d.fullPoint || d.fullTank, 10) || 100; const lowMarker = document.getElementById('lowTankMarker'); const fullMarker = document.getElementById('fullTankMarker'); if (lowMarker) lowMarker.style.bottom = low + '%'; if (fullMarker) fullMarker.style.bottom = full + '%'; if (document.getElementById('lowTankMarkerLabel')) document.getElementById('lowTankMarkerLabel').innerText = (sysLang == 1 ? 'စတင် ' : 'LOW ') + low + '%'; if (document.getElementById('fullTankMarkerLabel')) document.getElementById('fullTankMarkerLabel').innerText = (sysLang == 1 ? 'ပြည့် ' : 'FULL ') + full + '%'; }
+        function setTankGuides(d) { const low = parseInt(d.lowTank, 10) || 30; const full = parseInt(d.fullPoint || d.fullTank, 10) || 100; const lowMarker = document.getElementById('lowTankMarker'); const fullMarker = document.getElementById('fullTankMarker'); if (lowMarker) lowMarker.style.bottom = low + '%'; if (fullMarker) fullMarker.style.bottom = full + '%'; if (document.getElementById('lowTankMarkerLabel')) document.getElementById('lowTankMarkerLabel').innerText = (sysLang == 1 ? 'စတင် ' : 'LOW ') + low + '%'; if (document.getElementById('fullTankMarkerLabel')) document.getElementById('fullTankMarkerLabel').innerText = (sysLang == 1 ? 'ပြည့် ' : 'FULL ') + full + '%'; }
 
         // MQTT Logic
         function connect() {
@@ -1274,7 +1270,7 @@
                 sysRole: parseInt(document.getElementById('sysRole').value), linkID: document.getElementById('linkID').value.trim().toUpperCase(), setM: parseInt(document.getElementById('setM').value),
                 opM: parseInt(document.getElementById('opM').value), vDly: parseInt(document.getElementById('vDly').value),
                 uH: parseFloat(document.getElementById('uH').value), lowTank: parseInt(document.getElementById('lowTank').value), fullTank: parseInt(document.getElementById('fullTank').value), vH: parseInt(document.getElementById('vH').value), vL: parseInt(document.getElementById('vL').value), vG: parseInt(document.getElementById('vG').value),
-                dD: parseInt(document.getElementById('dD').value), pLckM: parseInt(document.getElementById('pLckM').value), rstM: parseInt(document.getElementById('rstM').value), rM: parseInt(document.getElementById('rM').value),
+                dD: parseInt(document.getElementById('dD').value), rstM: parseInt(document.getElementById('rstM').value), rM: parseInt(document.getElementById('rM').value),
                 dndEn: parseInt(document.getElementById('dndEn').value), dndS: parseInt(document.getElementById('dndS').value), dndE: parseInt(document.getElementById('dndE').value),
                 tzOf: parseFloat(document.getElementById('tzOf').value)
             });
@@ -1385,8 +1381,7 @@
                 rawInfo.includes("OVER_VOLTAGE") ||
                 rawInfo.includes("UNDER_VOLTAGE") ||
                 rawInfo.includes("ALARM") ||
-                rawInfo.includes("ERROR") ||
-                rawInfo.includes("STAGNANT")
+                rawInfo.includes("ERROR")
             ) {
                 iType = 'danger';
             } else if (
@@ -1407,7 +1402,7 @@
             if (tankFill && activeTab !== 'saving') {
                 setTankGuides(d);
                 tankFill.style.height = (d.tank || 0) + '%';
-                if (d.tank <= (d.lowTank || 50)) tankFill.classList.add('low-water'); else tankFill.classList.remove('low-water');
+                if (d.tank <= (d.lowTank || 30)) tankFill.classList.add('low-water'); else tankFill.classList.remove('low-water');
                 if (d.pStat == "ON") tankFill.classList.add('pumping'); else tankFill.classList.remove('pumping');
             }
 
@@ -1424,7 +1419,6 @@
                 if (d.vL !== undefined) safeUpdate('vL', d.vL, "Volts");
                 if (d.vG !== undefined) safeUpdate('vG', d.vG, "Volts");
                 if (d.dD !== undefined) safeUpdate('dD', d.dD, "Seconds");
-                if (d.pLckM !== undefined) safeUpdate('pLckM', d.pLckM, "Minutes");
                 if (d.rstM !== undefined) safeUpdate('rstM', d.rstM);
                 if (d.rM !== undefined) safeUpdate('rM', d.rM);
                 if (d.ssid !== undefined) safeUpdate('ssid', d.ssid);
@@ -1457,10 +1451,7 @@
             if (cdRow) {
                 if ((d.err == 2 && d.rM > 0) || d.isDR || (d.info && d.info.includes("COOLING"))) {
                     cdRow.style.display = 'flex';
-                    let totalSecs = (d.cd || d.rCd || d.rstCd || 0);
-                    let m = Math.floor(totalSecs / 60);
-                    let s = totalSecs % 60;
-                    document.getElementById('cd').innerText = m + "m " + s + "s";
+                    document.getElementById('cd').innerText = (d.cd || d.rCd || d.rstCd || 0) + "s";
                 } else {
                     cdRow.style.display = 'none';
                 }
