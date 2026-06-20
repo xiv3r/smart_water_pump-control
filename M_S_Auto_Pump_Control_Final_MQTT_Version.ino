@@ -651,9 +651,18 @@ setBadge('info', iF, iType);
       }
       
       let cd=document.getElementById('cdRow');
-      if(d.err == 2 && d.rM > 0) { cd.style.display='flex'; cd.children[0].innerText = d.lang==1?'ပြန်လည်စတင်ရန်-':'Retry in:'; let m = Math.floor(d.rCd / 60); let s = d.rCd % 60; document.getElementById('cd').innerText = m + 'm ' + s + 's'; } 
-      else if(d.isDR) { cd.style.display='flex'; cd.children[0].innerText = d.lang==1?'ရေမရှိ အချက်ပေးရန်-':'Dry-Run in:'; document.getElementById('cd').innerText = "(" + d.cd + "s)"; } 
-      else if(d.info=="COOLING_DOWN!" || d.info=="အအေးခံနေသည်!") { cd.style.display='flex'; cd.children[0].innerText = d.lang==1?'အအေးခံရန် ကျန်ချိန်-':'Cooling in:'; let m = Math.floor(d.rstCd / 60); let s = d.rstCd % 60; document.getElementById('cd').innerText = m + 'm ' + s + 's'; } 
+      if(d.err == 2 && d.rM > 0) { 
+        cd.style.display='flex'; cd.children[0].innerText = d.lang==1?'ပြန်လည်စတင်ရန်-':'Retry in:'; 
+        let m = Math.floor(d.rCd / 60); let s = d.rCd % 60; document.getElementById('cd').innerText = m + 'm ' + s + 's'; 
+      } 
+      else if(d.info.includes("COOLING_DOWN") || d.info.includes("အအေးခံနေသည်")) { 
+        cd.style.display='flex'; cd.children[0].innerText = d.lang==1?'အအေးခံရန် ကျန်ချိန်-':'Cooling in:'; 
+        let m = Math.floor(d.rstCd / 60); let s = d.rstCd % 60; document.getElementById('cd').innerText = m + 'm ' + s + 's'; 
+      } 
+      else if(d.isDR) { 
+        cd.style.display='flex'; cd.children[0].innerText = d.lang==1?'ရေမရှိ အချက်ပေးရန်-':'Dry-Run in:'; 
+        document.getElementById('cd').innerText = "(" + d.cd + "s)"; 
+      } 
       else { cd.style.display='none'; }
 
       let ota=document.getElementById('otaHub');
@@ -2844,7 +2853,13 @@ String generateStatusJson() {
   doc["err"] = dryRunConfig.error;
   doc["cd"] = dryRunConfig.waitSeconds;
   doc["rCd"] = dryRunConfig.retryCountdown;
-  doc["rstCd"] = coolDownConfig.isResting ? ((coolDownConfig.restMinutes * 60000UL) - (millis() - coolDownConfig.restStartTime)) / 1000 : 0;
+  if (coolDownConfig.isResting) {
+    unsigned long totalRestMs = (unsigned long)coolDownConfig.restMinutes * 60000UL;
+    unsigned long elapsedMs = millis() - coolDownConfig.restStartTime;
+    doc["rstCd"] = (totalRestMs > elapsedMs) ? (totalRestMs - elapsedMs) / 1000 : 0;
+  } else {
+    doc["rstCd"] = 0;
+  }
   doc["isDR"] = (pumpConfig.isRunning && dryRunConfig.waitSeconds < dryRunConfig.WAIT_SECONDS_SET) ? 1 : 0;
 
   // License info
