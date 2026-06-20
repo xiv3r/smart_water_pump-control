@@ -1022,6 +1022,8 @@
             "SETTLING_WATER!": "ရေအနည်ထိုင်ရန်စောင့်ချိန်!", "Voltage:": "လျှပ်စစ်အား-",
             "Volt Status:": "ဗို့အား အခြေအနေ-", "Pump:": "ရေမော်တာ-", "System Info:": "စက် အချက်အလက်-",
             "Retry in:": "ပြန်လည်စတင်ရန်-", "Start Pump": "ရေမော်တာ ဖွင့်မည်", "Stop Pump": "ရေမော်တာ ပိတ်မည်",
+            "Cooling in:": "အအေးခံရန် ကျန်ချိန်-",
+            "Dry-Run in:": "ရေမရှိ အချက်ပေးရန်-",
             "LICENSE EXPIRED": "သက်တမ်းကုန်ဆုံးပြီ", "WiFi SSID": "ဝိုင်ဖိုင် အမည်", "WiFi Password": "ဝိုင်ဖိုင် စကားဝှက်",
             "Show WiFi Password": "ဝိုင်ဖိုင် စကားဝှက် ပြမည်", "Show PIN": "ပင်နံပါတ် ပြမည်",
             "Device PIN (for Cloud)": "လုံခြုံရေး ပင်နံပါတ်", "Interface Language": "ဘာသာစကား",
@@ -1534,11 +1536,28 @@
 
             // Countdown Logic
             const cdRow = document.getElementById('cdRow');
-            if (cdRow) {
-                if ((d.err == 2 && d.rM > 0) || d.isDR || (d.info && d.info.includes("COOLING"))) {
+            const cdLabel = cdRow ? cdRow.children[0] : null;
+            const cdVal = document.getElementById('cd');
+
+            if (cdRow && cdVal) {
+                if (d.err == 2 && d.rM > 0) {
                     cdRow.style.display = 'flex';
-                    document.getElementById('cd').innerText = (d.cd || d.rCd || d.rstCd || 0) + "s";
-                } else {
+                    if (cdLabel) cdLabel.innerText = tr("Retry in:");
+                    let m = Math.floor(d.rCd / 60), s = d.rCd % 60;
+                    cdVal.innerText = m + "m " + s + "s";
+                }
+                else if (rawInfo.includes("COOLING") || rawInfo.includes("အအေးခံနေသည်")) {
+                    cdRow.style.display = 'flex';
+                    if (cdLabel) cdLabel.innerText = tr("Cooling in:");
+                    let m = Math.floor(d.rstCd / 60), s = d.rstCd % 60;
+                    cdVal.innerText = m + "m " + s + "s";
+                }
+                else if (d.isDR) {
+                    cdRow.style.display = 'flex';
+                    if (cdLabel) cdLabel.innerText = tr("Dry-Run in:");
+                    cdVal.innerText = d.cd + "s";
+                }
+                else {
                     cdRow.style.display = 'none';
                 }
             }
