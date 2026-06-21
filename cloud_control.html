@@ -691,7 +691,41 @@
                 padding: 14px 4px;
             }
         }
+
+        /* --- CUSTOM SCROLLBAR FOR MOBILE --- */
+        #logBox {
+            /* This enables smooth "bouncy" scrolling on iPhones/Android */
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Force the scrollbar to be visible in Webkit browsers (Chrome/Safari) */
+        #logBox::-webkit-scrollbar {
+            width: 6px;
+            /* Slim width */
+            display: block !important;
+            /* Force display on mobile */
+        }
+
+        /* The track (background) */
+        #logBox::-webkit-scrollbar-track {
+            background: #000;
+            border-radius: 10px;
+        }
+
+        /* The draggable bar (thumb) */
+        #logBox::-webkit-scrollbar-thumb {
+            background: #444;
+            /* Dark grey so it shows on black */
+            border-radius: 10px;
+            border: 1px solid #222;
+        }
+
+        /* When touched/clicked, turn it Green to match your text */
+        #logBox::-webkit-scrollbar-thumb:active {
+            background: #0f0;
+        }
     </style>
+
 </head>
 
 <body>
