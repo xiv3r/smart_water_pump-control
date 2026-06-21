@@ -2062,36 +2062,62 @@ void updatePumpLogic() {
     }
   }
 
-  // --- 7. STATE DETERMINATION & LOGGING ---
-  String logLabel = "";
-  if (voltAbnormal) {
-    currentState = PumpState::VOLTAGE_ERROR;
-    logLabel = (voltageConfig.currentVoltage > highCutoff) ? "VOLT: High (" + String((int)voltageConfig.currentVoltage) + "V)" : "VOLT: Low (" + String((int)voltageConfig.currentVoltage) + "V)";
-  } else if (voltageConfig.status == 0) currentState = PumpState::VOLTAGE_WAIT;
+// --- 7. SMART STATE DETERMINATION & LOGGING (FIXED) ---
+  static String lastStableCondition = "NORMAL"; 
+  String currentCondition = "NORMAL";           
+  String logMessage = "";
+
+  // 1. Determine the logical condition based on your settings
+  if (voltageConfig.currentVoltage > highCutoff) {
+      currentCondition = "HIGH_V";
+  } else if (voltageConfig.currentVoltage < lowCutoff) {
+      currentCondition = "LOW_V";
+  } else if (voltageConfig.status == 0) {
+      // If we are in the "Wait/Recovery" period (Gap)
+      if (voltageConfig.currentVoltage > highResume) currentCondition = "HIGH_V";
+      else if (voltageConfig.currentVoltage < lowResume) currentCondition = "LOW_V";
+  }
+
+  if (sensorError) currentCondition = "SENSOR_ERR";
+  else if (dryRunConfig.error == 1) currentCondition = "DRY_RUN";
+  else if (coolDownConfig.isResting) currentCondition = "RESTING";
+
+  // 2. ONLY log if the condition changes (Prevents Spam)
+  if (currentCondition != lastStableCondition) {
+      
+      if (currentCondition == "NORMAL") {
+          logMessage = "SYS: Power Normal / Standby";
+      } else if (currentCondition == "HIGH_V") {
+          logMessage = "VOLT: High (" + String((int)voltageConfig.currentVoltage) + "V)";
+      } else if (currentCondition == "LOW_V") {
+          logMessage = "VOLT: Low (" + String((int)voltageConfig.currentVoltage) + "V)";
+      } else if (currentCondition == "SENSOR_ERR") {
+          logMessage = "ERR: Sensor Failure";
+      } else if (currentCondition == "DRY_RUN") {
+          logMessage = "ALR: Dry Run Detected";
+      } else if (currentCondition == "RESTING") {
+          logMessage = "INFO: Motor Cool-down";
+      }
+
+      if (logMessage != "") {
+          logEvent(logMessage); // This writes to your history
+      }
+      lastStableCondition = currentCondition;
+  }
+
+  // 3. Keep your existing State selection for the LCD/Cloud visuals
+  if (voltAbnormal) currentState = PumpState::VOLTAGE_ERROR;
+  else if (voltageConfig.status == 0) currentState = PumpState::VOLTAGE_WAIT;
   else if (compConfig.isPostVenting) currentState = PumpState::POST_STOP_VALVE;
-  else if (sensorError) {
-    currentState = PumpState::SENSOR_ERROR;
-    logLabel = "ERR: Sensor Fail";
-  } else if (coolDownConfig.isResting) {
-    currentState = PumpState::COOLING_DOWN;
-    logLabel = "INFO: Motor Rest";
-  } else if (msConfig.isSettling) currentState = PumpState::SETTLING_WATER;
-  else if (dryRunConfig.error == 1) {
-    currentState = PumpState::DRY_RUN_ALARM;
-    logLabel = "ALR: Dry Run (No Water)";
-  } else if (dryRunConfig.error == 2) currentState = PumpState::DRY_RUN_LOCKED;
+  else if (sensorError) currentState = PumpState::SENSOR_ERROR;
+  else if (coolDownConfig.isResting) currentState = PumpState::COOLING_DOWN;
+  else if (msConfig.isSettling) currentState = PumpState::SETTLING_WATER;
+  else if (dryRunConfig.error == 1) currentState = PumpState::DRY_RUN_ALARM;
+  else if (dryRunConfig.error == 2) currentState = PumpState::DRY_RUN_LOCKED;
   else if (pumpConfig.motorStatus == 1) {
     if (compConfig.isPreVenting) currentState = PumpState::PRE_START_VALVE;
     else currentState = PumpState::PUMPING;
   } else currentState = PumpState::IDLE;
-
-  // Record to Flash ONLY if the error state is new
-  if (logLabel != "" && logLabel != lastLoggedState) {
-    logEvent(logLabel);
-    lastLoggedState = logLabel;
-  } else if (currentState == PumpState::IDLE || currentState == PumpState::PUMPING) {
-    lastLoggedState = "";  // Reset so we can log future errors
-  }
 
   // --- 8. HARDWARE EXECUTION ---
   switch (currentState) {
@@ -3274,27 +3300,30 @@ void startOTA() {
 void logEvent(String msg) {
   if (!xSemaphoreTakeRecursive(systemMutex, pdMS_TO_TICKS(100))) return;
 
-  // Get Timestamp
   struct tm timeinfo;
-  char ts[15] = "00/00 00:00";  // Increased size for the date
-   if (getLocalTime(&timeinfo)) { strftime(ts, sizeof(ts), "%d/%m %H:%M", &timeinfo); }
+  char ts[15] = "00/00 00:00"; 
+  if (getLocalTime(&timeinfo)) { strftime(ts, sizeof(ts), "%d/%m %H:%M", &timeinfo); }
 
-  // Append message to log file
   File file = LittleFS.open("/events.txt", "a");
   if (file) {
     file.printf("[%s] %s\n", ts, msg.c_str());
     file.close();
+    Serial.println("Logged: " + msg);
   }
 
-  // Rolling Log: If file is larger than 1KB (~25 entries), clear old data
+  // Smarter Rolling Log: Increase to 8000 bytes (~200 entries)
   File check = LittleFS.open("/events.txt", "r");
-  if (check && check.size() > 1000) {
-    check.close();
-    LittleFS.remove("/events.txt");
-    // Optional: re-log that it was cleared
-  } else if (check) {
-    check.close();
+  if (check) {
+    if (check.size() > 8000) { 
+      check.close();
+      LittleFS.remove("/events.txt");
+      // Log that it rolled over
+      File newFile = LittleFS.open("/events.txt", "a");
+      newFile.println("[SYS] Log Rolled Over (Memory Full)");
+      newFile.close();
+    } else {
+      check.close();
+    }
   }
-
   xSemaphoreGiveRecursive(systemMutex);
 }
