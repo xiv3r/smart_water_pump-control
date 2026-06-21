@@ -822,6 +822,13 @@
                 <div class="row"><span>Volt Status:</span> <span id="vstat" class="badge bg-secondary">--</span></div>
                 <div class="row"><span>Pump:</span> <span id="pstate" class="badge bg-secondary">--</span></div>
                 <div class="row"><span>System Info:</span> <span id="info" class="badge bg-secondary">--</span></div>
+                <div style="margin-top: 15px;">
+                    <label style="font-size: 0.75rem; color: #555; text-transform: uppercase;">📋 Event History</label>
+                    <div id="logBox"
+                        style="background:#000; color:#0f0; font-family:monospace; padding:8px; border-radius:8px; height:90px; overflow-y:auto; font-size:0.7rem; text-align:left; border:1px solid #333; margin-top:5px; line-height:1.4;">
+                        Waiting for logs...
+                    </div>
+                </div>
                 <div class="row" id="cdRow" style="display:none; color:#ff6b6b; font-weight:bold;"><span>Retry
                         in:</span> <span id="cd"
                         style="background:rgba(220,53,69,0.1); padding:2px 8px; border-radius:6px;">--</span></div>
@@ -1484,6 +1491,11 @@
             document.getElementById('dispIp').innerText = d.ip || "---";
             document.getElementById('dispCid').innerText = d.id || "---";
             document.getElementById('volt').innerText = (d.volt || "--") + " V";
+            if (d.logs) {
+                const logBox = document.getElementById('logBox');
+                logBox.innerText = d.logs;
+                logBox.scrollTop = logBox.scrollHeight; // Scroll to latest at bottom
+            }
 
             // 1. Voltage Status Colors
             let vType = 'secondary';
