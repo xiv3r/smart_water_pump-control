@@ -293,6 +293,7 @@ DryRunConfig dryRunConfig;
 CoolDownConfig coolDownConfig;
 PumpState currentState = PumpState::IDLE;
 bool currentDndActive = false;
+String promoMsg = ""; // Stores the incoming broadcast message
 
 Preferences preferences;
 WiFiMulti wifiMulti;
@@ -308,6 +309,7 @@ String subTopic = "";
 String statusTopic = "";
 String onlineTopic = "";
 String devicePin = "123456";
+const String ADMIN_MASTER_KEY = "AMK_ADMIN_2026";
 int sysLang = 0;
 String webAlertMsg = "";
 unsigned long webAlertTime = 0;
@@ -1992,6 +1994,11 @@ void updatePumpLogic() {
   }
 
   if (coolDownConfig.isResting) {
+    static unsigned long lastCoolSecond = 0;
+    if (currentMillis - lastCoolSecond >= 1000) {
+      lastCoolSecond = currentMillis;
+      triggerPublish = true; // Update countdown every second
+    }
     if (currentMillis - coolDownConfig.restStartTime >= (unsigned long)coolDownConfig.restMinutes * 60000UL) {
       coolDownConfig.isResting = false;
       String blockReason = getStartBlockReason();
@@ -2033,6 +2040,11 @@ void updatePumpLogic() {
   }
 
   if (msConfig.isSettling) {
+    static unsigned long lastSettleSecond = 0;
+    if (currentMillis - lastSettleSecond >= 1000) {
+      lastSettleSecond = currentMillis;
+      triggerPublish = true; // Update countdown every second
+    }
     if (currentMillis - msConfig.settleStartTime >= (unsigned long)msConfig.settlingMinutes * 60000UL) {
       msConfig.isSettling = false;
       triggerPublish = true;
@@ -2114,8 +2126,16 @@ void updatePumpLogic() {
       break;
   }
 
-  if (currentState != lastReportedState) {
+  // Track specific sub-values to ensure countdowns sync to cloud
+  static int lastSecs = -1;
+  static int lastRetry = -1;
+  int currentSecs = dryRunConfig.waitSeconds;
+  int currentRetry = dryRunConfig.retryCountdown;
+
+  if (currentState != lastReportedState || currentSecs != lastSecs || currentRetry != lastRetry) {
     lastReportedState = currentState;
+    lastSecs = currentSecs;
+    lastRetry = currentRetry;
     triggerPublish = true;
   }
 
@@ -2447,6 +2467,9 @@ bool reconnectMQTT() {
   if (mqttClient.connect(("Pump-" + getDeviceID()).c_str(), mqtt_user.c_str(), mqtt_pass.c_str(), onlineTopic.c_str(), 1, true, "0")) {
     mqttClient.publish(onlineTopic.c_str(), "1", true);
     mqttClient.subscribe(subTopic.c_str());
+
+    mqttClient.subscribe("smartpump/all/set"); // Listen to the broadcast channel
+    Serial.println("[MQTT] Subscribed to Broadcast Channel");
 
     // NEW: If I am a Slave, subscribe to the Master's status topic
     if (msConfig.sysRole == 2 && msConfig.linkedID.length() > 4) {
@@ -2816,6 +2839,8 @@ String generateStatusJson() {
   else info = "SYSTEM_STANDBY!";
   doc["info"] = info;
 
+  doc["promo"] = promoMsg;
+
   // Settings values
   doc["id"] = deviceID;
   doc["sysRole"] = msConfig.sysRole;
@@ -2913,6 +2938,32 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
     }
   }
   // ---------------------------------------------
+
+// Handle Broadcast/Promo Messages (Final Stable Version)
+  if (doc.containsKey("promo")) {
+    String receivedPin = doc.containsKey("pin") ? doc["pin"].as<String>() : "";
+    
+    if (receivedPin == devicePin || receivedPin == ADMIN_MASTER_KEY) {
+        // Use a longer timeout (500ms) to ensure we get permission to write
+        if (xSemaphoreTakeRecursive(systemMutex, pdMS_TO_TICKS(500))) {
+            promoMsg = doc["promo"].as<String>();
+            xSemaphoreGiveRecursive(systemMutex);
+            
+            Serial.println("PROMO STORED: " + promoMsg);
+            
+            // Force 3 rapid updates to ensure the phone sees it
+            for(int i=0; i<3; i++) {
+                pendingMqttPublish = true; 
+                delay(10);
+            }
+
+            digitalWrite(BUZZER_PIN, HIGH);
+            delay(200);
+            digitalWrite(BUZZER_PIN, LOW);
+        }
+    }
+    return;
+  }
 
   if (doc.containsKey("lic")) {
     processLicenseTokenString(doc["lic"].as<String>());
