@@ -1461,7 +1461,7 @@ String processManualToggle() {
       }
     }
 
-    // 4. NORMAL TOGGLE (Start or Stop)
+// 4. NORMAL TOGGLE (Start or Stop)
     bool wantsToStart = (pumpConfig.motorStatus == 0);
     if (wantsToStart) {
       String blockReason = getStartBlockReason();
@@ -1470,15 +1470,14 @@ String processManualToggle() {
         return "Blocked:" + blockReason;
       }
       pumpConfig.motorStatus = 1;
-      pumpConfig.manualOverride = true;  // VIP Pass to ignore DND
+      pumpConfig.manualOverride = true; 
       coolDownConfig.runStartTime = millis();
       dryRunConfig.waitSeconds = dryRunConfig.WAIT_SECONDS_SET;
+      logEvent("SYS: Manual Override Start"); // Specific log
       Serial.println("[USER] Manual Start Command Accepted.");
     } else {
 
       // --- NEW BLOCKING NOTIFICATION FOR LOW WATER ---
-      // We only show this warning if it's NOT DND period.
-      // If it IS DND period, the pump will stop normally as you requested.
       if (tankConfig.displayUpperPercentage <= tankConfig.LOW_THRESHOLD && !currentDndActive) {
         xSemaphoreGiveRecursive(systemMutex);
         return "Blocked:Water level is LOW. Pump will continue until Tank is Full.";
@@ -1486,6 +1485,7 @@ String processManualToggle() {
 
       pumpConfig.motorStatus = 0;
       pumpConfig.manualOverride = true;
+      logEvent("SYS: Manual Override Stop");
       Serial.println("[USER] Manual Stop Command Accepted.");
     }
 
@@ -1859,23 +1859,17 @@ void updatePumpLogic() {
 
   if (!xSemaphoreTakeRecursive(systemMutex, pdMS_TO_TICKS(50))) return;
 
-  // --- NEW: CONTINUOUS MASTER/SLAVE MONITORING (Strict Version) ---
+  // --- 1. CONTINUOUS MASTER/SLAVE MONITORING ---
   if (msConfig.sysRole == 2 && pumpConfig.motorStatus == 1) {
     unsigned long now = millis();
-
-    // Check if Master is Online
     bool masterIsOnline = (WiFi.status() == WL_CONNECTED && msConfig.lastMasterUpdate != 0 && (now - msConfig.lastMasterUpdate < MASTER_LINK_TIMEOUT));
 
     if (masterIsOnline) {
-      // Check if Master is specifically in a SAFE state
-      // Safe states are ONLY "SYSTEM_STANDBY!", "FLOW_DETECTED!", or "FLOW_CHECKING!"
       bool masterIsSafe = (msConfig.masterInfo.indexOf("STANDBY") != -1 || msConfig.masterInfo.indexOf("FLOW") != -1);
-
-      // If Master is NOT safe (is Empty, Busy, Settling, Voltage Error, or Sensor Error), Slave MUST stop.
       if (!masterIsSafe) {
         pumpConfig.motorStatus = 0;
-        pumpConfig.manualOverride = false;  // Reset override so it stays stopped
-        Serial.println("[SLAVE] Master Not Ready (" + msConfig.masterInfo + "). Sequential Stop triggered.");
+        pumpConfig.manualOverride = false;
+        logEvent("SYS: Slave Stop (Master Sump Not Ready)");
         saveMotorStatus();
         triggerPublish = true;
       }
@@ -1883,8 +1877,6 @@ void updatePumpLogic() {
   }
 
   handleBuzzerPatterns();
-
-  static PumpState lastReportedState = (PumpState)-1;
 
   // --- 2. SENSORS & FLOW PERSISTENCE ---
   bool physicalFlow = (digitalRead(FLOW_SENSOR_PIN) == LOW);
@@ -1908,9 +1900,7 @@ void updatePumpLogic() {
   // --- 3. CHECK DND STATUS ---
   if (scheduleConfig.enabled) {
     struct tm timeinfo;
-    bool timeIsReady = false;
     if (getLocalTime(&timeinfo, 10) && timeinfo.tm_year > 120) {
-      timeIsReady = true;
       int hour = timeinfo.tm_hour;
       bool isInsideDndWindow = false;
       if (scheduleConfig.dndStart > scheduleConfig.dndEnd) {
@@ -1923,10 +1913,6 @@ void updatePumpLogic() {
         triggerPublish = true;
       }
     }
-    if (!timeIsReady && currentDndActive == true) {
-      currentDndActive = false;
-      triggerPublish = true;
-    }
   } else {
     currentDndActive = false;
   }
@@ -1936,27 +1922,30 @@ void updatePumpLogic() {
     pumpConfig.motorStatus = 0;
     pumpConfig.manualOverride = false;
     saveMotorStatus();
+    logEvent("SYS: Pump Auto-Stop (Tank Full)");
     triggerPublish = true;
   }
-
+  
   if (pumpConfig.motorStatus == 0 && tankConfig.displayUpperPercentage <= tankConfig.LOW_THRESHOLD && voltageConfig.status == 1 && dryRunConfig.error == 0 && !sensorError && !coolDownConfig.isResting && !currentDndActive && getStartBlockReason() == "") {
     pumpConfig.motorStatus = 1;
     coolDownConfig.runStartTime = currentMillis;
     dryRunConfig.waitSeconds = dryRunConfig.WAIT_SECONDS_SET;
     saveMotorStatus();
+    logEvent("SYS: Pump Auto-Start (Low Water)");
     triggerPublish = true;
   }
 
   // --- 5. TRANSITION & VENTING ---
   bool targetRunning = (pumpConfig.motorStatus == 1);
-  if (targetRunning && !compConfig.lastTargetStatus) {
+  static bool lastTargetStatus = false; 
+  if (targetRunning && !lastTargetStatus) {
     msConfig.isSettling = false;
     if (compConfig.opMode == 1 && compConfig.valveDelay > 0) {
       compConfig.isPreVenting = true;
       compConfig.isPostVenting = false;
       compConfig.ventStartTime = currentMillis;
     }
-  } else if (!targetRunning && compConfig.lastTargetStatus) {
+  } else if (!targetRunning && lastTargetStatus) {
     if (msConfig.sysRole == 1 && msConfig.settlingMinutes > 0) {
       msConfig.isSettling = true;
       msConfig.settleStartTime = currentMillis;
@@ -1967,27 +1956,13 @@ void updatePumpLogic() {
       compConfig.ventStartTime = currentMillis;
     }
   }
-  compConfig.lastTargetStatus = targetRunning;
+  lastTargetStatus = targetRunning;
 
-  if (compConfig.isPreVenting) {
-    if (currentState == PumpState::PRE_START_VALVE) {
-      if (currentMillis - compConfig.ventStartTime >= (unsigned long)compConfig.valveDelay * 1000UL) {
-        compConfig.isPreVenting = false;
-        triggerPublish = true;
-      }
-    } else {
-      compConfig.ventStartTime = currentMillis;
-    }
+  if (compConfig.isPreVenting && currentMillis - compConfig.ventStartTime >= (unsigned long)compConfig.valveDelay * 1000UL) {
+    compConfig.isPreVenting = false; triggerPublish = true;
   }
-  if (compConfig.isPostVenting) {
-    if (currentState == PumpState::POST_STOP_VALVE) {
-      if (currentMillis - compConfig.ventStartTime >= (unsigned long)compConfig.valveDelay * 1000UL) {
-        compConfig.isPostVenting = false;
-        triggerPublish = true;
-      }
-    } else {
-      compConfig.ventStartTime = currentMillis;
-    }
+  if (compConfig.isPostVenting && currentMillis - compConfig.ventStartTime >= (unsigned long)compConfig.valveDelay * 1000UL) {
+    compConfig.isPostVenting = false; triggerPublish = true;
   }
 
   // --- 6. COOL-DOWN & VOLTAGE PROTECTION ---
@@ -2005,17 +1980,13 @@ void updatePumpLogic() {
   }
 
   if (coolDownConfig.isResting) {
-    static unsigned long lastCoolSecond = 0;
-    if (currentMillis - lastCoolSecond >= 1000) {
-      lastCoolSecond = currentMillis;
-      triggerPublish = true;  // Update countdown every second
-    }
     if (currentMillis - coolDownConfig.restStartTime >= (unsigned long)coolDownConfig.restMinutes * 60000UL) {
       coolDownConfig.isResting = false;
       String blockReason = getStartBlockReason();
       if (pumpConfig.wasRunningBeforeCoolDown && blockReason == "" && voltageConfig.status == 1 && (!currentDndActive || pumpConfig.manualOverride)) {
         pumpConfig.motorStatus = 1;
         coolDownConfig.runStartTime = currentMillis;
+        logEvent("SYS: Pump Resumed (Cool-down End)");
       }
       pumpConfig.wasRunningBeforeCoolDown = false;
       saveMotorStatus();
@@ -2033,9 +2004,10 @@ void updatePumpLogic() {
     }
     voltageConfig.lastCheck = currentMillis;
   } else if (voltageConfig.status == 0) {
-    if (currentMillis - voltageConfig.lastCheck >= 1000) {
+    static unsigned long lastWaitDec = 0;
+    if (currentMillis - lastWaitDec >= 1000) {
       voltageConfig.waitSeconds--;
-      voltageConfig.lastCheck = currentMillis;
+      lastWaitDec = currentMillis;
       triggerPublish = true;
       if (voltageConfig.waitSeconds <= 0) {
         voltageConfig.status = 1;
@@ -2043,6 +2015,7 @@ void updatePumpLogic() {
         if (pumpConfig.wasRunningBeforeVoltageError && blockReason == "" && !sensorError && !coolDownConfig.isResting && (!currentDndActive || pumpConfig.manualOverride)) {
           pumpConfig.motorStatus = 1;
           coolDownConfig.runStartTime = currentMillis;
+          logEvent("SYS: Pump Resumed (Voltage OK)");
         }
         pumpConfig.wasRunningBeforeVoltageError = false;
         saveMotorStatus();
@@ -2050,62 +2023,36 @@ void updatePumpLogic() {
     }
   }
 
-  if (msConfig.isSettling) {
-    static unsigned long lastSettleSecond = 0;
-    if (currentMillis - lastSettleSecond >= 1000) {
-      lastSettleSecond = currentMillis;
-      triggerPublish = true;  // Update countdown every second
-    }
-    if (currentMillis - msConfig.settleStartTime >= (unsigned long)msConfig.settlingMinutes * 60000UL) {
-      msConfig.isSettling = false;
-      triggerPublish = true;
-    }
+  if (msConfig.isSettling && currentMillis - msConfig.settleStartTime >= (unsigned long)msConfig.settlingMinutes * 60000UL) {
+    msConfig.isSettling = false; triggerPublish = true;
   }
 
-// --- 7. SMART STATE DETERMINATION & LOGGING (FIXED) ---
+  // --- 7. SMART STATE DETERMINATION & LOGGING (FIXED) ---
   static String lastStableCondition = "NORMAL"; 
   String currentCondition = "NORMAL";           
   String logMessage = "";
 
-  // 1. Determine the logical condition based on your settings
-  if (voltageConfig.currentVoltage > highCutoff) {
-      currentCondition = "HIGH_V";
-  } else if (voltageConfig.currentVoltage < lowCutoff) {
-      currentCondition = "LOW_V";
-  } else if (voltageConfig.status == 0) {
-      // If we are in the "Wait/Recovery" period (Gap)
+  if (voltageConfig.currentVoltage > highCutoff) currentCondition = "HIGH_V";
+  else if (voltageConfig.currentVoltage < lowCutoff) currentCondition = "LOW_V";
+  else if (voltageConfig.status == 0) {
       if (voltageConfig.currentVoltage > highResume) currentCondition = "HIGH_V";
       else if (voltageConfig.currentVoltage < lowResume) currentCondition = "LOW_V";
   }
-
   if (sensorError) currentCondition = "SENSOR_ERR";
   else if (dryRunConfig.error == 1) currentCondition = "DRY_RUN";
   else if (coolDownConfig.isResting) currentCondition = "RESTING";
 
-  // 2. ONLY log if the condition changes (Prevents Spam)
   if (currentCondition != lastStableCondition) {
-      
-      if (currentCondition == "NORMAL") {
-          logMessage = "SYS: Power Normal / Standby";
-      } else if (currentCondition == "HIGH_V") {
-          logMessage = "VOLT: High (" + String((int)voltageConfig.currentVoltage) + "V)";
-      } else if (currentCondition == "LOW_V") {
-          logMessage = "VOLT: Low (" + String((int)voltageConfig.currentVoltage) + "V)";
-      } else if (currentCondition == "SENSOR_ERR") {
-          logMessage = "ERR: Sensor Failure";
-      } else if (currentCondition == "DRY_RUN") {
-          logMessage = "ALR: Dry Run Detected";
-      } else if (currentCondition == "RESTING") {
-          logMessage = "INFO: Motor Cool-down";
-      }
-
-      if (logMessage != "") {
-          logEvent(logMessage); // This writes to your history
-      }
+      if (currentCondition == "NORMAL") logMessage = "SYS: All Guards Normal";
+      else if (currentCondition == "HIGH_V") logMessage = "VOLT: High (" + String((int)voltageConfig.currentVoltage) + "V)";
+      else if (currentCondition == "LOW_V") logMessage = "VOLT: Low (" + String((int)voltageConfig.currentVoltage) + "V)";
+      else if (currentCondition == "SENSOR_ERR") logMessage = "ERR: Sensor Failure";
+      else if (currentCondition == "DRY_RUN") logMessage = "ALR: Dry Run Detected";
+      else if (currentCondition == "RESTING") logMessage = "INFO: Motor Cool-down";
+      if (logMessage != "") logEvent(logMessage);
       lastStableCondition = currentCondition;
   }
 
-  // 3. Keep your existing State selection for the LCD/Cloud visuals
   if (voltAbnormal) currentState = PumpState::VOLTAGE_ERROR;
   else if (voltageConfig.status == 0) currentState = PumpState::VOLTAGE_WAIT;
   else if (compConfig.isPostVenting) currentState = PumpState::POST_STOP_VALVE;
@@ -2128,9 +2075,10 @@ void updatePumpLogic() {
       if (effectiveFlow) {
         dryRunConfig.waitSeconds = dryRunConfig.WAIT_SECONDS_SET;
       } else {
-        if (currentMillis - dryRunConfig.lastUpdate >= 1000) {
+        static unsigned long lastDrUpdate = 0;
+        if (currentMillis - lastDrUpdate >= 1000) {
           dryRunConfig.waitSeconds--;
-          dryRunConfig.lastUpdate = currentMillis;
+          lastDrUpdate = currentMillis;
           triggerPublish = true;
           if (dryRunConfig.waitSeconds <= 0) {
             dryRunConfig.error = 1;
@@ -2141,30 +2089,22 @@ void updatePumpLogic() {
         }
       }
       break;
-
     case PumpState::PRE_START_VALVE:
     case PumpState::POST_STOP_VALVE:
       digitalWrite(MOTOR_PIN, LOW);
       digitalWrite(SOLENOID_PIN, HIGH);
       pumpConfig.isRunning = false;
       break;
-
-    case PumpState::SENSOR_ERROR:
-    case PumpState::DRY_RUN_ALARM:
-    case PumpState::DRY_RUN_LOCKED:
-    case PumpState::SETTLING_WATER:
     default:
       digitalWrite(MOTOR_PIN, LOW);
       digitalWrite(SOLENOID_PIN, LOW);
       pumpConfig.isRunning = false;
-      if (currentState == PumpState::DRY_RUN_ALARM) {
-        if (currentMillis - dryRunConfig.alarmStartTime >= 60000) {
+      if (currentState == PumpState::DRY_RUN_ALARM && currentMillis - dryRunConfig.alarmStartTime >= 60000) {
           dryRunConfig.error = 2;
           dryRunConfig.retryCountdown = dryRunConfig.autoRetryMinutes * 60;
           dryRunConfig.lastRetryUpdate = currentMillis;
-        }
-      } else if (currentState == PumpState::DRY_RUN_LOCKED) {
-        if (dryRunConfig.autoRetryMinutes > 0 && currentMillis - dryRunConfig.lastRetryUpdate >= 1000) {
+      } else if (currentState == PumpState::DRY_RUN_LOCKED && dryRunConfig.autoRetryMinutes > 0) {
+        if (currentMillis - dryRunConfig.lastRetryUpdate >= 1000) {
           dryRunConfig.retryCountdown--;
           dryRunConfig.lastRetryUpdate = currentMillis;
           triggerPublish = true;
@@ -2173,6 +2113,7 @@ void updatePumpLogic() {
             dryRunConfig.waitSeconds = dryRunConfig.WAIT_SECONDS_SET;
             pumpConfig.motorStatus = 1;
             coolDownConfig.runStartTime = currentMillis;
+            logEvent("SYS: Dry-Run Auto-Retry");
             saveMotorStatus();
           }
         }
@@ -2180,19 +2121,14 @@ void updatePumpLogic() {
       break;
   }
 
-  // Track specific sub-values to ensure countdowns sync to cloud
-  static int lastSecs = -1;
-  static int lastRetry = -1;
-  int currentSecs = dryRunConfig.waitSeconds;
-  int currentRetry = dryRunConfig.retryCountdown;
-
-  if (currentState != lastReportedState || currentSecs != lastSecs || currentRetry != lastRetry) {
+  static PumpState lastReportedState = (PumpState)-1;
+  static int lastSecs = -1, lastRetry = -1;
+  if (currentState != lastReportedState || dryRunConfig.waitSeconds != lastSecs || dryRunConfig.retryCountdown != lastRetry) {
     lastReportedState = currentState;
-    lastSecs = currentSecs;
-    lastRetry = currentRetry;
+    lastSecs = dryRunConfig.waitSeconds;
+    lastRetry = dryRunConfig.retryCountdown;
     triggerPublish = true;
   }
-
   if (triggerPublish) pendingMqttPublish = true;
   xSemaphoreGiveRecursive(systemMutex);
 }
