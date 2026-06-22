@@ -5,12 +5,15 @@
     <title>Smart Pump Control Installer</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Smart Pump Control Premium Installer - ESP32-S3 firmware flasher and setup guide.">
+    <meta name="description"
+        content="Smart Pump Control Premium Installer �?" ESP32-S3 firmware flasher and setup guide.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
     <style>
-        /* DESIGN TOKENS */
+        /* �"?�"?�"? DESIGN TOKENS �"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"? */
         :root {
             --bg-deep: #080c17;
             --bg-card: #0e1525;
@@ -27,7 +30,7 @@
             --glow-blue: rgba(0, 180, 240, 0.35);
         }
 
-        /* RESET & BASE */
+        /* �"?�"?�"? RESET & BASE �"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"? */
         *,
         *::before,
         *::after {
@@ -49,6 +52,7 @@
             min-height: 100vh;
         }
 
+        /* Subtle star-field overlay */
         body::before {
             content: '';
             position: fixed;
@@ -62,7 +66,7 @@
             z-index: 0;
         }
 
-        /* TYPOGRAPHY */
+        /* �"?�"?�"? TYPOGRAPHY �"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"? */
         h1 {
             background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
             -webkit-background-clip: text;
@@ -109,7 +113,7 @@
             text-decoration: underline;
         }
 
-        /* MAIN CONTAINER */
+        /* �"?�"?�"? MAIN CONTAINER �"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"? */
         .container {
             position: relative;
             z-index: 1;
@@ -131,10 +135,18 @@
         }
 
         @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(24px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
+        /* Top accent line */
         .container::before {
             content: '';
             position: absolute;
@@ -146,7 +158,7 @@
             border-radius: 1px;
         }
 
-        /* LOGO */
+        /* �"?�"?�"? LOGO �"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"? */
         .logo {
             width: 96px;
             height: auto;
@@ -158,11 +170,18 @@
         }
 
         @keyframes logoPulse {
-            0%, 100% { box-shadow: 0 0 20px rgba(0, 180, 240, 0.5), 0 0 55px rgba(0, 180, 240, 0.18); }
-            50% { box-shadow: 0 0 35px rgba(0, 180, 240, 0.8), 0 0 90px rgba(0, 180, 240, 0.38); }
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(0, 180, 240, 0.5), 0 0 55px rgba(0, 180, 240, 0.18);
+            }
+
+            50% {
+                box-shadow: 0 0 35px rgba(0, 180, 240, 0.8), 0 0 90px rgba(0, 180, 240, 0.38);
+            }
         }
 
-        /* BADGE / VERSION CHIP */
+        /* �"?�"?�"? BADGE / VERSION CHIP �"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"? */
         .version-chip {
             display: inline-block;
             background: rgba(0, 180, 240, 0.1);
@@ -177,7 +196,7 @@
             margin-bottom: 14px;
         }
 
-        /* BUTTONS */
+        /* �"?�"?�"? BUTTONS �"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"? */
         .button {
             border: none;
             color: white;
@@ -209,19 +228,32 @@
         }
 
         @keyframes shimmer {
-            0% { left: -100%; }
-            100% { left: 220%; }
+            0% {
+                left: -100%;
+            }
+
+            100% {
+                left: 220%;
+            }
         }
 
-        .button:hover { transform: translateY(-3px); }
-        .button:active { transform: scale(0.97); opacity: 0.9; }
+        .button:hover {
+            transform: translateY(-3px);
+        }
+
+        .button:active {
+            transform: scale(0.97);
+            opacity: 0.9;
+        }
 
         .button-v1 {
             background: linear-gradient(135deg, #005fa3, var(--accent-blue));
             box-shadow: 0 4px 22px rgba(0, 180, 240, 0.4);
         }
 
-        .button-v1:hover { box-shadow: 0 8px 35px rgba(0, 180, 240, 0.6); }
+        .button-v1:hover {
+            box-shadow: 0 8px 35px rgba(0, 180, 240, 0.6);
+        }
 
         .button-cloud {
             background: linear-gradient(135deg, #006b45, var(--accent-green));
@@ -229,7 +261,19 @@
             color: #001a0e;
         }
 
-        .button-cloud:hover { box-shadow: 0 8px 35px rgba(0, 232, 122, 0.55); }
+        .button-cloud:hover {
+            box-shadow: 0 8px 35px rgba(0, 232, 122, 0.55);
+        }
+
+        .button-apk {
+            background: linear-gradient(135deg, #3f51b5, #7c4dff);
+            box-shadow: 0 4px 22px rgba(124, 77, 255, 0.35);
+            color: #ffffff;
+        }
+
+        .button-apk:hover {
+            box-shadow: 0 8px 35px rgba(124, 77, 255, 0.55);
+        }
 
         .button-premium {
             background: linear-gradient(135deg, #b87000, var(--accent-amber));
@@ -237,16 +281,18 @@
             color: #1a0e00;
         }
 
-        .button-premium:hover { box-shadow: 0 8px 35px rgba(255, 176, 32, 0.55); }
+        .button-premium:hover {
+            box-shadow: 0 8px 35px rgba(255, 176, 32, 0.55);
+        }
 
-        /* DIVIDER */
+        /* �"?�"?�"? DIVIDER �"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"? */
         .section-divider {
             border: none;
             border-top: 1px solid rgba(255, 255, 255, 0.06);
             margin: 28px 0;
         }
 
-        /* GRID LAYOUT */
+        /* �"?�"?�"? GRID LAYOUT �"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"? */
         .grid-container {
             display: grid;
             grid-template-columns: 1fr;
@@ -257,11 +303,16 @@
         }
 
         @media(min-width: 768px) {
-            .grid-container { grid-template-columns: 1fr 1fr; }
-            .container { padding: 45px 40px; }
+            .grid-container {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .container {
+                padding: 45px 40px;
+            }
         }
 
-        /* CARDS */
+        /* �"?�"?�"? CARDS �"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"? */
         .card {
             background: rgba(10, 16, 30, 0.7);
             border: 1px solid rgba(0, 180, 240, 0.1);
@@ -271,7 +322,9 @@
             flex-direction: column;
             width: 100%;
             min-width: 0;
-            transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.28s, box-shadow 0.28s;
+            transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 0.28s,
+                box-shadow 0.28s;
         }
 
         .card:hover {
@@ -294,10 +347,25 @@
             gap: 8px;
         }
 
-        .card ol, .card ul { padding-left: 20px; margin-bottom: 0; }
-        .card li { margin-bottom: 10px; font-size: 0.9rem; color: #8ca0be; line-height: 1.6; }
-        .card li b { color: var(--text-primary); font-weight: 600; }
+        .card ol,
+        .card ul {
+            padding-left: 20px;
+            margin-bottom: 0;
+        }
 
+        .card li {
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: #8ca0be;
+            line-height: 1.6;
+        }
+
+        .card li b {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* Tinted card variants */
         .card-blue {
             background: rgba(0, 60, 130, 0.12) !important;
             border-color: rgba(0, 180, 240, 0.18) !important;
@@ -308,6 +376,12 @@
             border-color: rgba(255, 176, 32, 0.18) !important;
         }
 
+        .card-blue h3 {
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
         .card-amber h3 {
             background: linear-gradient(90deg, var(--accent-amber), #ff8c42);
             -webkit-background-clip: text;
@@ -315,7 +389,7 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* WIRING WRAPPER */
+        /* �"?�"?�"? WIRING WRAPPER �"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"? */
         .wiring-wrapper {
             overflow-x: auto;
             background: rgba(4, 10, 20, 0.8);
@@ -334,34 +408,171 @@
             font-size: 11px;
         }
 
-        .wiring-table td { padding: 4px 2px; vertical-align: middle; height: 34px; white-space: nowrap; }
+        .wiring-table td {
+            padding: 4px 2px;
+            vertical-align: middle;
+            height: 34px;
+            white-space: nowrap;
+        }
 
-        .comp-base { border-radius: 8px; font-weight: 700; padding: 7px 5px; display: inline-block; width: 95px; text-align: center; font-size: 11px; transition: box-shadow 0.3s; }
-        .comp-base:hover { box-shadow: 0 0 14px rgba(0, 180, 240, 0.5); }
-        .comp-sensor { background: rgba(0, 80, 160, 0.25); border: 1.5px solid rgba(0, 180, 240, 0.6); color: var(--accent-blue); }
-        .comp-actuator { background: rgba(160, 0, 40, 0.2); border: 1.5px solid rgba(255, 59, 92, 0.5); color: #ff7090; }
-        .comp-display { background: rgba(0, 100, 90, 0.2); border: 1.5px solid rgba(0, 229, 209, 0.5); color: var(--accent-cyan); }
-        .comp-input { background: rgba(60, 60, 80, 0.25); border: 1.5px solid rgba(160, 160, 200, 0.4); color: #a0a8c0; }
+        /* Component Boxes */
+        .comp-base {
+            border-radius: 8px;
+            font-weight: 700;
+            padding: 7px 5px;
+            display: inline-block;
+            width: 95px;
+            text-align: center;
+            font-size: 11px;
+            transition: box-shadow 0.3s;
+        }
 
-        .board-body-left { background: #071408; color: #00ff88; text-align: left; border-left: 2px solid #1a4a1a; padding-left: 6px; width: 66px; font-family: 'JetBrains Mono', monospace; text-shadow: 0 0 8px rgba(0, 255, 136, 0.6); font-size: 10px; }
-        .board-body-right { background: #071408; color: #00ff88; text-align: right; border-right: 2px solid #1a4a1a; padding-right: 6px; width: 66px; font-family: 'JetBrains Mono', monospace; text-shadow: 0 0 8px rgba(0, 255, 136, 0.6); font-size: 10px; }
-        .board-header { background: linear-gradient(90deg, #0a2215, #154030); color: #00ff88; text-align: center; font-weight: 700; padding: 9px; font-size: 0.85em; letter-spacing: 2px; border-radius: 8px 8px 0 0; text-shadow: 0 0 12px rgba(0, 255, 136, 0.8); }
-        .board-footer { background: linear-gradient(90deg, #0a2215, #154030); height: 8px; border-radius: 0 0 8px 8px; }
+        .comp-base:hover {
+            box-shadow: 0 0 14px rgba(0, 180, 240, 0.5);
+        }
 
-        .wire-line { height: 2px; background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan)); box-shadow: 0 0 4px rgba(0, 180, 240, 0.7); width: 12px; display: inline-block; vertical-align: middle; position: relative; animation: wirePulse 2.2s ease-in-out infinite; }
-        @keyframes wirePulse { 0%, 100% { opacity: 0.55; box-shadow: 0 0 4px rgba(0, 180, 240, 0.6); } 50% { opacity: 1; box-shadow: 0 0 10px rgba(0, 229, 209, 1); } }
-        .wire-dot { width: 5px; height: 5px; background: var(--accent-cyan); border-radius: 50%; position: absolute; top: -1.5px; box-shadow: 0 0 5px var(--accent-cyan); }
-        .dot-left { right: 0; }
-        .dot-right { left: 0; }
+        .comp-sensor {
+            background: rgba(0, 80, 160, 0.25);
+            border: 1.5px solid rgba(0, 180, 240, 0.6);
+            color: var(--accent-blue);
+        }
 
-        /* FOOTER */
-        .page-footer { margin-top: 28px; font-size: 0.82rem; color: var(--text-dim); }
-        .page-footer strong { color: var(--text-muted); }
+        .comp-actuator {
+            background: rgba(160, 0, 40, 0.2);
+            border: 1.5px solid rgba(255, 59, 92, 0.5);
+            color: #ff7090;
+        }
 
-        /* COMPAT NOTE */
-        .compat-note { display: inline-block; background: rgba(255, 176, 32, 0.08); border: 1px solid rgba(255, 176, 32, 0.2); color: #b08000; padding: 5px 14px; border-radius: 8px; font-size: 0.82rem; margin-top: 6px; }
+        .comp-display {
+            background: rgba(0, 100, 90, 0.2);
+            border: 1.5px solid rgba(0, 229, 209, 0.5);
+            color: var(--accent-cyan);
+        }
 
-        .btn-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin-top: 26px; }
+        .comp-input {
+            background: rgba(60, 60, 80, 0.25);
+            border: 1.5px solid rgba(160, 160, 200, 0.4);
+            color: #a0a8c0;
+        }
+
+        /* ESP32 Board */
+        .board-body-left {
+            background: #071408;
+            color: #00ff88;
+            text-align: left;
+            border-left: 2px solid #1a4a1a;
+            padding-left: 6px;
+            width: 66px;
+            font-family: 'JetBrains Mono', monospace;
+            text-shadow: 0 0 8px rgba(0, 255, 136, 0.6);
+            font-size: 10px;
+        }
+
+        .board-body-right {
+            background: #071408;
+            color: #00ff88;
+            text-align: right;
+            border-right: 2px solid #1a4a1a;
+            padding-right: 6px;
+            width: 66px;
+            font-family: 'JetBrains Mono', monospace;
+            text-shadow: 0 0 8px rgba(0, 255, 136, 0.6);
+            font-size: 10px;
+        }
+
+        .board-header {
+            background: linear-gradient(90deg, #0a2215, #154030);
+            color: #00ff88;
+            text-align: center;
+            font-weight: 700;
+            padding: 9px;
+            font-size: 0.85em;
+            letter-spacing: 2px;
+            border-radius: 8px 8px 0 0;
+            text-shadow: 0 0 12px rgba(0, 255, 136, 0.8);
+        }
+
+        .board-footer {
+            background: linear-gradient(90deg, #0a2215, #154030);
+            height: 8px;
+            border-radius: 0 0 8px 8px;
+        }
+
+        /* Wires */
+        .wire-line {
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
+            box-shadow: 0 0 4px rgba(0, 180, 240, 0.7);
+            width: 12px;
+            display: inline-block;
+            vertical-align: middle;
+            position: relative;
+            animation: wirePulse 2.2s ease-in-out infinite;
+        }
+
+        @keyframes wirePulse {
+
+            0%,
+            100% {
+                opacity: 0.55;
+                box-shadow: 0 0 4px rgba(0, 180, 240, 0.6);
+            }
+
+            50% {
+                opacity: 1;
+                box-shadow: 0 0 10px rgba(0, 229, 209, 1);
+            }
+        }
+
+        .wire-dot {
+            width: 5px;
+            height: 5px;
+            background: var(--accent-cyan);
+            border-radius: 50%;
+            position: absolute;
+            top: -1.5px;
+            box-shadow: 0 0 5px var(--accent-cyan);
+        }
+
+        .dot-left {
+            right: 0;
+        }
+
+        .dot-right {
+            left: 0;
+        }
+
+        /* �"?�"?�"? FOOTER �"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"? */
+        .page-footer {
+            margin-top: 28px;
+            font-size: 0.82rem;
+            color: var(--text-dim);
+        }
+
+        .page-footer strong {
+            color: var(--text-muted);
+        }
+
+        /* �"?�"?�"? COMPAT NOTE �"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"?�"? */
+        .compat-note {
+            display: inline-block;
+            background: rgba(255, 176, 32, 0.08);
+            border: 1px solid rgba(255, 176, 32, 0.2);
+            color: #b08000;
+            padding: 5px 14px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            margin-top: 6px;
+        }
+
+        /* Buttons row */
+        .btn-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 14px;
+            margin-top: 26px;
+        }
     </style>
     <script type="module" src="https://unpkg.com/esp-web-tools@9/dist/web/install-button.js?module"></script>
 </head>
@@ -382,7 +593,12 @@
         const body = new URLSearchParams();
         body.append("token", token);
         body.append("deviceId", getDeviceId());
-        const res = await fetch(TOKEN_API_URL, { method: "POST", body });
+
+        const res = await fetch(TOKEN_API_URL, {
+            method: "POST",
+            body
+        });
+
         return res.json();
     }
 
@@ -417,6 +633,7 @@
 
         async function runTokenCheck() {
             if (sessionClosed) return false;
+
             const token = tokenInput.value.trim();
             if (!token) {
                 tokenMsg.textContent = "Please enter token.";
@@ -424,9 +641,12 @@
                 lockInstall();
                 return false;
             }
+
             tokenMsg.textContent = "Checking token...";
             tokenMsg.style.color = "#ffb020";
+
             const result = await verifyToken(token);
+
             if (result.allow) {
                 tokenMsg.textContent = "Token accepted. You can install now.";
                 tokenMsg.style.color = "#00e87a";
@@ -440,17 +660,36 @@
             }
         }
 
-        tokenInput.addEventListener("blur", async () => { try { await runTokenCheck(); } catch { } });
-        tokenInput.addEventListener("keydown", (ev) => { if (ev.key !== "Enter") return; ev.preventDefault(); tokenInput.blur(); });
+        tokenInput.addEventListener("blur", async () => {
+            try { await runTokenCheck(); } catch { }
+        });
+
+        tokenInput.addEventListener("keydown", (ev) => {
+            if (ev.key !== "Enter") return;
+            ev.preventDefault();
+            tokenInput.blur();
+        });
 
         realBtn.addEventListener("click", async (ev) => {
-            if (sessionClosed) { ev.preventDefault(); ev.stopPropagation(); return; }
+            if (sessionClosed) {
+                ev.preventDefault();
+                ev.stopPropagation();
+                return;
+            }
+
             try {
                 const ok = await runTokenCheck();
-                if (!ok) { ev.preventDefault(); ev.stopPropagation(); return; }
+                if (!ok) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    return;
+                }
+
+                // keep flow open so user can complete install popup
                 closeSession("Install session started. Complete installation in popup.", "#00e87a");
             } catch (e) {
-                ev.preventDefault(); ev.stopPropagation();
+                ev.preventDefault();
+                ev.stopPropagation();
                 tokenMsg.textContent = "Cannot reach token server.";
                 tokenMsg.style.color = "#ffb020";
                 lockInstall();
@@ -466,121 +705,248 @@
 
         installBtn.addEventListener("state-changed", (ev) => {
             const st = ev && ev.detail ? ev.detail.state : "";
-            if (st === "FINISHED" || st === "installed") { handleInstallSuccessOnce(); }
+            if (st === "FINISHED" || st === "installed") {
+                handleInstallSuccessOnce();
+            }
         });
 
-        installBtn.addEventListener("installation-success", () => { handleInstallSuccessOnce(); });
+        installBtn.addEventListener("installation-success", () => {
+            handleInstallSuccessOnce();
+        });
     });
 </script>
 
 <body>
     <div class="container">
+        <!-- Logo -->
         <img src="logo.png" alt="Smart Pump Logo" class="logo">
+
+        <!-- Title -->
         <h1>Smart Pump Control</h1>
         <div class="version-chip">Premium Edition &nbsp;·&nbsp; v1.2.0</div>
         <h2>Pump &amp; Compressor Dual-Mode Controller</h2>
-        <p>Advanced <b>Voltage Protection</b>, <b>Dry-Run Auto-Retry</b>, <b>Solenoid Venting</b>, and <b>Cloud MQTT Tracking</b> - all in one firmware.</p>
 
+        <p>
+            Advanced <b>Voltage Protection</b>, <b>Dry-Run Auto-Retry</b>,
+            <b>Solenoid Venting</b>, and <b>Cloud MQTT Tracking</b> - all in one firmware.
+        </p>
+
+        <!-- Token Gate -->
         <div style="max-width:360px; margin:16px auto 12px; text-align:center;">
-            <label for="tokenInput" style="display:block; margin-bottom:8px; color:var(--text-primary); font-weight:600;">Install Token</label>
-            <input id="tokenInput" type="text" placeholder="Enter your token" style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border); background:var(--bg-surface); color:var(--text-primary); text-align:center;">
+            <label for="tokenInput"
+                style="display:block; margin-bottom:8px; color:var(--text-primary); font-weight:600;">Install
+                Token</label>
+            <input id="tokenInput" type="text" placeholder="Enter your token"
+                style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border); background:var(--bg-surface); color:var(--text-primary); text-align:center;">
             <p id="tokenMsg" style="margin:10px 0 0; font-size:0.9rem; color:var(--text-muted);"></p>
         </div>
 
+        <!-- Flash Button -->
         <esp-web-install-button id="installBtn" manifest="installer_manifest.json">
             <button slot="activate" class="button button-v1">&#9889; CONNECT &amp; INSTALL</button>
         </esp-web-install-button>
-        <div><span class="compat-note">Compatible with ESP32-S3 &middot; Connect via USB</span></div>
+        <div><span class="compat-note">&#128268; Compatible with ESP32-S3 &middot; Connect via USB</span></div>
 
+        <!-- Dashboard & Guide Links -->
         <hr class="section-divider">
-        <p style="font-weight:600; color:var(--text-primary); margin-bottom:18px;">Documentation &amp; Cloud Access</p>
+
+        <p style="font-weight:600; color:var(--text-primary); margin-bottom:18px;">&#128214; Documentation &amp; Cloud Access
+        </p>
         <div class="btn-row">
-            <a href="cloud_control.html" class="button button-cloud">CLOUD DASHBOARD</a>
-            <a href="user_guide_premium.html" target="_blank" class="button button-premium">TECHNICAL MANUAL</a>
+            <a href="cloud_control.html" class="button button-cloud">&#9729;&#65039; CLOUD DASHBOARD</a>
+            <a href="smart_pump.apk" class="button button-apk" download>&#128241; DOWNLOAD ANDROID APP</a>
+            <a href="user_guide_premium.html" target="_blank" class="button button-premium">&#128214; TECHNICAL MANUAL</a>
         </div>
 
+        <!-- Info Cards -->
         <div class="grid-container">
+
+            <!-- Setup Guide -->
             <div class="card card-blue">
-                <h3>Quick Setup</h3>
+                <h3>&#128640; Quick Setup</h3>
                 <ol>
-                    <li><b>WiFi Setup:</b> Connect to hotspot <code>Auto-Pump-Config</code> (Password: <code>12345678</code>).</li>
-                    <li><b>Configure:</b> Open <a href="http://192.168.4.1" target="_blank">192.168.4.1</a> and enter your Home WiFi details.</li>
+                    <li><b>WiFi Setup:</b> Connect to hotspot <code>Auto-Pump-Config</code> (Password:
+                        <code>12345678</code>).
+                    </li>
+                    <li><b>Configure:</b> Open <a href="http://192.168.4.1" target="_blank">192.168.4.1</a> and enter
+                        your Home WiFi details.</li>
                     <li><b>Access:</b> After reboot, visit the device IP shown on the LCD to open the dashboard.</li>
-                    <li><b>Settings:</b> Set Tank Height, Voltage Limits, and Auto-Retry logic in the settings menu.</li>
+                    <li><b>Settings:</b> Set Tank Height, Voltage Limits, and Auto-Retry logic in the settings menu.
+                    </li>
                 </ol>
             </div>
 
+            <!-- Features -->
             <div class="card card-amber">
-                <h3>Safety &amp; Features</h3>
+                <h3>&#128737;&#65039; Safety &amp; Features</h3>
                 <ul>
                     <li><b>Dual-Mode:</b> Switch between <b>Water Pump</b> and <b>Air Compressor</b> operations.</li>
                     <li><b>Solenoid Venting:</b> Automatic pressure release valve for compressor reliability.</li>
-                    <li><b>Voltage Guard:</b> Automatic cut-off (>250 V or <170 V).</li>
+                    <li><b>Voltage Guard:</b> Automatic cut-off (&gt;250 V or &lt;170 V).</li>
                     <li><b>Dry-Run System:</b> Smart flow detection with <b>Auto-Retry</b> or <b>Lock</b> modes.</li>
                     <li><b>Cool-Down Logic:</b> Hardware overheating protection for high-demand loads.</li>
                     <li><b>Smart Scheduling:</b> DND mode for automated overnight silence.</li>
                 </ul>
             </div>
 
-            <div class="card" style="grid-column: 1 / -1; background: rgba(5,10,22,0.6); border-color: rgba(0,255,136,0.12);">
-                <h3>Wiring Guide (ESP32-S3)</h3>
+            <!-- Wiring Guide �?" spans full width -->
+            <div class="card"
+                style="grid-column: 1 / -1; background: rgba(5,10,22,0.6); border-color: rgba(0,255,136,0.12);">
+                <h3
+                    style="background: linear-gradient(90deg,#00ff88,#00e5d1); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;">
+                    &#128268; Wiring Guide (ESP32-S3)</h3>
+
                 <div class="wiring-wrapper">
                     <table class="wiring-table">
-                        <tr><td></td><td></td><td colspan="2" class="board-header">ESP32-S3</td><td></td><td></td></tr>
+                        <!-- Header -->
                         <tr>
-                            <td><div class="comp-base comp-display">LCD (SDA)</div></td>
-                            <td><div class="wire-line"><div class="wire-dot dot-left"></div></div></td>
+                            <td></td>
+                            <td></td>
+                            <td colspan="2" class="board-header">�sT ESP32-S3</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <!-- LCD SDA / SCL -->
+                        <tr>
+                            <td>
+                                <div class="comp-base comp-display">&#128421;&#65039; LCD (SDA)</div>
+                            </td>
+                            <td>
+                                <div class="wire-line">
+                                    <div class="wire-dot dot-left"></div>
+                                </div>
+                            </td>
                             <td class="board-body-left">GPIO 01</td>
                             <td class="board-body-right">GPIO 02</td>
-                            <td><div class="wire-line"><div class="wire-dot dot-right"></div></div></td>
-                            <td><div class="comp-base comp-display">LCD (SCL)</div></td>
+                            <td>
+                                <div class="wire-line">
+                                    <div class="wire-dot dot-right"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="comp-base comp-display">&#128421;&#65039; LCD (SCL)</div>
+                            </td>
                         </tr>
+                        <!-- Volt / Trig -->
                         <tr>
-                            <td><div class="comp-base comp-sensor">Volt Sensor</div></td>
-                            <td><div class="wire-line"><div class="wire-dot dot-left"></div></div></td>
+                            <td>
+                                <div class="comp-base comp-sensor">&#9889; Volt Sensor</div>
+                            </td>
+                            <td>
+                                <div class="wire-line">
+                                    <div class="wire-dot dot-left"></div>
+                                </div>
+                            </td>
                             <td class="board-body-left">GPIO 04</td>
                             <td class="board-body-right">GPIO 05</td>
-                            <td><div class="wire-line"><div class="wire-dot dot-right"></div></div></td>
-                            <td><div class="comp-base comp-sensor">Ultra Trig</div></td>
+                            <td>
+                                <div class="wire-line">
+                                    <div class="wire-dot dot-right"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="comp-base comp-sensor">&#128207; Ultra Trig</div>
+                            </td>
                         </tr>
+                        <!-- Echo / Buzzer -->
                         <tr>
-                            <td><div class="comp-base comp-sensor">Ultra Echo</div></td>
-                            <td><div class="wire-line"><div class="wire-dot dot-left"></div></div></td>
+                            <td>
+                                <div class="comp-base comp-sensor">&#128207; Ultra Echo</div>
+                            </td>
+                            <td>
+                                <div class="wire-line">
+                                    <div class="wire-dot dot-left"></div>
+                                </div>
+                            </td>
                             <td class="board-body-left">GPIO 06</td>
                             <td class="board-body-right">GPIO 07</td>
-                            <td><div class="wire-line"><div class="wire-dot dot-right"></div></div></td>
-                            <td><div class="comp-base comp-actuator">Buzzer</div></td>
+                            <td>
+                                <div class="wire-line">
+                                    <div class="wire-dot dot-right"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="comp-base comp-actuator">&#128276; Buzzer</div>
+                            </td>
                         </tr>
+                        <!-- Motor / Manual Btn -->
                         <tr>
-                            <td><div class="comp-base comp-actuator">Motor</div></td>
-                            <td><div class="wire-line"><div class="wire-dot dot-left"></div></div></td>
+                            <td>
+                                <div class="comp-base comp-actuator">&#9881;&#65039; Motor</div>
+                            </td>
+                            <td>
+                                <div class="wire-line">
+                                    <div class="wire-dot dot-left"></div>
+                                </div>
+                            </td>
                             <td class="board-body-left">GPIO 08</td>
                             <td class="board-body-right">GPIO 09</td>
-                            <td><div class="wire-line"><div class="wire-dot dot-right"></div></div></td>
-                            <td><div class="comp-base comp-input">Manual Btn</div></td>
+                            <td>
+                                <div class="wire-line">
+                                    <div class="wire-dot dot-right"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="comp-base comp-input">&#128278; Manual Btn</div>
+                            </td>
                         </tr>
+                        <!-- Solenoid / Flow -->
                         <tr>
-                            <td><div class="comp-base comp-actuator">Solenoid</div></td>
-                            <td><div class="wire-line"><div class="wire-dot dot-left"></div></div></td>
+                            <td>
+                                <div class="comp-base comp-actuator">&#128168; Solenoid</div>
+                            </td>
+                            <td>
+                                <div class="wire-line">
+                                    <div class="wire-dot dot-left"></div>
+                                </div>
+                            </td>
                             <td class="board-body-left">GPIO 10</td>
                             <td class="board-body-right">GPIO 18</td>
-                            <td><div class="wire-line"><div class="wire-dot dot-right"></div></div></td>
-                            <td><div class="comp-base comp-sensor">Flow Sens</div></td>
+                            <td>
+                                <div class="wire-line">
+                                    <div class="wire-dot dot-right"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="comp-base comp-sensor">&#127754; Flow Sens</div>
+                            </td>
                         </tr>
+                        <!-- RGB LED -->
                         <tr>
-                            <td><div class="comp-base comp-actuator">RGB LED</div></td>
-                            <td><div class="wire-line"><div class="wire-dot dot-left"></div></div></td>
+                            <td>
+                                <div class="comp-base comp-actuator">&#127752; RGB LED</div>
+                            </td>
+                            <td>
+                                <div class="wire-line">
+                                    <div class="wire-dot dot-left"></div>
+                                </div>
+                            </td>
                             <td class="board-body-left">GPIO 48</td>
                             <td class="board-body-right">---</td>
-                            <td><div class="wire-line"></div></td>
-                            <td><div style="width:95px;height:10px;"></div></td>
+                            <td>
+                                <div class="wire-line"></div>
+                            </td>
+                            <td>
+                                <div style="width:95px;height:10px;"></div>
+                            </td>
                         </tr>
-                        <tr><td></td><td></td><td colspan="2" class="board-footer"></td><td></td><td></td></tr>
+                        <!-- Footer -->
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td colspan="2" class="board-footer"></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
                     </table>
                 </div>
             </div>
-        </div>
+
+        </div><!-- /grid -->
+
         <p class="page-footer">Developed by <strong>Aung Moe Khine</strong></p>
-    </div>
+    </div><!-- /container -->
 </body>
+
 </html>
+
