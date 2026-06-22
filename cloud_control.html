@@ -202,6 +202,8 @@
         .tank-fill::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 50'%3E%3Cpath d='M0,25 Q100,5 200,25 T400,25 T600,25 T800,25 v35 h-800 z' fill='%2387CEFA' opacity='0.7'/%3E%3C/svg%3E"); animation: wave 4s linear infinite; z-index: 1; }
         .tank-fill::after { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 50'%3E%3Cpath d='M0,25 Q100,45 200,25 T400,25 T600,25 T800,25 v35 h-800 z' fill='%23039be5'/%3E%3C/svg%3E"); animation: wave 3s linear infinite reverse; z-index: 2; margin-top: 2px; }
         .tank-fill.low-water { background: #dc3545; box-shadow: 0 0 15px rgba(220, 53, 69, 0.5); }
+        .tank-fill.low-water::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 50'%3E%3Cpath d='M0,25 Q100,5 200,25 T400,25 T600,25 T800,25 v35 h-800 z' fill='%23ff9aa2' opacity='0.78'/%3E%3C/svg%3E"); }
+        .tank-fill.low-water::after { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 50'%3E%3Cpath d='M0,25 Q100,45 200,25 T400,25 T600,25 T800,25 v35 h-800 z' fill='%23dc3545'/%3E%3C/svg%3E"); }
         .tank-fill.pumping::before, .tank-fill.pumping::after { opacity: 1; }
         @keyframes wave { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
@@ -252,11 +254,36 @@
         .lang-mm h2 { font-size: 1.25rem; }
         .lang-mm .badge { font-size: 0.75rem; letter-spacing: 0; }
 
+        #logBox {
+            overflow-y: scroll !important;
+            overflow-x: hidden !important;
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-y;
+            overscroll-behavior: contain;
+            scrollbar-gutter: stable;
+            scrollbar-width: thin;
+        }
+
         @media screen and (max-width: 440px) {
             .lang-mm .tab { font-size: 0.72rem; padding: 12px 2px; }
             .lang-mm .row { font-size: 0.82rem; }
             .lang-mm .btn { font-size: 0.95rem; padding: 14px 4px; }
-            #logBox { font-size: 0.58rem !important; text-align: left !important; }
+            #logBox {
+                display: block !important;
+                height: 125px !important;
+                min-height: 125px;
+                max-height: 125px;
+                font-size: 0.58rem !important;
+                text-align: left !important;
+            }
+        }
+
+        @media screen and (max-width: 440px) and (orientation: landscape) {
+            #logBox {
+                height: 110px !important;
+                min-height: 110px;
+                max-height: 110px;
+            }
         }
 
         #logBox::-webkit-scrollbar { width: 6px; display: block !important; }
@@ -514,6 +541,8 @@
         let client, deviceID, devicePin, pollInterval, watchdog;
         let dataReceived = false; let isConnecting = false; let activeTab = 'home';
         let localRetryCd = 0; let localCdInterval = null; let isExpired = false;
+        let logHistory = [], lastLogSnapshot = "", currentLogDevice = "";
+        const MAX_LOG_LINES = 200;
         const uH = document.getElementById('uH'); for (let i = 12; i <= 84; i += 6) { let opt = document.createElement('option'); opt.value = i; opt.innerText = (i / 12).toFixed(1) + " ft"; uH.appendChild(opt); }
         const lowTank = document.getElementById('lowTank'); for (let i = 20; i <= 50; i += 5) { let opt = document.createElement('option'); opt.value = i; opt.innerText = i + " %"; lowTank.appendChild(opt); }
         const fullTank = document.getElementById('fullTank'); for (let i = 80; i <= 100; i += 5) { let opt = document.createElement('option'); opt.value = i; opt.innerText = i + " %"; fullTank.appendChild(opt); }
@@ -533,10 +562,35 @@
         function formatTime() { let n = new Date(); return n.getHours().toString().padStart(2, '0') + ":" + n.getMinutes().toString().padStart(2, '0'); }
         function updateOnlineStatus(o) { [document.getElementById('statusDot'), document.getElementById('statusDotS')].forEach(d => { if (d) d.className = "conn-dot " + (o ? "" : "off"); });[document.getElementById('statusTxt'), document.getElementById('statusTxtS')].forEach(t => { if (t) t.innerText = o ? tr("Device: Online") : tr("Device: Offline"); }); if (o) resetWatchdog(); }
         function resetWatchdog() { if (watchdog) clearTimeout(watchdog); watchdog = setTimeout(() => updateOnlineStatus(false), 90000); }
+        function resetLogHistory() { logHistory = []; lastLogSnapshot = ""; }
+        function mergeLogHistory(rawLogs) {
+            const incoming = String(rawLogs || "").replace(/\r/g, "").split("\n").map(l => l.trimEnd()).filter(Boolean);
+            if (incoming.length > 1 && !incoming[0].trimStart().startsWith("[")) incoming.shift();
+            if (!incoming.length) return "";
+            const snapshot = incoming.join("\n");
+            if (snapshot === lastLogSnapshot && logHistory.length) return logHistory.join("\n");
+            if (!logHistory.length) {
+                logHistory = incoming.slice(-MAX_LOG_LINES);
+            } else {
+                let overlap = 0;
+                const maxOverlap = Math.min(logHistory.length, incoming.length);
+                for (let n = maxOverlap; n > 0; n--) {
+                    let same = true;
+                    for (let i = 0; i < n; i++) {
+                        if (logHistory[logHistory.length - n + i] !== incoming[i]) { same = false; break; }
+                    }
+                    if (same) { overlap = n; break; }
+                }
+                logHistory = logHistory.concat(incoming.slice(overlap)).slice(-MAX_LOG_LINES);
+            }
+            lastLogSnapshot = snapshot;
+            return logHistory.join("\n");
+        }
         function renderTankRulerTicks() { const ruler = document.getElementById('tankRuler'); if (!ruler || ruler.dataset.ready === '1') return; let html = ''; for (let v = 0; v <= 100; v += 5) { const cls = (v % 25 === 0) ? 'tank-ruler-tick major' : 'tank-ruler-tick'; html += '<div class="' + cls + '" style="bottom:' + v + '%;"></div>'; } ruler.innerHTML = html; ruler.dataset.ready = '1'; }
         function setTankGuides(d) { const low = parseInt(d.lowTank, 10) || 30; const full = parseInt(d.fullPoint || d.fullTank, 10) || 100; const lowMarker = document.getElementById('lowTankMarker'); const fullMarker = document.getElementById('fullTankMarker'); if (lowMarker) lowMarker.style.bottom = low + '%'; if (fullMarker) fullMarker.style.bottom = full + '%'; if (document.getElementById('lowTankMarkerLabel')) document.getElementById('lowTankMarkerLabel').innerText = (sysLang == 1 ? 'စတင် ' : 'LOW ') + low + '%'; if (document.getElementById('fullTankMarkerLabel')) document.getElementById('fullTankMarkerLabel').innerText = (sysLang == 1 ? 'ပြည့် ' : 'FULL ') + full + '%'; }
         function connect() {
             vibe(); if (isConnecting) return; deviceID = document.getElementById('devID').value.trim().toUpperCase(); devicePin = document.getElementById('devPin').value.trim(); if (deviceID.length < 5) { alert("Invalid ID"); return; } isConnecting = true; localStorage.setItem("cloudPumpID", deviceID); localStorage.setItem("cloudPumpPin", devicePin); const btnLogin = document.getElementById('btnLogin'); btnLogin.innerText = (sysLang == 1 ? "ချိတ်ဆက်နေသည်..." : "Connecting..."); btnLogin.disabled = true; if (client) { try { client.onMessageArrived = null; client.onConnectionLost = null; client.disconnect(); } catch (e) { } } client = new Paho.MQTT.Client(BROKER, PORT, "Web_" + Math.random().toString(16).substr(2, 8));
+            if (currentLogDevice !== deviceID) { resetLogHistory(); currentLogDevice = deviceID; }
             client.onMessageArrived = (msg) => {
                 const topic = msg.destinationName, raw = msg.payloadString; if (topic.endsWith("/online")) { updateOnlineStatus(raw === "1"); return; } [document.getElementById('refreshBtn'), document.getElementById('refreshBtnS')].forEach(b => b && b.classList.remove('spinning')); document.getElementById('lastMsg').innerText = (sysLang == 1 ? "နောက်ဆုံးချိတ်ဆက်မှု- " : "Last sync: ") + formatTime();
                 try {
@@ -571,10 +625,11 @@
             document.getElementById('tankVal').innerText = tS; document.getElementById('dispIp').innerText = d.ip || "---"; document.getElementById('dispCid').innerText = d.id || "---"; document.getElementById('volt').innerText = (d.volt || "--") + " V";
             if (d.logs) {
                 const logBox = document.getElementById('logBox');
-                const isNewContent = logBox.innerText !== d.logs;
+                const mergedLogs = mergeLogHistory(d.logs);
+                const isNewContent = logBox.innerText !== mergedLogs;
                 if (isNewContent) {
                     const isAtBottom = logBox.scrollHeight - logBox.scrollTop - logBox.clientHeight < 30;
-                    logBox.innerText = d.logs;
+                    logBox.innerText = mergedLogs;
                     if (isAtBottom) { logBox.scrollTop = logBox.scrollHeight; }
                 }
             }
