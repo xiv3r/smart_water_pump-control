@@ -148,8 +148,13 @@
         }
 
         @keyframes shimmer {
-            0% { left: -100%; }
-            100% { left: 200%; }
+            0% {
+                left: -100%;
+            }
+
+            100% {
+                left: 200%;
+            }
         }
 
         .btn:hover:not(:disabled) {
@@ -164,13 +169,40 @@
             opacity: 0.9;
         }
 
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        .spinning { animation: spin 1s linear infinite; opacity: 1 !important; color: #03ef62 !important; }
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
 
-        .btn-green { background: linear-gradient(135deg, #28a745, #20c997) !important; box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3) !important; }
-        .btn-red { background: linear-gradient(135deg, #dc3545, #ff6b6b) !important; box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3) !important; }
-        .btn-purple { background: linear-gradient(135deg, #6f42c1, #a958a5) !important; box-shadow: 0 4px 15px rgba(111, 66, 193, 0.3) !important; }
-        .btn-grey { background: #555 !important; color: #aaa !important; cursor: not-allowed; box-shadow: none !important; transform: none !important; }
+        .spinning {
+            animation: spin 1s linear infinite;
+            opacity: 1 !important;
+            color: #03ef62 !important;
+        }
+
+        .btn-green {
+            background: linear-gradient(135deg, #28a745, #20c997) !important;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3) !important;
+        }
+
+        .btn-red {
+            background: linear-gradient(135deg, #dc3545, #ff6b6b) !important;
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3) !important;
+        }
+
+        .btn-purple {
+            background: linear-gradient(135deg, #6f42c1, #a958a5) !important;
+            box-shadow: 0 4px 15px rgba(111, 66, 193, 0.3) !important;
+        }
+
+        .btn-grey {
+            background: #555 !important;
+            color: #aaa !important;
+            cursor: not-allowed;
+            box-shadow: none !important;
+            transform: none !important;
+        }
 
         .badge {
             padding: 5px 12px;
@@ -183,76 +215,460 @@
             text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
         }
 
-        .bg-success { background: rgba(40, 167, 69, 0.2); color: #28a745; border: 1px solid rgba(40, 167, 69, 0.5); box-shadow: 0 0 12px rgba(40, 167, 69, 0.4), inset 0 0 8px rgba(40, 167, 69, 0.2); }
-        .bg-danger { background: rgba(220, 53, 69, 0.2); color: #ff6b6b; border: 1px solid rgba(220, 53, 69, 0.5); box-shadow: 0 0 12px rgba(220, 53, 69, 0.5), inset 0 0 8px rgba(220, 53, 69, 0.2); }
-        .bg-warning { background: rgba(255, 193, 7, 0.15); color: #ffc107; border: 1px solid rgba(255, 193, 7, 0.5); box-shadow: 0 0 12px rgba(255, 193, 7, 0.3), inset 0 0 8px rgba(255, 193, 7, 0.15); }
-        .bg-info { background: rgba(23, 162, 184, 0.2); color: #17a2b8; border: 1px solid rgba(23, 162, 184, 0.5); box-shadow: 0 0 12px rgba(23, 162, 184, 0.4), inset 0 0 8px rgba(23, 162, 184, 0.2); }
-        .bg-secondary { background: rgba(108, 117, 125, 0.2); color: #adb5bd; border: 1px solid rgba(108, 117, 125, 0.5); }
-
-        .tank-wrap {
-            width: 140px; height: 180px; border: 4px solid #444; border-radius: 15px; margin: 30px auto; position: relative;
-            background: linear-gradient(90deg, #1a1a1a 0%, #2a2a2a 50%, #1a1a1a 100%); overflow: visible; box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+        .bg-success {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+            border: 1px solid rgba(40, 167, 69, 0.5);
+            box-shadow: 0 0 12px rgba(40, 167, 69, 0.4), inset 0 0 8px rgba(40, 167, 69, 0.2);
         }
 
-        .tank-wrap::before { content: ''; position: absolute; top: -14px; left: 50%; transform: translateX(-50%); width: 80px; height: 14px; background: linear-gradient(90deg, #1a1a1a 0%, #333 50%, #1a1a1a 100%); border-left: 4px solid #444; border-right: 4px solid #444; z-index: 1; }
-        .tank-wrap::after { content: ''; position: absolute; top: -24px; left: 50%; transform: translateX(-50%); width: 100px; height: 10px; background: linear-gradient(90deg, #1a1a1a 0%, #333 50%, #1a1a1a 100%); border: 3px solid #444; border-radius: 4px; z-index: 5; }
-        .tank-inner { position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 10px; overflow: hidden; z-index: 2; }
-        .tank-fill { position: absolute; bottom: 0; left: 0; width: 100%; background: #039be5; transition: height 0.8s cubic-bezier(0.4, 0, 0.2, 1), background 0.5s; height: 0%; overflow: visible; }
-        .tank-fill::before, .tank-fill::after { content: ''; position: absolute; left: 0; width: 200%; height: 25px; opacity: 0; transition: opacity 0.5s, background-image 0.5s; background-repeat: repeat-x; background-size: 50% 100%; top: -15px; }
-        .tank-fill::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 50'%3E%3Cpath d='M0,25 Q100,5 200,25 T400,25 T600,25 T800,25 v35 h-800 z' fill='%2387CEFA' opacity='0.7'/%3E%3C/svg%3E"); animation: wave 4s linear infinite; z-index: 1; }
-        .tank-fill::after { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 50'%3E%3Cpath d='M0,25 Q100,45 200,25 T400,25 T600,25 T800,25 v35 h-800 z' fill='%23039be5'/%3E%3C/svg%3E"); animation: wave 3s linear infinite reverse; z-index: 2; margin-top: 2px; }
-        .tank-fill.low-water { background: #dc3545; box-shadow: 0 0 15px rgba(220, 53, 69, 0.5); }
-        .tank-fill.low-water::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 50'%3E%3Cpath d='M0,25 Q100,5 200,25 T400,25 T600,25 T800,25 v35 h-800 z' fill='%23ff9aa2' opacity='0.78'/%3E%3C/svg%3E"); }
-        .tank-fill.low-water::after { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 50'%3E%3Cpath d='M0,25 Q100,45 200,25 T400,25 T600,25 T800,25 v35 h-800 z' fill='%23dc3545'/%3E%3C/svg%3E"); }
-        .tank-fill.pumping::before, .tank-fill.pumping::after { opacity: 1; }
-        @keyframes wave { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        .bg-danger {
+            background: rgba(220, 53, 69, 0.2);
+            color: #ff6b6b;
+            border: 1px solid rgba(220, 53, 69, 0.5);
+            box-shadow: 0 0 12px rgba(220, 53, 69, 0.5), inset 0 0 8px rgba(220, 53, 69, 0.2);
+        }
 
-        .tank-glaze { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%); border-radius: 10px; }
-        .tank-ridges { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3; }
-        .tank-ridges::after { content: ''; position: absolute; left: -4px; right: -4px; top: 25%; height: 2px; background: rgba(0, 0, 0, 0.4); box-shadow: 0 45px 0 rgba(0, 0, 0, 0.4), 0 90px 0 rgba(0, 0, 0, 0.4); }
-        .tank-guides { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
-        .tank-ruler { position: absolute; left: -15px; top: 0; bottom: 0; width: 12px; z-index: 4; pointer-events: none; }
-        .tank-ruler-tick { position: absolute; left: 0; width: 5px; height: 1px; background: rgba(210, 220, 235, 0.20); }
-        .tank-ruler-tick.major { width: 8px; background: rgba(210, 220, 235, 0.30); }
-        .tank-guide-line { position: absolute; left: 8px; right: 8px; height: 1px; background: rgba(255, 255, 255, 0.16); }
-        .tank-guide-line.low-marker { left: 4px; right: 4px; height: 2px; background: rgba(255, 193, 7, 0.65); box-shadow: 0 0 4px rgba(255, 193, 7, 0.40); }
-        .tank-guide-line.full-marker { left: 4px; right: 4px; height: 2px; background: rgba(40, 167, 69, 0.65); box-shadow: 0 0 4px rgba(40, 167, 69, 0.40); }
-        .tank-guide-label { position: absolute; left: -82px; transform: translateY(-50%); font-size: 0.62rem; font-weight: 700; letter-spacing: 0.4px; text-align: right; width: 60px; opacity: 0.72; text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6); white-space: nowrap; }
-        .low-marker .tank-guide-label { color: rgba(255, 193, 7, 0.78); }
-        .full-marker .tank-guide-label { color: rgba(40, 167, 69, 0.78); }
-        .tank-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold; font-size: 1.6rem; color: #fff; z-index: 6; text-shadow: 0px 2px 5px rgba(0, 0, 0, 0.9); }
+        .bg-warning {
+            background: rgba(255, 193, 7, 0.15);
+            color: #ffc107;
+            border: 1px solid rgba(255, 193, 7, 0.5);
+            box-shadow: 0 0 12px rgba(255, 193, 7, 0.3), inset 0 0 8px rgba(255, 193, 7, 0.15);
+        }
 
-        .lbl-wrap { display: flex; justify-content: space-between; align-items: center; margin: 15px 0 5px; flex-wrap: wrap; gap: 5px; }
-        label { font-weight: bold; color: #aaa; font-size: 0.9rem; }
-        .range { color: #555; font-size: 0.75rem; font-weight: normal; }
+        .bg-info {
+            background: rgba(23, 162, 184, 0.2);
+            color: #17a2b8;
+            border: 1px solid rgba(23, 162, 184, 0.5);
+            box-shadow: 0 0 12px rgba(23, 162, 184, 0.4), inset 0 0 8px rgba(23, 162, 184, 0.2);
+        }
 
-        input, select { width: 100%; padding: 12px; background: rgba(42, 42, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); color: white; border-radius: 8px; box-sizing: border-box; font-size: 1.1rem; }
-        #loginScreen input { text-align: center !important; margin-bottom: 15px; letter-spacing: 1px; }
-        #devPin { letter-spacing: 8px !important; }
+        .bg-secondary {
+            background: rgba(108, 117, 125, 0.2);
+            color: #adb5bd;
+            border: 1px solid rgba(108, 117, 125, 0.5);
+        }
 
-        .show-pass { margin-top: 8px; font-size: 0.85rem; color: #888; display: flex; align-items: center; cursor: pointer; justify-content: flex-start; text-align: left; width: 100%; }
-        .show-pass input { width: auto; margin-right: 8px; }
+        .tank-wrap {
+            width: 140px;
+            height: 180px;
+            border: 4px solid #444;
+            border-radius: 15px;
+            margin: 30px auto;
+            position: relative;
+            background: linear-gradient(90deg, #1a1a1a 0%, #2a2a2a 50%, #1a1a1a 100%);
+            overflow: visible;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+        }
 
-        hr { border: 0; border-top: 1px solid rgba(255, 255, 255, 0.1); margin: 25px 0; }
-        .footer { margin-top: 25px; font-size: 0.75rem; color: #666; text-align: center; }
-        #loginScreen { margin-top: 10vh; text-align: center; }
+        .tank-wrap::before {
+            content: '';
+            position: absolute;
+            top: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 14px;
+            background: linear-gradient(90deg, #1a1a1a 0%, #333 50%, #1a1a1a 100%);
+            border-left: 4px solid #444;
+            border-right: 4px solid #444;
+            z-index: 1;
+        }
 
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); }
-        .modal-content { background: rgba(30, 30, 30, 0.9); position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 25px; border-left: 5px solid #ffc107; border-radius: 12px; width: 85%; max-width: 320px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8); text-align: left; box-sizing: border-box; }
-        .modal-title { color: #ffc107; font-size: 1.3rem; margin: 0 0 10px 0; display: flex; align-items: center; gap: 8px; }
-        .modal-text { color: #ddd; margin-bottom: 25px; font-size: 1.05rem; line-height: 1.5; }
-        .modal-close { background: #333; color: white; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; font-size: 1.1rem; transition: background 0.2s; }
+        .tank-wrap::after {
+            content: '';
+            position: absolute;
+            top: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 10px;
+            background: linear-gradient(90deg, #1a1a1a 0%, #333 50%, #1a1a1a 100%);
+            border: 3px solid #444;
+            border-radius: 4px;
+            z-index: 5;
+        }
 
-        .banner { padding: 12px; border-radius: 12px; margin: 0 auto 15px auto; font-weight: bold; max-width: 400px; display: none; backdrop-filter: blur(10px); }
-        .banner-red { background: rgba(220, 53, 69, 0.2); color: #ff6b6b; border: 1px solid rgba(220, 53, 69, 0.5); }
-        .banner-yellow { background: rgba(255, 193, 7, 0.15); color: #ffc107; border: 1px solid rgba(255, 193, 7, 0.5); }
+        .tank-inner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 10px;
+            overflow: hidden;
+            z-index: 2;
+        }
 
-        .lang-mm { line-height: 1.6; }
-        .lang-mm .tab { font-size: 0.85rem; letter-spacing: 0; }
-        .lang-mm .row { font-size: 0.92rem; }
-        .lang-mm label { font-size: 0.85rem; }
-        .lang-mm h2 { font-size: 1.25rem; }
-        .lang-mm .badge { font-size: 0.75rem; letter-spacing: 0; }
+        .tank-fill {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #039be5;
+            transition: height 0.8s cubic-bezier(0.4, 0, 0.2, 1), background 0.5s;
+            height: 0%;
+            overflow: visible;
+        }
+
+        .tank-fill::before,
+        .tank-fill::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            width: 200%;
+            height: 25px;
+            opacity: 0;
+            transition: opacity 0.5s, background-image 0.5s;
+            background-repeat: repeat-x;
+            background-size: 50% 100%;
+            top: -15px;
+        }
+
+        .tank-fill::before {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 50'%3E%3Cpath d='M0,25 Q100,5 200,25 T400,25 T600,25 T800,25 v35 h-800 z' fill='%2387CEFA' opacity='0.7'/%3E%3C/svg%3E");
+            animation: wave 4s linear infinite;
+            z-index: 1;
+        }
+
+        .tank-fill::after {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 50'%3E%3Cpath d='M0,25 Q100,45 200,25 T400,25 T600,25 T800,25 v35 h-800 z' fill='%23039be5'/%3E%3C/svg%3E");
+            animation: wave 3s linear infinite reverse;
+            z-index: 2;
+            margin-top: 2px;
+        }
+
+        .tank-fill.low-water {
+            background: #dc3545;
+            box-shadow: 0 0 15px rgba(220, 53, 69, 0.5);
+        }
+
+        .tank-fill.low-water::before {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 50'%3E%3Cpath d='M0,25 Q100,5 200,25 T400,25 T600,25 T800,25 v35 h-800 z' fill='%23ff9aa2' opacity='0.78'/%3E%3C/svg%3E");
+        }
+
+        .tank-fill.low-water::after {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 50'%3E%3Cpath d='M0,25 Q100,45 200,25 T400,25 T600,25 T800,25 v35 h-800 z' fill='%23dc3545'/%3E%3C/svg%3E");
+        }
+
+        .tank-fill.pumping::before,
+        .tank-fill.pumping::after {
+            opacity: 1;
+        }
+
+        @keyframes wave {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        .tank-glaze {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+            pointer-events: none;
+            background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%);
+            border-radius: 10px;
+        }
+
+        .tank-ridges {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        .tank-ridges::after {
+            content: '';
+            position: absolute;
+            left: -4px;
+            right: -4px;
+            top: 25%;
+            height: 2px;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 45px 0 rgba(0, 0, 0, 0.4), 0 90px 0 rgba(0, 0, 0, 0.4);
+        }
+
+        .tank-guides {
+            position: absolute;
+            inset: 0;
+            z-index: 4;
+            pointer-events: none;
+        }
+
+        .tank-ruler {
+            position: absolute;
+            left: -15px;
+            top: 0;
+            bottom: 0;
+            width: 12px;
+            z-index: 4;
+            pointer-events: none;
+        }
+
+        .tank-ruler-tick {
+            position: absolute;
+            left: 0;
+            width: 5px;
+            height: 1px;
+            background: rgba(210, 220, 235, 0.20);
+        }
+
+        .tank-ruler-tick.major {
+            width: 8px;
+            background: rgba(210, 220, 235, 0.30);
+        }
+
+        .tank-guide-line {
+            position: absolute;
+            left: 8px;
+            right: 8px;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.16);
+        }
+
+        .tank-guide-line.low-marker {
+            left: 4px;
+            right: 4px;
+            height: 2px;
+            background: rgba(255, 193, 7, 0.65);
+            box-shadow: 0 0 4px rgba(255, 193, 7, 0.40);
+        }
+
+        .tank-guide-line.full-marker {
+            left: 4px;
+            right: 4px;
+            height: 2px;
+            background: rgba(40, 167, 69, 0.65);
+            box-shadow: 0 0 4px rgba(40, 167, 69, 0.40);
+        }
+
+        .tank-guide-label {
+            position: absolute;
+            left: -82px;
+            transform: translateY(-50%);
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            text-align: right;
+            width: 60px;
+            opacity: 0.72;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6);
+            white-space: nowrap;
+        }
+
+        .low-marker .tank-guide-label {
+            color: rgba(255, 193, 7, 0.78);
+        }
+
+        .full-marker .tank-guide-label {
+            color: rgba(40, 167, 69, 0.78);
+        }
+
+        .tank-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: bold;
+            font-size: 1.6rem;
+            color: #fff;
+            z-index: 6;
+            text-shadow: 0px 2px 5px rgba(0, 0, 0, 0.9);
+        }
+
+        .lbl-wrap {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 15px 0 5px;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        label {
+            font-weight: bold;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        .range {
+            color: #555;
+            font-size: 0.75rem;
+            font-weight: normal;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+            background: rgba(42, 42, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1.1rem;
+        }
+
+        #loginScreen input {
+            text-align: center !important;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        #devPin {
+            letter-spacing: 8px !important;
+        }
+
+        .show-pass {
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: #888;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            justify-content: flex-start;
+            text-align: left;
+            width: 100%;
+        }
+
+        .show-pass input {
+            width: auto;
+            margin-right: 8px;
+        }
+
+        hr {
+            border: 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 25px 0;
+        }
+
+        .footer {
+            margin-top: 25px;
+            font-size: 0.75rem;
+            color: #666;
+            text-align: center;
+        }
+
+        #loginScreen {
+            margin-top: 10vh;
+            text-align: center;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: rgba(30, 30, 30, 0.9);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 25px;
+            border-left: 5px solid #ffc107;
+            border-radius: 12px;
+            width: 85%;
+            max-width: 320px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+            text-align: left;
+            box-sizing: border-box;
+        }
+
+        .modal-title {
+            color: #ffc107;
+            font-size: 1.3rem;
+            margin: 0 0 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-text {
+            color: #ddd;
+            margin-bottom: 25px;
+            font-size: 1.05rem;
+            line-height: 1.5;
+        }
+
+        .modal-close {
+            background: #333;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            font-size: 1.1rem;
+            transition: background 0.2s;
+        }
+
+        .banner {
+            padding: 12px;
+            border-radius: 12px;
+            margin: 0 auto 15px auto;
+            font-weight: bold;
+            max-width: 400px;
+            display: none;
+            backdrop-filter: blur(10px);
+        }
+
+        .banner-red {
+            background: rgba(220, 53, 69, 0.2);
+            color: #ff6b6b;
+            border: 1px solid rgba(220, 53, 69, 0.5);
+        }
+
+        .banner-yellow {
+            background: rgba(255, 193, 7, 0.15);
+            color: #ffc107;
+            border: 1px solid rgba(255, 193, 7, 0.5);
+        }
+
+        .lang-mm {
+            line-height: 1.6;
+        }
+
+        .lang-mm .tab {
+            font-size: 0.85rem;
+            letter-spacing: 0;
+        }
+
+        .lang-mm .row {
+            font-size: 0.92rem;
+        }
+
+        .lang-mm label {
+            font-size: 0.85rem;
+        }
+
+        .lang-mm h2 {
+            font-size: 1.25rem;
+        }
+
+        .lang-mm .badge {
+            font-size: 0.75rem;
+            letter-spacing: 0;
+        }
 
         #logBox {
             overflow-y: scroll !important;
@@ -265,15 +681,27 @@
         }
 
         @media screen and (max-width: 440px) {
-            .lang-mm .tab { font-size: 0.72rem; padding: 12px 2px; }
-            .lang-mm .row { font-size: 0.82rem; }
-            .lang-mm .btn { font-size: 0.95rem; padding: 14px 4px; }
+            .lang-mm .tab {
+                font-size: 0.72rem;
+                padding: 12px 2px;
+            }
+
+            .lang-mm .row {
+                font-size: 0.82rem;
+            }
+
+            .lang-mm .btn {
+                font-size: 0.95rem;
+                padding: 14px 4px;
+            }
+
             #info {
                 font-size: 0.76rem;
                 padding: 5px 8px;
                 letter-spacing: 0;
                 white-space: nowrap;
             }
+
             #logBox {
                 display: block !important;
                 height: 125px !important;
@@ -292,10 +720,25 @@
             }
         }
 
-        #logBox::-webkit-scrollbar { width: 6px; display: block !important; }
-        #logBox::-webkit-scrollbar-track { background: #000; border-radius: 10px; }
-        #logBox::-webkit-scrollbar-thumb { background: #444; border-radius: 10px; border: 1px solid #222; }
-        #logBox::-webkit-scrollbar-thumb:active { background: #0f0; }
+        #logBox::-webkit-scrollbar {
+            width: 6px;
+            display: block !important;
+        }
+
+        #logBox::-webkit-scrollbar-track {
+            background: #000;
+            border-radius: 10px;
+        }
+
+        #logBox::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 10px;
+            border: 1px solid #222;
+        }
+
+        #logBox::-webkit-scrollbar-thumb:active {
+            background: #0f0;
+        }
     </style>
 </head>
 
@@ -310,40 +753,57 @@
 
     <div id="loginScreen" class="card">
         <img src="logo.png" alt="Logo" class="logo">
-        <h1 style="color:white; margin: 10px 0 5px 0; text-align: center; font-size: 1.5rem; letter-spacing: -0.5px;">Smart Pump Cloud</h1>
+        <h1 style="color:white; margin: 10px 0 5px 0; text-align: center; font-size: 1.5rem; letter-spacing: -0.5px;">
+            Smart Pump Cloud</h1>
         <div id="keychainSection" style="display:none; margin-bottom:20px;">
-            <p style="color:#888; font-size:0.85rem; margin-bottom:10px; text-align:left; font-weight:bold; text-transform:uppercase;">Saved Devices:</p>
-            <div id="keychainList" style="display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; padding-right:5px;"></div>
+            <p
+                style="color:#888; font-size:0.85rem; margin-bottom:10px; text-align:left; font-weight:bold; text-transform:uppercase;">
+                Saved Devices:</p>
+            <div id="keychainList"
+                style="display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto; padding-right:5px;">
+            </div>
             <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin:20px 0 10px 0;">
         </div>
-        <p id="manualLabel" style="color:#888; text-align: center; font-size:0.9rem; margin-bottom: 15px;">Connect New Device</p>
+        <p id="manualLabel" style="color:#888; text-align: center; font-size:0.9rem; margin-bottom: 15px;">Connect New
+            Device</p>
         <div style="max-width: 280px; margin: 0 auto;">
-            <div id="loginError" style="color: #ff6b6b; font-size: 0.85rem; margin-bottom: 10px; display: none; font-weight: bold;"></div>
+            <div id="loginError"
+                style="color: #ff6b6b; font-size: 0.85rem; margin-bottom: 10px; display: none; font-weight: bold;">
+            </div>
             <input type="text" id="devID" placeholder="DEVICE ID" style="text-transform:uppercase;">
             <input type="password" id="devPin" placeholder="••••••">
-            <p style="text-align:center; font-size:0.75rem; color:#555; cursor:pointer; margin-top:10px;" onclick="unlockFactory()">⚙️ Advanced Server Settings</p>
-            <div id="brokerSec" style="display:none; margin-top:10px; border:1px solid rgba(255,255,255,0.1); padding:10px; border-radius:12px; background: rgba(0,0,0,0.2);">
+            <p style="text-align:center; font-size:0.75rem; color:#555; cursor:pointer; margin-top:10px;"
+                onclick="unlockFactory()">⚙️ Advanced Server Settings</p>
+            <div id="brokerSec"
+                style="display:none; margin-top:10px; border:1px solid rgba(255,255,255,0.1); padding:10px; border-radius:12px; background: rgba(0,0,0,0.2);">
                 <label style="font-size:0.7rem; color:#888;">Broker URL</label>
-                <input type="text" id="cfgBroker" placeholder="Cluster URL" style="font-size:0.9rem; margin-bottom:8px;">
+                <input type="text" id="cfgBroker" placeholder="Cluster URL"
+                    style="font-size:0.9rem; margin-bottom:8px;">
                 <label style="font-size:0.7rem; color:#888;">Port (Usually 8883)</label>
                 <input type="number" id="cfgPort" value="8884" style="font-size:0.9rem; margin-bottom:8px;">
                 <label style="font-size:0.7rem; color:#888;">MQTT User</label>
                 <input type="text" id="cfgUser" placeholder="Smart_Pump" style="font-size:0.9rem; margin-bottom:8px;">
                 <label style="font-size:0.7rem; color:#888;">MQTT Password</label>
                 <input type="password" id="cfgPass" placeholder="••••••" style="font-size:0.9rem; margin-bottom:10px;">
-                <button class="btn btn-purple" style="padding:10px; font-size:0.9rem;" onclick="saveLocalServer()">Apply Server Settings</button>
+                <button class="btn btn-purple" style="padding:10px; font-size:0.9rem;" onclick="saveLocalServer()">Apply
+                    Server Settings</button>
             </div>
-            <button id="btnLogin" class="btn" onclick="connect()" style="margin-top: 15px; border-radius: 10px; padding: 16px; font-size: 1.1rem; background: #007bff;">Connect</button>
+            <button id="btnLogin" class="btn" onclick="connect()"
+                style="margin-top: 15px; border-radius: 10px; padding: 16px; font-size: 1.1rem; background: #007bff;">Connect</button>
         </div>
     </div>
 
     <div id="dashboard" style="display:none;">
-        <div id="expiryBanner" class="banner banner-red">⚠️ SYSTEM EXPIRED ⚠️<br><span style="font-size:0.8rem; font-weight:normal; color:#ddd;">Pump operations are disabled.</span></div>
-        <div id="warnBanner" class="banner banner-yellow">⚠️ SUBSCRIPTION ENDING SOON ⚠️<br><span style="font-size:0.8rem; font-weight:normal; color:#ddd;" id="warnMsg"></span></div>
-        <div id="promoBanner" style="display:none; background: linear-gradient(135deg, #6e8efb, #a777e3); color:white; padding:15px; border-radius:15px; margin: 0 auto 15px auto; font-weight:bold; max-width:400px; border:2px solid #fff; box-shadow:0 4px 15px rgba(0,0,0,0.3); text-align:center;">
+        <div id="expiryBanner" class="banner banner-red">⚠️ SYSTEM EXPIRED ⚠️<br><span
+                style="font-size:0.8rem; font-weight:normal; color:#ddd;">Pump operations are disabled.</span></div>
+        <div id="warnBanner" class="banner banner-yellow">⚠️ SUBSCRIPTION ENDING SOON ⚠️<br><span
+                style="font-size:0.8rem; font-weight:normal; color:#ddd;" id="warnMsg"></span></div>
+        <div id="promoBanner"
+            style="display:none; background: linear-gradient(135deg, #6e8efb, #a777e3); color:white; padding:15px; border-radius:15px; margin: 0 auto 15px auto; font-weight:bold; max-width:400px; border:2px solid #fff; box-shadow:0 4px 15px rgba(0,0,0,0.3); text-align:center;">
             <span style="font-size:1.2rem; display:block; margin-bottom:5px;">📢 Message from AMK</span>
             <span id="promoText" style="font-weight:normal; font-size:1rem;"></span>
-            <button onclick="dismissPromo()" style="background:rgba(255,255,255,0.2); border:none; color:white; margin-top:10px; padding:5px 10px; border-radius:8px; cursor:pointer; font-size:0.8rem;">Dismiss</button>
+            <button onclick="dismissPromo()"
+                style="background:rgba(255,255,255,0.2); border:none; color:white; margin-top:10px; padding:5px 10px; border-radius:8px; cursor:pointer; font-size:0.8rem;">Dismiss</button>
         </div>
         <div class="tabs">
             <div id="tabHome" class="tab tab-active" onclick="showTab('home')">🏠 Home</div>
@@ -353,125 +813,224 @@
         <div id="homeView">
             <div class="card">
                 <button id="refreshBtn" class="refresh-btn" onclick="requestData()" title="Refresh Data">🔄</button>
-                <div style="font-size:0.8rem; text-align:left; margin-bottom:15px;"><span id="statusDot" class="conn-dot"></span><span id="statusTxt" style="color:#aaa;">Connecting...</span></div>
+                <div style="font-size:0.8rem; text-align:left; margin-bottom:15px;"><span id="statusDot"
+                        class="conn-dot"></span><span id="statusTxt" style="color:#aaa;">Connecting...</span></div>
                 <div style="text-align: center; margin-bottom: 20px;">
                     <img src="logo.png" alt="Logo" class="logo">
                     <h2 style="color:#03ef; margin:0; font-weight:800; letter-spacing:-0.5px;">💧Tank Water Level</h2>
-                    <div id="roleBadgeC" class="badge" style="display:none; width:fit-content; margin: 12px auto 8px auto; font-size:0.75rem; letter-spacing: 1px; border-radius: 12px; padding: 5px 12px;"></div>
-                    <div id="dndBadgeC" style="display:none; font-size: 0.8rem; background: rgba(111,66,193,0.2); border: 1px solid rgba(111,66,193,0.6); color: #d8b4fe; padding: 4px 12px; border-radius: 20px; margin: 5px auto 0 auto; width: fit-content; text-transform: uppercase; font-weight: bold; letter-spacing: 1px;">🌙 DND Active</div>
+                    <div id="roleBadgeC" class="badge"
+                        style="display:none; width:fit-content; margin: 12px auto 8px auto; font-size:0.75rem; letter-spacing: 1px; border-radius: 12px; padding: 5px 12px;">
+                    </div>
+                    <div id="dndBadgeC"
+                        style="display:none; font-size: 0.8rem; background: rgba(111,66,193,0.2); border: 1px solid rgba(111,66,193,0.6); color: #d8b4fe; padding: 4px 12px; border-radius: 20px; margin: 5px auto 0 auto; width: fit-content; text-transform: uppercase; font-weight: bold; letter-spacing: 1px;">
+                        🌙 DND Active</div>
                 </div>
                 <div class="tank-wrap">
-                    <div class="tank-inner"><div id="tankFill" class="tank-fill"></div><div class="tank-glaze"></div></div>
-                    <div class="tank-ruler" id="tankRuler" aria-hidden="true"></div><div class="tank-ridges"></div>
+                    <div class="tank-inner">
+                        <div id="tankFill" class="tank-fill"></div>
+                        <div class="tank-glaze"></div>
+                    </div>
+                    <div class="tank-ruler" id="tankRuler" aria-hidden="true"></div>
+                    <div class="tank-ridges"></div>
                     <div class="tank-guides">
-                        <div class="tank-guide-line low-marker" id="lowTankMarker" style="bottom: 30%;"><span class="tank-guide-label" id="lowTankMarkerLabel">LOW 30%</span></div>
-                        <div class="tank-guide-line full-marker" id="fullTankMarker" style="bottom: 100%;"><span class="tank-guide-label" id="fullTankMarkerLabel">FULL 100%</span></div>
+                        <div class="tank-guide-line low-marker" id="lowTankMarker" style="bottom: 30%;"><span
+                                class="tank-guide-label" id="lowTankMarkerLabel">LOW 30%</span></div>
+                        <div class="tank-guide-line full-marker" id="fullTankMarker" style="bottom: 100%;"><span
+                                class="tank-guide-label" id="fullTankMarkerLabel">FULL 100%</span></div>
                     </div>
                     <div id="tankVal" class="tank-text">-- %</div>
                 </div>
-                <div class="row"><span>Voltage:</span> <span id="volt" style="font-weight:bold; font-size:1.2rem;">-- V</span></div>
+                <div class="row"><span>Voltage:</span> <span id="volt" style="font-weight:bold; font-size:1.2rem;">--
+                        V</span></div>
                 <div class="row"><span>Volt Status:</span> <span id="vstat" class="badge bg-secondary">--</span></div>
                 <div class="row"><span>Pump:</span> <span id="pstate" class="badge bg-secondary">--</span></div>
                 <div class="row"><span>System Info:</span> <span id="info" class="badge bg-secondary">--</span></div>
-                <div class="row" id="cdRow" style="display:none; color:#ff6b6b; font-weight:bold;"><span>Retry in:</span> <span id="cd" style="background:rgba(220,53,69,0.1); padding:2px 8px; border-radius:6px;">--</span></div>
+                <div class="row" id="cdRow" style="display:none; color:#ff6b6b; font-weight:bold;"><span>Retry
+                        in:</span> <span id="cd"
+                        style="background:rgba(220,53,69,0.1); padding:2px 8px; border-radius:6px;">--</span></div>
                 <div style="margin-top: 15px;">
-                    <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
-                        <label style="font-size: 0.75rem; color: #555; text-transform: uppercase; margin:0;">📋 Event History</label>
-                        <label style="display:flex; align-items:center; gap:6px; font-size:0.72rem; color:#aaa; user-select:none; cursor:pointer; white-space:nowrap; flex:0 0 auto;">
+                    <div
+                        style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+                        <label style="font-size: 0.75rem; color: #555; text-transform: uppercase; margin:0;">📋 Event
+                            History</label>
+                        <label
+                            style="display:flex; align-items:center; gap:6px; font-size:0.72rem; color:#aaa; user-select:none; cursor:pointer; white-space:nowrap; flex:0 0 auto;">
                             <input id="showHistoryChk" type="checkbox" onchange="toggleEventHistory()">
                             <span id="eventHistoryShowLabel">Show</span>
                         </label>
                     </div>
                     <div id="eventHistoryWrap">
-                        <div id="logBox" style="background:#000; color:#0f0; font-family:monospace; padding:10px 20px 10px 10px; border-radius:10px; height:130px; overflow-y:auto; overflow-x:hidden; font-size:0.65rem; text-align:left; border:1px solid #333; margin-top:8px; line-height:1.4; white-space:pre-wrap; word-break:break-word; letter-spacing: -0.2px; scrollbar-gutter: stable;">Waiting for logs...</div>
+                        <div id="logBox"
+                            style="background:#000; color:#0f0; font-family:monospace; padding:10px 20px 10px 10px; border-radius:10px; height:130px; overflow-y:auto; overflow-x:hidden; font-size:0.65rem; text-align:left; border:1px solid #333; margin-top:8px; line-height:1.4; white-space:pre-wrap; word-break:break-word; letter-spacing: -0.2px; scrollbar-gutter: stable;">
+                            Waiting for logs...</div>
                     </div>
                 </div>
-                <div id="otaHub" style="display:none; margin:15px 0; padding:15px; border:1px solid rgba(40,167,69,0.3); border-radius:12px; background:rgba(40,167,69,0.05);">
-                    <div style="color:#28a745; font-weight:bold; margin-bottom:10px;" id="otaMsg">New Version Available!</div>
+                <div id="otaHub"
+                    style="display:none; margin:15px 0; padding:15px; border:1px solid rgba(40,167,69,0.3); border-radius:12px; background:rgba(40,167,69,0.05);">
+                    <div style="color:#28a745; font-weight:bold; margin-bottom:10px;" id="otaMsg">New Version Available!
+                    </div>
                     <button class="btn btn-green" style="margin-top:0;" onclick="startOTA()">Update Now</button>
                 </div>
                 <button id="btnToggle" class="btn" onclick="sendToggle()">WAITING SYNC...</button>
-                <button id="btnReset" class="btn btn-red" onclick="sendReset()" style="display:none;">Reset Alarm</button>
+                <button id="btnReset" class="btn btn-red" onclick="sendReset()" style="display:none;">Reset
+                    Alarm</button>
             </div>
         </div>
 
         <div id="settingsView" style="display:none;">
             <div class="card">
                 <button id="refreshBtnS" class="refresh-btn" onclick="requestData()" title="Refresh Data">🔄</button>
-                <div style="font-size:0.8rem; text-align:left; margin-bottom:15px;"><span id="statusDotS" class="conn-dot"></span><span id="statusTxtS" style="color:#aaa;">Connecting...</span></div>
+                <div style="font-size:0.8rem; text-align:left; margin-bottom:15px;"><span id="statusDotS"
+                        class="conn-dot"></span><span id="statusTxtS" style="color:#aaa;">Connecting...</span></div>
                 <img src="logo.png" class="logo">
-                <div class="lbl-wrap"><label>WiFi SSID</label></div><input type="text" id="ssid" placeholder="Current WiFi SSID" oninput="markDirty('ssid')">
+                <div class="lbl-wrap"><label>WiFi SSID</label></div><input type="text" id="ssid"
+                    placeholder="Current WiFi SSID" oninput="markDirty('ssid')">
                 <div class="lbl-wrap"><label>WiFi Password</label></div>
-                <div class="pass-row"><input type="password" id="wifiPass" placeholder="Leave empty to keep current" oninput="markDirty('wifiPass')"><label class="show-pass"><input type="checkbox" onclick="togglePass('wifiPass')"> Show WiFi Password</label></div>
+                <div class="pass-row"><input type="password" id="wifiPass" placeholder="Leave empty to keep current"
+                        oninput="markDirty('wifiPass')"><label class="show-pass"><input type="checkbox"
+                            onclick="togglePass('wifiPass')"> Show WiFi Password</label></div>
                 <div class="lbl-wrap"><label>Device PIN (for Cloud)</label></div>
-                <div class="pass-row"><input type="password" id="newPin" placeholder="•••••" oninput="markDirty('newPin')"><label class="show-pass"><input type="checkbox" onclick="togglePass('newPin')"> Show PIN</label></div>
+                <div class="pass-row"><input type="password" id="newPin" placeholder="•••••"
+                        oninput="markDirty('newPin')"><label class="show-pass"><input type="checkbox"
+                            onclick="togglePass('newPin')"> Show PIN</label></div>
                 <hr>
-                <div class="lbl-wrap"><label>Interface Language</label></div><select id="appLang" onchange="setAppLang()"><option value="0">English</option><option value="1">Myanmar (မြန်မာ)</option></select>
+                <div class="lbl-wrap"><label>Interface Language</label></div><select id="appLang"
+                    onchange="setAppLang()">
+                    <option value="0">English</option>
+                    <option value="1">Myanmar (မြန်မာ)</option>
+                </select>
                 <hr>
                 <div class="lbl-wrap"><label>System Role (Pairing)</label></div>
-                <select id="sysRole" onchange="toggleRole(); markDirty('sysRole')"><option value="0">Standalone</option><option value="1">Master (Sump Tank)</option><option value="2">Slave (Upper Tank)</option></select>
+                <select id="sysRole" onchange="toggleRole(); markDirty('sysRole')">
+                    <option value="0">Standalone</option>
+                    <option value="1">Master (Sump Tank)</option>
+                    <option value="2">Slave (Upper Tank)</option>
+                </select>
                 <div id="masterOpts" style="display:none;">
                     <div class="lbl-wrap"><label>Master Settling Time</label><span class="range">0 - 30 min</span></div>
-                    <select id="setM" onchange="markDirty('setM')"><option value="0">No Settling</option><option value="5">5 Minutes</option><option value="10">10 Minutes</option><option value="15">15 Minutes</option><option value="20">20 Minutes</option><option value="30">30 Minutes</option></select>
+                    <select id="setM" onchange="markDirty('setM')">
+                        <option value="0">No Settling</option>
+                        <option value="5">5 Minutes</option>
+                        <option value="10">10 Minutes</option>
+                        <option value="15">15 Minutes</option>
+                        <option value="20">20 Minutes</option>
+                        <option value="30">30 Minutes</option>
+                    </select>
                 </div>
                 <div id="slaveOpts" style="display:none;">
-                    <div class="lbl-wrap"><label>Linked Master ID</label></div><input type="text" id="linkID" placeholder="Enter Master's Cloud ID" style="text-transform:uppercase; margin-top:5px;" oninput="markDirty('linkID')">
+                    <div class="lbl-wrap"><label>Linked Master ID</label></div><input type="text" id="linkID"
+                        placeholder="Enter Master's Cloud ID" style="text-transform:uppercase; margin-top:5px;"
+                        oninput="markDirty('linkID')">
                 </div>
                 <hr>
-                <div class="lbl-wrap"><label>Operating Mode</label></div><select id="opM" onchange="toggleVDly(); markDirty('opM')"><option value="0">Water Pump</option><option value="1">Air Compressor</option></select>
-                <div class="lbl-wrap" id="vWrap" style="display:none;"><label>Compressor Valve Delay</label><span class="range">5 - 15s</span></div><select id="vDly" style="display:none;" onchange="markDirty('vDly')"></select>
+                <div class="lbl-wrap"><label>Operating Mode</label></div><select id="opM"
+                    onchange="toggleVDly(); markDirty('opM')">
+                    <option value="0">Water Pump</option>
+                    <option value="1">Air Compressor</option>
+                </select>
+                <div class="lbl-wrap" id="vWrap" style="display:none;"><label>Compressor Valve Delay</label><span
+                        class="range">5 - 15s</span></div><select id="vDly" style="display:none;"
+                    onchange="markDirty('vDly')"></select>
                 <hr>
-                <div class="lbl-wrap"><label>Tank Height</label><span class="range">1.0 - 7.0 ft</span></div><select id="uH" onchange="markDirty('uH')"></select>
-                <div class="lbl-wrap"><label>High Tank Stop Level</label><span class="range">80 - 100 %</span></div><select id="fullTank" onchange="markDirty('fullTank')"></select>
-                <div class="lbl-wrap"><label>Low Tank Start Level</label><span class="range">20 - 70 %</span></div><select id="lowTank" onchange="markDirty('lowTank')"></select>
-                <div class="lbl-wrap"><label>High Voltage Set</label><span class="range">230 - 260 V</span></div><select id="vH" onchange="markDirty('vH')"></select>
-                <div class="lbl-wrap"><label>Low Voltage Set</label><span class="range">150 - 190 V</span></div><select id="vL" onchange="markDirty('vL')"></select>
-                <div class="lbl-wrap"><label>Voltage Resume Gap</label><span class="range">1 - 10 V</span></div><select id="vG" onchange="markDirty('vG')"></select>
-                <div class="lbl-wrap"><label>Dry-Run Delay</label><span class="range">60 - 180 s</span></div><select id="dD" onchange="markDirty('dD')"></select>
-                <div class="lbl-wrap"><label>Auto-Retry Wait</label><span class="range">Disable / 30 / 60</span></div><select id="rM" onchange="markDirty('rM')"><option value="0">Disabled</option><option value="30">30 Minutes</option><option value="60">60 Minutes</option></select>
-                <div class="lbl-wrap"><label>Pump Cool-down (After 1Hr)</label><span class="range">Disable / 5 - 15m</span></div><select id="rstM" onchange="markDirty('rstM')"><option value="0">Disabled</option><option value="5">5 Minutes</option><option value="10">10 Minutes</option><option value="15">15 Minutes</option></select>
+                <div class="lbl-wrap"><label>Tank Height</label><span class="range">1.0 - 7.0 ft</span></div><select
+                    id="uH" onchange="markDirty('uH')"></select>
+                <div class="lbl-wrap"><label>High Tank Stop Level</label><span class="range">80 - 100 %</span></div>
+                <select id="fullTank" onchange="markDirty('fullTank')"></select>
+                <div class="lbl-wrap"><label>Low Tank Start Level</label><span class="range">20 - 70 %</span></div>
+                <select id="lowTank" onchange="markDirty('lowTank')"></select>
+                <div class="lbl-wrap"><label>High Voltage Set</label><span class="range">230 - 260 V</span></div><select
+                    id="vH" onchange="markDirty('vH')"></select>
+                <div class="lbl-wrap"><label>Low Voltage Set</label><span class="range">150 - 190 V</span></div><select
+                    id="vL" onchange="markDirty('vL')"></select>
+                <div class="lbl-wrap"><label>Voltage Resume Gap</label><span class="range">1 - 10 V</span></div><select
+                    id="vG" onchange="markDirty('vG')"></select>
+                <div class="lbl-wrap"><label>Dry-Run Delay</label><span class="range">60 - 180 s</span></div><select
+                    id="dD" onchange="markDirty('dD')"></select>
+                <div class="lbl-wrap"><label>Auto-Retry Wait</label><span class="range">Disable / 30 / 60</span></div>
+                <select id="rM" onchange="markDirty('rM')">
+                    <option value="0">Disabled</option>
+                    <option value="30">30 Minutes</option>
+                    <option value="60">60 Minutes</option>
+                </select>
+                <div class="lbl-wrap"><label>Pump Cool-down (After 1Hr)</label><span class="range">Disable / 5 -
+                        15m</span></div><select id="rstM" onchange="markDirty('rstM')">
+                    <option value="0">Disabled</option>
+                    <option value="5">5 Minutes</option>
+                    <option value="10">10 Minutes</option>
+                    <option value="15">15 Minutes</option>
+                </select>
                 <hr>
-                <div class="lbl-wrap"><label>🌙 Smart Scheduling (DND)</label></div><select id="dndEn" onchange="markDirty('dndEn')"><option value="0">Disabled</option><option value="1">Enabled</option></select>
+                <div class="lbl-wrap"><label>🌙 Smart Scheduling (DND)</label></div><select id="dndEn"
+                    onchange="markDirty('dndEn')">
+                    <option value="0">Disabled</option>
+                    <option value="1">Enabled</option>
+                </select>
                 <div style="display:flex; gap:10px; margin-top:10px;">
-                    <div style="flex:1;"><label>Start Hour</label><select id="dndS" onchange="markDirty('dndS')"></select></div>
-                    <div style="flex:1;"><label>End Hour</label><select id="dndE" onchange="markDirty('dndE')"></select></div>
+                    <div style="flex:1;"><label>Start Hour</label><select id="dndS"
+                            onchange="markDirty('dndS')"></select></div>
+                    <div style="flex:1;"><label>End Hour</label><select id="dndE" onchange="markDirty('dndE')"></select>
+                    </div>
                 </div>
-                <div class="lbl-wrap"><label>📍 Home Time Zone (GMT)</label></div><select id="tzOf" onchange="markDirty('tzOf')"></select>
+                <div class="lbl-wrap"><label>📍 Home Time Zone (GMT)</label></div><select id="tzOf"
+                    onchange="markDirty('tzOf')"></select>
                 <hr>
-                <button type="button" class="btn btn-purple" style="margin-bottom:10px; padding:10px;" onclick="unlockFactory()">🛠️ Factory Mode</button>
-                <div id="factorySec" style="display:none; background:rgba(111,66,193,0.1); padding:15px; border-radius:12px; border:1px solid rgba(111,66,193,0.3);">
+                <button type="button" class="btn btn-purple" style="margin-bottom:10px; padding:10px;"
+                    onclick="unlockFactory()">🛠️ Factory Mode</button>
+                <div id="factorySec"
+                    style="display:none; background:rgba(111,66,193,0.1); padding:15px; border-radius:12px; border:1px solid rgba(111,66,193,0.3);">
                     <h3 style="color:#d8b4fe; text-align:center;">Cloud Server Config</h3>
-                    <div class="lbl-wrap"><label>MQTT Server URL</label></div><input type="text" id="mqSrv_s" oninput="markDirty('mqSrv_s')">
-                    <div class="lbl-wrap"><label>MQTT Port</label></div><input type="number" id="mqPort_s" oninput="markDirty('mqPort_s')">
-                    <div class="lbl-wrap"><label>MQTT Username</label></div><input type="text" id="mqUser_s" oninput="markDirty('mqUser_s')">
-                    <div class="lbl-wrap"><label>MQTT Password</label></div><input type="password" id="mqPass_s" oninput="markDirty('mqPass_s')">
+                    <div class="lbl-wrap"><label>MQTT Server URL</label></div><input type="text" id="mqSrv_s"
+                        oninput="markDirty('mqSrv_s')">
+                    <div class="lbl-wrap"><label>MQTT Port</label></div><input type="number" id="mqPort_s"
+                        oninput="markDirty('mqPort_s')">
+                    <div class="lbl-wrap"><label>MQTT Username</label></div><input type="text" id="mqUser_s"
+                        oninput="markDirty('mqUser_s')">
+                    <div class="lbl-wrap"><label>MQTT Password</label></div><input type="password" id="mqPass_s"
+                        oninput="markDirty('mqPass_s')">
                 </div>
                 <button class="btn btn-green" onclick="sendSave()">Save & Reboot</button>
                 <hr>
-                <div style="background:rgba(40,167,69,0.05); border:1px solid rgba(40,167,69,0.3); border-radius:12px; padding:15px; margin-bottom:20px;">
+                <div
+                    style="background:rgba(40,167,69,0.05); border:1px solid rgba(40,167,69,0.3); border-radius:12px; padding:15px; margin-bottom:20px;">
                     <h3 style="color:#28a745; margin:0 0 10px 0;">🔑 License Management</h3>
-                    <div style="font-size:0.8rem; margin-bottom:10px; color:#aaa;">Status: <span id="licStat" style="color:white; font-weight:bold;">Unknown</span></div>
+                    <div style="font-size:0.8rem; margin-bottom:10px; color:#aaa;">Status: <span id="licStat"
+                            style="color:white; font-weight:bold;">Unknown</span></div>
                     <div class="lbl-wrap"><label>Upload Token File (.key)</label></div>
-                    <label style="display:flex; align-items:center; padding: 8px; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1); cursor:pointer; color: #aaa; border-radius:8px; margin-bottom:5px; width:100%; box-sizing:border-box; text-align:left; overflow:hidden;">
-                        <span style="background:#007bff; color:white; padding:5px 8px; border-radius:4px; margin-right:5px; font-size:0.75rem; white-space:nowrap;">Choose File</span>
-                        <span id="fileName" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size: 0.72rem; flex:1;">No file chosen</span>
-                        <input type="file" id="licFile" accept=".key,.txt" style="display:none;" onchange="vibe(); document.getElementById('fileName').innerText = this.files[0] ? this.files[0].name : 'No file chosen'">
+                    <label
+                        style="display:flex; align-items:center; padding: 8px; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1); cursor:pointer; color: #aaa; border-radius:8px; margin-bottom:5px; width:100%; box-sizing:border-box; text-align:left; overflow:hidden;">
+                        <span
+                            style="background:#007bff; color:white; padding:5px 8px; border-radius:4px; margin-right:5px; font-size:0.75rem; white-space:nowrap;">Choose
+                            File</span>
+                        <span id="fileName"
+                            style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size: 0.72rem; flex:1;">No
+                            file chosen</span>
+                        <input type="file" id="licFile" accept=".key,.txt" style="display:none;"
+                            onchange="vibe(); document.getElementById('fileName').innerText = this.files[0] ? this.files[0].name : 'No file chosen'">
                     </label>
-                    <button class="btn btn-green" style="margin-top:5px; padding:10px;" onclick="uploadLicenseFile()">Upload File</button>
+                    <button class="btn btn-green" style="margin-top:5px; padding:10px;"
+                        onclick="uploadLicenseFile()">Upload File</button>
                     <div style="color:#666; margin:10px 0; font-size:0.9rem;">- OR -</div>
                     <div class="lbl-wrap"><label>Paste Token String</label></div>
                     <input type="text" id="licText" placeholder="Paste MTc... string here" style="margin-bottom:5px;">
-                    <button class="btn btn-purple" style="margin-top:5px; padding:10px;" onclick="uploadLicenseText()">Activate via Text</button>
+                    <button class="btn btn-purple" style="margin-top:5px; padding:10px;"
+                        onclick="uploadLicenseText()">Activate via Text</button>
                 </div>
                 <div style="text-align:center;">
                     <h3 style="color:#a958a5; margin:0 0 15px 0;">🛠️ Maintenance</h3>
-                    <div id="otaHubS" style="display:none; margin-bottom:15px; padding:15px; border:1px solid rgba(111, 66, 193, 0.3); border-radius:12px; background:rgba(111, 66, 193, 0.05); text-align:left;">
-                        <div style="color:#d8b4fe; font-weight:bold; margin-bottom:10px;" id="otaMsgS">Update Available!</div>
+                    <div id="otaHubS"
+                        style="display:none; margin-bottom:15px; padding:15px; border:1px solid rgba(111, 66, 193, 0.3); border-radius:12px; background:rgba(111, 66, 193, 0.05); text-align:left;">
+                        <div style="color:#d8b4fe; font-weight:bold; margin-bottom:10px;" id="otaMsgS">Update Available!
+                        </div>
                         <button class="btn btn-green" style="margin-top:0;" onclick="startOTA()">Update Now</button>
                     </div>
-                    <button class="btn btn-purple" style="margin-top:0;" onclick="checkOTA(this)">Check for Updates</button>
-                    <p style="font-size:0.8rem; color:#555; margin-top:10px;">Current Version: <span id="curVer">--</span></p>
-                    <button class="btn" style="margin-top:15px; background:rgba(0,106,255,0.7); border:1px solid rgba(0,106,255,0.9);" onclick="vibe(); window.open('https://aungmoekhine.github.io/smart_water_pump-control/user_guide_premium.html', '_blank')">📖 User Guide</button>
+                    <button class="btn btn-purple" style="margin-top:0;" onclick="checkOTA(this)">Check for
+                        Updates</button>
+                    <p style="font-size:0.8rem; color:#555; margin-top:10px;">Current Version: <span
+                            id="curVer">--</span></p>
+                    <button class="btn"
+                        style="margin-top:15px; background:rgba(0,106,255,0.7); border:1px solid rgba(0,106,255,0.9);"
+                        onclick="vibe(); window.open('https://aungmoekhine.github.io/smart_water_pump-control/user_guide_premium.html', '_blank')">📖
+                        User Guide</button>
                 </div>
             </div>
         </div>
@@ -479,7 +1038,9 @@
         <div class="footer">
             <div id="lastMsg" style="margin-bottom:8px;">Waiting for first sync...</div>
             <span>Cloud ID: <span id="dispCid">--</span></span><br><span>Device IP: <span id="dispIp">--</span></span>
-            <div style="margin-top: 15px;"><button class="btn" style="padding: 10px 20px; font-size: 0.95rem; width: auto; min-width: 120px; background: rgba(0,123,255,0.5); border: 1px solid rgba(0,123,255,0.8);" onclick="logout()">Logout</button></div>
+            <div style="margin-top: 15px;"><button class="btn"
+                    style="padding: 10px 20px; font-size: 0.95rem; width: auto; min-width: 120px; background: rgba(0,123,255,0.5); border: 1px solid rgba(0,123,255,0.8);"
+                    onclick="logout()">Logout</button></div>
         </div>
     </div>
 
@@ -490,33 +1051,33 @@
         let BROKER = localStorage.getItem("lastBroker") || "210195b635414206adcd944325fe6f59.s1.eu.hivemq.cloud";
         let PORT = parseInt(localStorage.getItem("lastPort")) || 8884;
         let USER = localStorage.getItem("lastUser") || "Smart_Pump";
-let PASS = localStorage.getItem("lastPass") || "Sm@rt_Pump_2026";
-let sysLang = localStorage.getItem('cloudLang') ? parseInt(localStorage.getItem('cloudLang')) : 0;
-let showEventHistory = localStorage.getItem('cloudShowEventHistory');
-if (showEventHistory === null) showEventHistory = "1";
-function applyEventHistoryVisibility() {
-    const wrap = document.getElementById('eventHistoryWrap');
-    const chk = document.getElementById('showHistoryChk');
-    const visible = showEventHistory !== "0";
-    if (wrap) wrap.style.display = visible ? 'block' : 'none';
-    if (chk) chk.checked = visible;
-}
-function applyEventHistoryLabels() {
-    const chk = document.getElementById('showHistoryChk');
-    const row = chk ? chk.parentElement?.parentElement : null;
-    const labels = row ? row.querySelectorAll('label') : [];
-    if (labels[0]) labels[0].innerText = (sysLang == 1 ? "📋 ဖြစ်ရပ်မှတ်တမ်း" : "📋 Event History");
-    const showLabel = document.getElementById('eventHistoryShowLabel');
-    if (showLabel) showLabel.innerText = (sysLang == 1 ? "ပြရန်" : "Show");
-}
-function toggleEventHistory() {
-    showEventHistory = document.getElementById('showHistoryChk').checked ? "1" : "0";
-    localStorage.setItem('cloudShowEventHistory', showEventHistory);
-    applyEventHistoryVisibility();
-}
-applyEventHistoryVisibility();
-applyEventHistoryLabels();
-const dict = { "Device: Online": "စက် အွန်လိုင်း", "Device: Offline": "စက် အော့ဖ်လိုင်း", "Connecting...": "ချိတ်ဆက်နေသည်...", "NORMAL": "ပုံမှန်", "OVER": "ကျော်လွန်", "UNDER": "လျော့နည်း", "DELAY": "စောင့်ဆိုင်း", "ON": "ဖွင့်", "OFF": "ပိတ်", "DRY_RUN_ALARM!": "ရေမရှိ အချက်ပေး!", "PUMP_LOCKED!": "ပိတ်သိမ်းထားသည်!", "WAITING_RETRY!": "ပြန်စရန်စောင့်နေသည်!", "SENSOR_ERROR!": "ဆင်ဆာ ချို့ယွင်းချက်!", "SYSTEM_STANDBY!": "အသင့်အနေအထား!", "FLOW_DETECTED!": "ရေစီးဆင်းမှုရှိသည်!", "FLOW_CHECKING!": "ရေစီးဆင်းမှုစစ်နေ!", "COOLING_DOWN!": "အအေးခံနေသည်!", "VENTING_VALVE!": "လေလျှော့နေသည်!", "SETTLING_WATER!": "ရေအနည်ထိုင်ရန်စောင့်ချိန်!", "Voltage:": "လျှပ်စစ်အား-", "Volt Status:": "ဗို့အား အခြေအနေ-", "Pump:": "ရေမော်တာ-", "System Info:": "စက် အချက်အလက်-", "Retry in:": "ပြန်လည်စတင်ရန်-", "Start Pump": "ရေမော်တာ ဖွင့်မည်", "Stop Pump": "ရေမော်တာ ပိတ်မည်", "Cooling in:": "အအေးခံရန် ကျန်ချိန်-", "Dry-Run in:": "ရေမရှိ အချက်ပေးရန်-", "LICENSE EXPIRED": "သက်တမ်းကုန်ဆုံးပြီ", "WiFi SSID": "ဝိုင်ဖိုင် အမည်", "WiFi Password": "ဝိုင်ဖိုင် စကားဝှက်", "Show WiFi Password": "ဝိုင်ဖိုင် စကားဝှက် ပြမည်", "Show PIN": "ပင်နံပါတ် ပြမည်", "Device PIN (for Cloud)": "လုံခြုံရေး ပင်နံပါတ်", "Interface Language": "ဘာသာစကား", "Operating Mode": "စက် အမျိုးအစား", "Compressor Valve Delay": "အဆို့ရှင် ဖွင့်ချိန်", "Tank Height": "ရေတိုင်ကီ အမြင့်", "Low Tank Start Level": "ရေမော်တာစတင်မည့် ရေမှတ်", "High Voltage Set": "ဗို့အားလွန် သတ်မှတ်ချက်", "Low Voltage Set": "ဗို့အားလျော့ သတ်မှတ်ချက်", "Voltage Resume Gap": "ဗို့အားပြန်ဖွင့် ကွာဟချက်", "Dry-Run Delay": "ရေမရှိ အချက်ပေးချိန်", "Pump Cool-down (After 1Hr)": "၁နာရီမောင်းပြီး အနားပေးချိန်", "Auto-Retry Wait": "ပြန်လည်စတင်ရန် စောင့်ချိန်", "🌙 Smart Scheduling (DND)": "🌙 ညဘက် အသံပိတ်စနစ် (DND)", "Start Hour": "စတင်ရန် အချိန်", "End Hour": "ပြီးဆုံးရန် အချိန်", "📍 Home Time Zone (GMT)": "📍 အချိန်ဇုန် (GMT)", "Cloud ID:": "ကလောက် အိုင်ဒီ-", "Device IP:": "စက် အိုင်ပီ-", "System Role (Pairing)": "စနစ် အဆင့်အတန်း (Role)", "Master Settling Time": "ရေအနည်ထိုင်ချိန်", "Linked Master ID": "ချိတ်ဆက်ထားသော Master ID", "High Tank Stop Level": "ရေမော်တာရပ်မည့် ရေမှတ်", "🔑 License Management": "🔑 လိုင်စင် စီမံခန့်ခွဲမှု", "🛠️ Maintenance": "🛠️ ပြုပြင်ထိန်းသိမ်းမှု", "Check for Updates": "ဗားရှင်း အသစ်စစ်ရန်", "User Guide": "အသုံးပြုနည်း လမ်းညွှန်", "Current Version:": "လက်ရှိ ဗားရှင်း-", "Upload Token File (.key)": "လိုင်စင်တိုကင်ဖိုင်တင်ရန် (.key)", "Paste Token String": "တိုကင် စာသား ထည့်ပါ", "Choose File": "ဖိုင်ရွေးမည်", "Upload File": "ဖိုင် တင်မည်", "Activate via Text": "စာသားဖြင့် သက်တမ်းတိုးမည်", "Status:": "အခြေအနေ-", "🛠️ Factory Mode": "🛠️ စက်ရုံထုတ် ဆက်တင်များ", "Cloud Server Config": "ကလောက် ဆာဗာ ဆက်တင်များ", "MQTT Server URL": "ဆာဗာ လိပ်စာ (URL)", "MQTT Port": "ပေါ့တ် (Port)", "MQTT Username": "အသုံးပြုသူ အမည်", "MQTT Password": "စကားဝှက်", "⚙️ Advanced Server Settings": "⚙️ ဆာဗာ အဆင့်မြင့် ဆက်တင်များ", "Apply Server Settings": "ဆာဗာ ပြောင်းလဲမှု အတည်ပြုမည်", "Broker URL": "ဆာဝါ လိပ်စာ (URL)", "MQTT User": "အသုံးပြုသူ အမည်", "Logout": "ထွက်မည်" };
+        let PASS = localStorage.getItem("lastPass") || "Sm@rt_Pump_2026";
+        let sysLang = localStorage.getItem('cloudLang') ? parseInt(localStorage.getItem('cloudLang')) : 0;
+        let showEventHistory = localStorage.getItem('cloudShowEventHistory');
+        if (showEventHistory === null) showEventHistory = "1";
+        function applyEventHistoryVisibility() {
+            const wrap = document.getElementById('eventHistoryWrap');
+            const chk = document.getElementById('showHistoryChk');
+            const visible = showEventHistory !== "0";
+            if (wrap) wrap.style.display = visible ? 'block' : 'none';
+            if (chk) chk.checked = visible;
+        }
+        function applyEventHistoryLabels() {
+            const chk = document.getElementById('showHistoryChk');
+            const row = chk ? chk.parentElement?.parentElement : null;
+            const labels = row ? row.querySelectorAll('label') : [];
+            if (labels[0]) labels[0].innerText = (sysLang == 1 ? "📋 ဖြစ်ရပ်မှတ်တမ်း" : "📋 Event History");
+            const showLabel = document.getElementById('eventHistoryShowLabel');
+            if (showLabel) showLabel.innerText = (sysLang == 1 ? "ပြရန်" : "Show");
+        }
+        function toggleEventHistory() {
+            showEventHistory = document.getElementById('showHistoryChk').checked ? "1" : "0";
+            localStorage.setItem('cloudShowEventHistory', showEventHistory);
+            applyEventHistoryVisibility();
+        }
+        applyEventHistoryVisibility();
+        applyEventHistoryLabels();
+        const dict = { "Device: Online": "စက် အွန်လိုင်း", "Device: Offline": "စက် အော့ဖ်လိုင်း", "Connecting...": "ချိတ်ဆက်နေသည်...", "NORMAL": "ပုံမှန်", "OVER": "ကျော်လွန်", "UNDER": "လျော့နည်း", "DELAY": "စောင့်ဆိုင်း", "ON": "ဖွင့်", "OFF": "ပိတ်", "DRY_RUN_ALARM!": "ရေမရှိ အချက်ပေး!", "PUMP_LOCKED!": "ပိတ်သိမ်းထားသည်!", "WAITING_RETRY!": "ပြန်စရန်စောင့်နေသည်!", "SENSOR_ERROR!": "ဆင်ဆာ ချို့ယွင်းချက်!", "SYSTEM_STANDBY!": "အသင့်အနေအထား!", "FLOW_DETECTED!": "ရေစီးဆင်းမှုရှိသည်!", "FLOW_CHECKING!": "ရေစီးဆင်းမှုစစ်နေ!", "COOLING_DOWN!": "အအေးခံနေသည်!", "VENTING_VALVE!": "လေလျှော့နေသည်!", "SETTLING_WATER!": "ရေအနည်ထိုင်ရန်စောင့်ချိန်!", "Voltage:": "လျှပ်စစ်အား-", "Volt Status:": "ဗို့အား အခြေအနေ-", "Pump:": "ရေမော်တာ-", "System Info:": "စက် အချက်အလက်-", "Retry in:": "ပြန်လည်စတင်ရန်-", "Start Pump": "ရေမော်တာ ဖွင့်မည်", "Stop Pump": "ရေမော်တာ ပိတ်မည်", "Cooling in:": "အအေးခံရန် ကျန်ချိန်-", "Dry-Run in:": "ရေမရှိ အချက်ပေးရန်-", "LICENSE EXPIRED": "သက်တမ်းကုန်ဆုံးပြီ", "WiFi SSID": "ဝိုင်ဖိုင် အမည်", "WiFi Password": "ဝိုင်ဖိုင် စကားဝှက်", "Show WiFi Password": "ဝိုင်ဖိုင် စကားဝှက် ပြမည်", "Show PIN": "ပင်နံပါတ် ပြမည်", "Device PIN (for Cloud)": "လုံခြုံရေး ပင်နံပါတ်", "Interface Language": "ဘာသာစကား", "Operating Mode": "စက် အမျိုးအစား", "Compressor Valve Delay": "အဆို့ရှင် ဖွင့်ချိန်", "Tank Height": "ရေတိုင်ကီ အမြင့်", "Low Tank Start Level": "ရေမော်တာစတင်မည့် ရေမှတ်", "High Voltage Set": "ဗို့အားလွန် သတ်မှတ်ချက်", "Low Voltage Set": "ဗို့အားလျော့ သတ်မှတ်ချက်", "Voltage Resume Gap": "ဗို့အားပြန်ဖွင့် ကွာဟချက်", "Dry-Run Delay": "ရေမရှိ အချက်ပေးချိန်", "Pump Cool-down (After 1Hr)": "၁နာရီမောင်းပြီး အနားပေးချိန်", "Auto-Retry Wait": "ပြန်လည်စတင်ရန် စောင့်ချိန်", "🌙 Smart Scheduling (DND)": "🌙 ညဘက် အသံပိတ်စနစ် (DND)", "Start Hour": "စတင်ရန် အချိန်", "End Hour": "ပြီးဆုံးရန် အချိန်", "📍 Home Time Zone (GMT)": "📍 အချိန်ဇုန် (GMT)", "Cloud ID:": "ကလောက် အိုင်ဒီ-", "Device IP:": "စက် အိုင်ပီ-", "System Role (Pairing)": "စနစ် အဆင့်အတန်း (Role)", "Master Settling Time": "ရေအနည်ထိုင်ချိန်", "Linked Master ID": "ချိတ်ဆက်ထားသော Master ID", "High Tank Stop Level": "ရေမော်တာရပ်မည့် ရေမှတ်", "🔑 License Management": "🔑 လိုင်စင် စီမံခန့်ခွဲမှု", "🛠️ Maintenance": "🛠️ ပြုပြင်ထိန်းသိမ်းမှု", "Check for Updates": "ဗားရှင်း အသစ်စစ်ရန်", "User Guide": "အသုံးပြုနည်း လမ်းညွှန်", "Current Version:": "လက်ရှိ ဗားရှင်း-", "Upload Token File (.key)": "လိုင်စင်တိုကင်ဖိုင်တင်ရန် (.key)", "Paste Token String": "တိုကင် စာသား ထည့်ပါ", "Choose File": "ဖိုင်ရွေးမည်", "Upload File": "ဖိုင် တင်မည်", "Activate via Text": "စာသားဖြင့် သက်တမ်းတိုးမည်", "Status:": "အခြေအနေ-", "🛠️ Factory Mode": "🛠️ စက်ရုံထုတ် ဆက်တင်များ", "Cloud Server Config": "ကလောက် ဆာဗာ ဆက်တင်များ", "MQTT Server URL": "ဆာဗာ လိပ်စာ (URL)", "MQTT Port": "ပေါ့တ် (Port)", "MQTT Username": "အသုံးပြုသူ အမည်", "MQTT Password": "စကားဝှက်", "⚙️ Advanced Server Settings": "⚙️ ဆာဗာ အဆင့်မြင့် ဆက်တင်များ", "Apply Server Settings": "ဆာဗာ ပြောင်းလဲမှု အတည်ပြုမည်", "Broker URL": "ဆာဝါ လိပ်စာ (URL)", "MQTT User": "အသုံးပြုသူ အမည်", "Logout": "ထွက်မည်" };
         const tr = (t) => {
             if (sysLang != 1 || !t) return t;
             let s = String(t);
@@ -600,7 +1161,7 @@ const dict = { "Device: Online": "စက် အွန်လိုင်း", "De
         const vH = document.getElementById('vH'); for (let i = 230; i <= 260; i++) { let opt = document.createElement('option'); opt.value = i; opt.innerText = i + " Volts"; vH.appendChild(opt); }
         const vL = document.getElementById('vL'); for (let i = 150; i <= 190; i++) { let opt = document.createElement('option'); opt.value = i; opt.innerText = i + " Volts"; vL.appendChild(opt); }
         const vG = document.getElementById('vG'); for (let i = 1; i <= 10; i++) { let opt = document.createElement('option'); opt.value = i; opt.innerText = i + " Volts"; vG.appendChild(opt); } vG.value = "5";
-        const dD = document.getElementById('dD'); for (let i = 60; i <= 180; i += 5) { let opt = document.createElement('option'); opt.value = i; opt.innerText = i + " Seconds"; dD.appendChild(opt); }
+        const dD = document.getElementById('dD'); for (let i = 30; i <= 180; i += 5) { let opt = document.createElement('option'); opt.value = i; opt.innerText = i + " Seconds"; dD.appendChild(opt); }
         const vDly = document.getElementById('vDly'); for (let i = 5; i <= 15; i++) { let opt = document.createElement('option'); opt.value = i; opt.innerText = i + " Seconds"; vDly.appendChild(opt); }
         const dndS = document.getElementById('dndS'), dndE = document.getElementById('dndE');
         for (let i = 0; i < 24; i++) { let h = (i < 10 ? '0' : '') + i + ':00';[dndS, dndE].forEach(s => { let opt = document.createElement('option'); opt.value = i; opt.innerText = h; s.appendChild(opt); }); }
