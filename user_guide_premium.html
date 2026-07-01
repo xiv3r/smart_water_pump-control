@@ -7,24 +7,26 @@
     <title>APC-S3 Pro — Master Technical Manual (Deep-Dive Edition)</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&family=Outfit:wght@500;600;700;800&display=swap"
+        rel="stylesheet">
     <style>
         /* ─── DESIGN TOKENS ─────────────────────────────────────── */
         :root {
-            --bg-deep:      #080c17;
-            --bg-card:      #0e1525;
-            --bg-surface:   #161e30;
-            --accent-blue:  #00b4f0;
-            --accent-cyan:  #00e5d1;
+            --bg-deep: #080c17;
+            --bg-card: #0e1525;
+            --bg-surface: #161e30;
+            --accent-blue: #00b4f0;
+            --accent-cyan: #00e5d1;
             --accent-green: #00e87a;
-            --accent-red:   #ff3b5c;
+            --accent-red: #ff3b5c;
             --accent-amber: #ffb020;
             --text-primary: #e8eef7;
-            --text-muted:   #5a6a85;
-            --text-dim:     #2e3d58;
-            --border:       rgba(0,180,240,0.12);
-            --glow-blue:    rgba(0,180,240,0.35);
-            --glass:        rgba(14, 21, 37, 0.85);
+            --text-muted: #5a6a85;
+            --text-dim: #2e3d58;
+            --border: rgba(0, 180, 240, 0.12);
+            --glow-blue: rgba(0, 180, 240, 0.35);
+            --glass: rgba(14, 21, 37, 0.85);
         }
 
         @font-face {
@@ -42,8 +44,8 @@
             font-family: 'Inter', 'Pyidaungsu', sans-serif;
             background: var(--bg-deep);
             background-image:
-                radial-gradient(ellipse 80% 50% at 50% -10%, rgba(0,100,200,0.18) 0%, transparent 65%),
-                radial-gradient(ellipse 40% 30% at 90% 90%,  rgba(0,80,120,0.10)  0%, transparent 50%);
+                radial-gradient(ellipse 80% 50% at 50% -10%, rgba(0, 100, 200, 0.18) 0%, transparent 65%),
+                radial-gradient(ellipse 40% 30% at 90% 90%, rgba(0, 80, 120, 0.10) 0%, transparent 50%);
             background-attachment: fixed;
             color: var(--text-primary);
             line-height: 1.7;
@@ -56,10 +58,10 @@
             position: fixed;
             inset: 0;
             background-image:
-                radial-gradient(1px 1px at 15% 25%, rgba(0,180,240,0.5) 0%, transparent 100%),
-                radial-gradient(1px 1px at 80% 55%, rgba(0,229,209,0.4) 0%, transparent 100%),
-                radial-gradient(1.5px 1.5px at 45% 75%, rgba(0,232,122,0.3) 0%, transparent 100%),
-                radial-gradient(1px 1px at 70% 20%, rgba(168,85,247,0.3) 0%, transparent 100%);
+                radial-gradient(1px 1px at 15% 25%, rgba(0, 180, 240, 0.5) 0%, transparent 100%),
+                radial-gradient(1px 1px at 80% 55%, rgba(0, 229, 209, 0.4) 0%, transparent 100%),
+                radial-gradient(1.5px 1.5px at 45% 75%, rgba(0, 232, 122, 0.3) 0%, transparent 100%),
+                radial-gradient(1px 1px at 70% 20%, rgba(168, 85, 247, 0.3) 0%, transparent 100%);
             pointer-events: none;
             z-index: 0;
         }
@@ -109,8 +111,15 @@
         }
 
         @keyframes logoPulse {
-            0%, 100% { filter: drop-shadow(0 0 20px rgba(0,180,240,0.4)); }
-            50%       { filter: drop-shadow(0 0 45px rgba(0,180,240,0.7)); }
+
+            0%,
+            100% {
+                filter: drop-shadow(0 0 20px rgba(0, 180, 240, 0.4));
+            }
+
+            50% {
+                filter: drop-shadow(0 0 45px rgba(0, 180, 240, 0.7));
+            }
         }
 
         h1.cover-title {
@@ -165,9 +174,9 @@
             border: 1px solid var(--border);
             border-radius: 32px;
             box-shadow:
-                0 0 0 1px rgba(0,180,240,0.04),
-                0 24px 70px rgba(0,0,0,0.65),
-                inset 0 1px 0 rgba(255,255,255,0.04);
+                0 0 0 1px rgba(0, 180, 240, 0.04),
+                0 24px 70px rgba(0, 0, 0, 0.65),
+                inset 0 1px 0 rgba(255, 255, 255, 0.04);
             animation: fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
@@ -175,15 +184,24 @@
         .container::before {
             content: '';
             position: absolute;
-            top: 0; left: 10%; right: 10%;
+            top: 0;
+            left: 10%;
+            right: 10%;
             height: 1px;
             background: linear-gradient(90deg, transparent, var(--accent-blue), var(--accent-cyan), transparent);
             border-radius: 1px;
         }
 
         @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(24px); }
-            to   { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         h1.section-title {
@@ -318,7 +336,7 @@
         .card:hover {
             transform: translateY(-5px);
             border-color: var(--accent-blue);
-            box-shadow: 0 14px 45px rgba(0,0,0,0.5), 0 0 22px rgba(0,180,240,0.1);
+            box-shadow: 0 14px 45px rgba(0, 0, 0, 0.5), 0 0 22px rgba(0, 180, 240, 0.1);
         }
 
         .card h4 {
@@ -469,7 +487,7 @@
         .wiring-wrapper {
             overflow-x: auto;
             background: rgba(4, 10, 20, 0.8);
-            border: 1px solid rgba(0,180,240,0.12);
+            border: 1px solid rgba(0, 180, 240, 0.12);
             padding: 20px 10px;
             border-radius: 24px;
             text-align: center;
@@ -503,26 +521,32 @@
             font-size: 11px;
             transition: box-shadow 0.3s;
         }
-        .comp-base:hover { box-shadow: 0 0 14px rgba(0,180,240,0.5); }
+
+        .comp-base:hover {
+            box-shadow: 0 0 14px rgba(0, 180, 240, 0.5);
+        }
 
         .comp-sensor {
             background: rgba(0, 80, 160, 0.25);
-            border: 1.5px solid rgba(0,180,240,0.6);
+            border: 1.5px solid rgba(0, 180, 240, 0.6);
             color: var(--accent-blue);
         }
+
         .comp-actuator {
             background: rgba(160, 0, 40, 0.2);
-            border: 1.5px solid rgba(255,59,92,0.5);
+            border: 1.5px solid rgba(255, 59, 92, 0.5);
             color: #ff7090;
         }
+
         .comp-display {
             background: rgba(0, 100, 90, 0.2);
-            border: 1.5px solid rgba(0,229,209,0.5);
+            border: 1.5px solid rgba(0, 229, 209, 0.5);
             color: var(--accent-cyan);
         }
+
         .comp-input {
-            background: rgba(60,60,80,0.25);
-            border: 1.5px solid rgba(160,160,200,0.4);
+            background: rgba(60, 60, 80, 0.25);
+            border: 1.5px solid rgba(160, 160, 200, 0.4);
             color: #a0a8c0;
         }
 
@@ -535,9 +559,10 @@
             padding-left: 6px;
             width: 66px;
             font-family: 'JetBrains Mono', monospace;
-            text-shadow: 0 0 8px rgba(0,255,136,0.6);
+            text-shadow: 0 0 8px rgba(0, 255, 136, 0.6);
             font-size: 10px;
         }
+
         .board-body-right {
             background: #071408;
             color: #00ff88;
@@ -546,9 +571,10 @@
             padding-right: 6px;
             width: 66px;
             font-family: 'JetBrains Mono', monospace;
-            text-shadow: 0 0 8px rgba(0,255,136,0.6);
+            text-shadow: 0 0 8px rgba(0, 255, 136, 0.6);
             font-size: 10px;
         }
+
         .board-header {
             background: linear-gradient(90deg, #0a2215, #154030);
             color: #00ff88;
@@ -558,8 +584,9 @@
             font-size: 0.85em;
             letter-spacing: 2px;
             border-radius: 8px 8px 0 0;
-            text-shadow: 0 0 12px rgba(0,255,136,0.8);
+            text-shadow: 0 0 12px rgba(0, 255, 136, 0.8);
         }
+
         .board-footer {
             background: linear-gradient(90deg, #0a2215, #154030);
             height: 8px;
@@ -570,7 +597,7 @@
         .wire-line {
             height: 2px;
             background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
-            box-shadow: 0 0 4px rgba(0,180,240,0.7);
+            box-shadow: 0 0 4px rgba(0, 180, 240, 0.7);
             width: 12px;
             display: inline-block;
             vertical-align: middle;
@@ -579,20 +606,36 @@
         }
 
         @keyframes wirePulse {
-            0%, 100% { opacity: 0.55; box-shadow: 0 0 4px rgba(0,180,240,0.6); }
-            50%       { opacity: 1;    box-shadow: 0 0 10px rgba(0,229,209,1); }
+
+            0%,
+            100% {
+                opacity: 0.55;
+                box-shadow: 0 0 4px rgba(0, 180, 240, 0.6);
+            }
+
+            50% {
+                opacity: 1;
+                box-shadow: 0 0 10px rgba(0, 229, 209, 1);
+            }
         }
 
         .wire-dot {
-            width: 5px; height: 5px;
+            width: 5px;
+            height: 5px;
             background: var(--accent-cyan);
             border-radius: 50%;
             position: absolute;
             top: -1.5px;
             box-shadow: 0 0 5px var(--accent-cyan);
         }
-        .dot-left  { right: 0; }
-        .dot-right { left: 0; }
+
+        .dot-left {
+            right: 0;
+        }
+
+        .dot-right {
+            left: 0;
+        }
 
         /* --- TOC --- */
         .toc {
@@ -890,75 +933,150 @@
 
         <!-- 03 PINOUT -->
         <h1 class="section-title"><span class="num">03.</span> Engineering Pin-Mapping</h1>
-        <p>Official GPIO assignments for the ESP32-S3 WROOM interface. Do not modify the hardware traces without consulting the factory manual.</p>
-        
+        <p>Official GPIO assignments for the ESP32-S3 WROOM interface. Do not modify the hardware traces without
+            consulting the factory manual.</p>
+
         <div class="wiring-wrapper">
             <table class="wiring-table">
                 <!-- Header -->
                 <tr>
-                    <td></td><td></td>
+                    <td></td>
+                    <td></td>
                     <td colspan="2" class="board-header">⚙ ESP32-S3</td>
-                    <td></td><td></td>
+                    <td></td>
+                    <td></td>
                 </tr>
                 <!-- LCD SDA / SCL -->
                 <tr>
-                    <td><div class="comp-base comp-display">🖥️ LCD (SDA)</div></td>
-                    <td><div class="wire-line"><div class="wire-dot dot-left"></div></div></td>
+                    <td>
+                        <div class="comp-base comp-display">🖥️ LCD (SDA)</div>
+                    </td>
+                    <td>
+                        <div class="wire-line">
+                            <div class="wire-dot dot-left"></div>
+                        </div>
+                    </td>
                     <td class="board-body-left">GPIO 01</td>
                     <td class="board-body-right">GPIO 02</td>
-                    <td><div class="wire-line"><div class="wire-dot dot-right"></div></div></td>
-                    <td><div class="comp-base comp-display">🖥️ LCD (SCL)</div></td>
+                    <td>
+                        <div class="wire-line">
+                            <div class="wire-dot dot-right"></div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="comp-base comp-display">🖥️ LCD (SCL)</div>
+                    </td>
                 </tr>
                 <!-- Volt / Trig -->
                 <tr>
-                    <td><div class="comp-base comp-sensor">⚡ Volt Sensor</div></td>
-                    <td><div class="wire-line"><div class="wire-dot dot-left"></div></div></td>
+                    <td>
+                        <div class="comp-base comp-sensor">⚡ Volt Sensor</div>
+                    </td>
+                    <td>
+                        <div class="wire-line">
+                            <div class="wire-dot dot-left"></div>
+                        </div>
+                    </td>
                     <td class="board-body-left">GPIO 04</td>
                     <td class="board-body-right">GPIO 05</td>
-                    <td><div class="wire-line"><div class="wire-dot dot-right"></div></div></td>
-                    <td><div class="comp-base comp-sensor">📏 Ultra Trig</div></td>
+                    <td>
+                        <div class="wire-line">
+                            <div class="wire-dot dot-right"></div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="comp-base comp-sensor">📏 Ultra Trig</div>
+                    </td>
                 </tr>
                 <!-- Echo / Buzzer -->
                 <tr>
-                    <td><div class="comp-base comp-sensor">📏 Ultra Echo</div></td>
-                    <td><div class="wire-line"><div class="wire-dot dot-left"></div></div></td>
+                    <td>
+                        <div class="comp-base comp-sensor">📏 Ultra Echo</div>
+                    </td>
+                    <td>
+                        <div class="wire-line">
+                            <div class="wire-dot dot-left"></div>
+                        </div>
+                    </td>
                     <td class="board-body-left">GPIO 06</td>
                     <td class="board-body-right">GPIO 07</td>
-                    <td><div class="wire-line"><div class="wire-dot dot-right"></div></div></td>
-                    <td><div class="comp-base comp-actuator">🔔 Buzzer</div></td>
+                    <td>
+                        <div class="wire-line">
+                            <div class="wire-dot dot-right"></div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="comp-base comp-actuator">🔔 Buzzer</div>
+                    </td>
                 </tr>
                 <!-- Motor / Manual Btn -->
                 <tr>
-                    <td><div class="comp-base comp-actuator">⚙️ Motor</div></td>
-                    <td><div class="wire-line"><div class="wire-dot dot-left"></div></div></td>
+                    <td>
+                        <div class="comp-base comp-actuator">⚙️ Motor</div>
+                    </td>
+                    <td>
+                        <div class="wire-line">
+                            <div class="wire-dot dot-left"></div>
+                        </div>
+                    </td>
                     <td class="board-body-left">GPIO 08</td>
                     <td class="board-body-right">GPIO 09</td>
-                    <td><div class="wire-line"><div class="wire-dot dot-right"></div></div></td>
-                    <td><div class="comp-base comp-input">🔘 Override/Reset</div></td>
+                    <td>
+                        <div class="wire-line">
+                            <div class="wire-dot dot-right"></div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="comp-base comp-input">🔘 Override/Reset</div>
+                    </td>
                 </tr>
                 <!-- Solenoid / Flow -->
                 <tr>
-                    <td><div class="comp-base comp-actuator">💨 Solenoid</div></td>
-                    <td><div class="wire-line"><div class="wire-dot dot-left"></div></div></td>
+                    <td>
+                        <div class="comp-base comp-actuator">💨 Solenoid</div>
+                    </td>
+                    <td>
+                        <div class="wire-line">
+                            <div class="wire-dot dot-left"></div>
+                        </div>
+                    </td>
                     <td class="board-body-left">GPIO 10</td>
                     <td class="board-body-right">GPIO 18</td>
-                    <td><div class="wire-line"><div class="wire-dot dot-right"></div></div></td>
-                    <td><div class="comp-base comp-sensor">🌊 Flow Sens</div></td>
+                    <td>
+                        <div class="wire-line">
+                            <div class="wire-dot dot-right"></div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="comp-base comp-sensor">🌊 Flow Sens</div>
+                    </td>
                 </tr>
                 <!-- RGB LED -->
                 <tr>
-                    <td><div class="comp-base comp-actuator">🌈 RGB LED</div></td>
-                    <td><div class="wire-line"><div class="wire-dot dot-left"></div></div></td>
+                    <td>
+                        <div class="comp-base comp-actuator">🌈 RGB LED</div>
+                    </td>
+                    <td>
+                        <div class="wire-line">
+                            <div class="wire-dot dot-left"></div>
+                        </div>
+                    </td>
                     <td class="board-body-left">GPIO 48</td>
                     <td class="board-body-right">---</td>
-                    <td><div class="wire-line"></div></td>
-                    <td><div style="width:95px;height:10px;"></div></td>
+                    <td>
+                        <div class="wire-line"></div>
+                    </td>
+                    <td>
+                        <div style="width:95px;height:10px;"></div>
+                    </td>
                 </tr>
                 <!-- Footer -->
                 <tr>
-                    <td></td><td></td>
+                    <td></td>
+                    <td></td>
                     <td colspan="2" class="board-footer"></td>
-                    <td></td><td></td>
+                    <td></td>
+                    <td></td>
                 </tr>
             </table>
         </div>
@@ -968,8 +1086,10 @@
         <div class="grid">
             <div class="card"><span class="dot dot-blue"></span>
                 <h4>Dimming / Breathing Blue</h4>
-                <p><strong>No WiFi:</strong> System is offline, slowly pulsing blue while attempting to reconnect to router.</p>
-                <div class="my-small">ဝိုင်ဖိုင်ချိတ်ဆက်မှု မရှိသေးဘဲ ပြန်လည်ချိတ်ဆက်ရန် ကြိုးပမ်းနေသောအချိန်တွင် အပြာရောင် ဖြည်းဖြည်းမှိန်ပြီး လင်းနေမည်။
+                <p><strong>No WiFi:</strong> System is offline, slowly pulsing blue while attempting to reconnect to
+                    router.</p>
+                <div class="my-small">ဝိုင်ဖိုင်ချိတ်ဆက်မှု မရှိသေးဘဲ ပြန်လည်ချိတ်ဆက်ရန် ကြိုးပမ်းနေသောအချိန်တွင်
+                    အပြာရောင် ဖြည်းဖြည်းမှိန်ပြီး လင်းနေမည်။
                 </div>
             </div>
             <div class="card"><span class="dot dot-cyan"></span>
@@ -1095,12 +1215,14 @@
                 <tr>
                     <td><span class="label-code">SETTL XXM</span></td>
                     <td>Sync</td>
-                    <td>Master (Sump) unit is in the <strong>Settling Water</strong> phase after pump stops. XX = minutes remaining. Slave must wait until settling completes.</td>
+                    <td>Master (Sump) unit is in the <strong>Settling Water</strong> phase after pump stops. XX =
+                        minutes remaining. Slave must wait until settling completes.</td>
                 </tr>
                 <tr>
                     <td><span class="label-code">WAIT SUMP</span></td>
                     <td>Sync</td>
-                    <td>Slave (Upper Tank) unit is waiting for Master to reach a safe state (<span class="tech-val">STANDBY</span> or <span class="tech-val">FLOW OK/CHK</span>).</td>
+                    <td>Slave (Upper Tank) unit is waiting for Master to reach a safe state (<span
+                            class="tech-val">STANDBY</span> or <span class="tech-val">FLOW OK/CHK</span>).</td>
                 </tr>
             </tbody>
         </table>
@@ -1145,37 +1267,47 @@
 
         <!-- 08 VOLTAGE SECURITY -->
         <h1 class="section-title"><span class="num">08.</span> ⚡ Voltage Security Engine</h1>
-        <p>The system constantly monitors the AC mains voltage via the ZMPT sensor. To protect the motor from burnout, the system now features <strong class="tech-val">Customizable Power Guards</strong>.</p>
+        <p>The system constantly monitors the AC mains voltage via the ZMPT sensor. To protect the motor from burnout,
+            the system now features <strong class="tech-val">Customizable Power Guards</strong>.</p>
         <div class="grid">
             <div class="card">
                 <h4><span class="feature-icon">⚠️</span> Cut-off Limits</h4>
-                <p>Configurable: Low <strong class="tech-val">150V-190V</strong> | High <strong class="tech-val">230V-260V</strong>. Precise protection for your motor windings.</p>
+                <p>Configurable: Low <strong class="tech-val">150V-190V</strong> | High <strong
+                        class="tech-val">230V-260V</strong>. Precise protection for your motor windings.</p>
             </div>
             <div class="card">
                 <h4><span class="feature-icon">⚖️</span> Resume Gap</h4>
-                <p>Configurable <strong class="tech-val">1V to 10V</strong>. Prevents rapid on/off switching (chattering) when voltage is hovering near the threshold.</p>
+                <p>Configurable <strong class="tech-val">1V to 10V</strong>. Prevents rapid on/off switching
+                    (chattering) when voltage is hovering near the threshold.</p>
             </div>
         </div>
         <div class="my-block">
-            <b>⚡ ဗို့အား ကာကွယ်ခြင်း -</b> မီးအား အတက်အကျကြောင့် မော်တာလောင်ခြင်းမှ ကာကွယ်ရန် ဗို့အားမြင့်/နိမ့် သတ်မှတ်ချက်များကို စိတ်ကြိုက်ပြင်ဆင်နိုင်ပါသည်။ မီးအားပြန်တက်လာချိန်တွင် စက်ခဏခဏ ပိတ်ဖွင့်မဖြစ်စေရန် <span class="highlight-my">Resume Gap (1V-10V)</span> စနစ်ကိုလည်း ထည့်သွင်းပေးထားပါသည်။
+            <b>⚡ ဗို့အား ကာကွယ်ခြင်း -</b> မီးအား အတက်အကျကြောင့် မော်တာလောင်ခြင်းမှ ကာကွယ်ရန် ဗို့အားမြင့်/နိမ့်
+            သတ်မှတ်ချက်များကို စိတ်ကြိုက်ပြင်ဆင်နိုင်ပါသည်။ မီးအားပြန်တက်လာချိန်တွင် စက်ခဏခဏ ပိတ်ဖွင့်မဖြစ်စေရန် <span
+                class="highlight-my">Resume Gap (1V-10V)</span> စနစ်ကိုလည်း ထည့်သွင်းပေးထားပါသည်။
         </div>
 
         <!-- 09 DRY-RUN AUTO-RETRY -->
         <h1 class="section-title"><span class="num">09.</span> 🌊 Dry-Run & Auto-Retry</h1>
         <h2 class="sub-title">1. Configurable Dry-Run Safety</h2>
-        <p>When the motor starts, the system monitors water flow. You can now adjust the detection sensitivity and retry behavior.</p>
+        <p>When the motor starts, the system monitors water flow. You can now adjust the detection sensitivity and retry
+            behavior.</p>
         <div class="grid">
             <div class="card">
                 <h4><span class="feature-icon">⏱️</span> Dry-Run Delay</h4>
-                <p>Configurable: <strong class="tech-val">60s to 180s</strong>. Set the timeout duration before the "DRY ALRM" is triggered.</p>
+                <p>Configurable: <strong class="tech-val">30s to 180s</strong>. Set the timeout duration before the "DRY
+                    ALRM" is triggered.</p>
             </div>
             <div class="card">
                 <h4><span class="feature-icon">🔄</span> Auto-Retry Time</h4>
-                <p>Options: <strong class="tech-val">OFF, 30m, 60m</strong>. Automatically attempts to restart the pump to check if water has returned.</p>
+                <p>Options: <strong class="tech-val">OFF, 30m, 60m</strong>. Automatically attempts to restart the pump
+                    to check if water has returned.</p>
             </div>
         </div>
         <div class="my-block">
-            <b>🌊 ရေပြတ်လပ်မှု ကာကွယ်ခြင်း -</b> ရေပြတ်လပ်မှု စောင့်ဆိုင်းချိန် <span class="highlight-my">(စက္ကန့် ၆၀ မှ ၁၈၀)</span> နှင့် အလိုအလျောက် ပြန်လည်စမ်းသပ်မည့်အချိန် <span class="highlight-my">(မိနစ် ၃၀ သို့မဟုတ် ၆၀)</span> တို့ကို စိတ်ကြိုက် ရွေးချယ်နိုင်ပါသည်။
+            <b>🌊 ရေပြတ်လပ်မှု ကာကွယ်ခြင်း -</b> ရေပြတ်လပ်မှု စောင့်ဆိုင်းချိန် <span class="highlight-my">(စက္ကန့် ၃၀
+                မှ ၁၈၀)</span> နှင့် အလိုအလျောက် ပြန်လည်စမ်းသပ်မည့်အချိန် <span class="highlight-my">(မိနစ် ၃၀ သို့မဟုတ်
+                ၆၀)</span> တို့ကို စိတ်ကြိုက် ရွေးချယ်နိုင်ပါသည်။
         </div>
 
         <h2 class="sub-title">Automatic Retry & Alarm Sequence</h2>
@@ -1184,70 +1316,107 @@
             <div class="alert-body">
                 <b>Two-Stage Dry-Run Protection Cycle:</b>
                 <ol>
-                    <li><strong>Stage 1: Active Alarm (DRY ALRM - 60 seconds):</strong> If the flow sensor detects no water for the configured Dry-Run Delay, the pump stops immediately. The LED flashes red, the LCD displays <span class="tech-val">DRY ALRM</span>, and the buzzer beeps urgently (500ms intervals) for exactly <strong>60 seconds</strong>.</li>
-                    <li><strong>Stage 2: Lockout / Waiting Retry (LOCKED / WAITING_RETRY!):</strong> After 60 seconds, the buzzer stops beep patterns.
+                    <li><strong>Stage 1: Active Alarm (DRY ALRM - 60 seconds):</strong> If the flow sensor detects no
+                        water for the configured Dry-Run Delay, the pump stops immediately. The LED flashes red, the LCD
+                        displays <span class="tech-val">DRY ALRM</span>, and the buzzer beeps urgently (500ms intervals)
+                        for exactly <strong>60 seconds</strong>.</li>
+                    <li><strong>Stage 2: Lockout / Waiting Retry (LOCKED / WAITING_RETRY!):</strong> After 60 seconds,
+                        the buzzer stops beep patterns.
                         <ul>
-                            <li>If <strong>Auto-Retry is enabled</strong> (e.g., 30 or 60 minutes): The LCD shows <span class="tech-val">LOCKED</span> and status reads <span class="tech-val">WAITING_RETRY!</span>. A countdown will run on the screen. Once the minutes expire, the system automatically clears the error and restarts the pump to test for water.</li>
-                            <li>If <strong>Auto-Retry is set to OFF</strong>: The system enters permanent lockout (<span class="tech-val">PUMP_LOCKED!</span>). The motor will not restart automatically and must be reset manually.</li>
+                            <li>If <strong>Auto-Retry is enabled</strong> (e.g., 30 or 60 minutes): The LCD shows <span
+                                    class="tech-val">LOCKED</span> and status reads <span
+                                    class="tech-val">WAITING_RETRY!</span>. A countdown will run on the screen. Once the
+                                minutes expire, the system automatically clears the error and restarts the pump to test
+                                for water.</li>
+                            <li>If <strong>Auto-Retry is set to OFF</strong>: The system enters permanent lockout (<span
+                                    class="tech-val">PUMP_LOCKED!</span>). The motor will not restart automatically and
+                                must be reset manually.</li>
                         </ul>
                     </li>
                 </ol>
-                <p><strong>How to Reset Manually:</strong> Press the physical button once or send a Reset command via the MQTT Cloud API or Local Web UI to instantly clear the dry-run error and restart operation.</p>
+                <p><strong>How to Reset Manually:</strong> Press the physical button once or send a Reset command via
+                    the MQTT Cloud API or Local Web UI to instantly clear the dry-run error and restart operation.</p>
             </div>
         </div>
 
         <div class="my-block">
             <b>🔄 ရေပြတ်လပ်မှု အလိုအလျောက် ပြန်လည်စမ်းသပ်ခြင်းနှင့် အချက်ပေးစနစ် -</b><br><br>
-            ၁။ <b>အဆင့် ၁ - အချက်ပေးအဆင့် (DRY ALRM - ၆၀ စက္ကန့်):</b> ရေပြတ်လပ်သွားလျှင် မော်တာချက်ချင်းရပ်သွားပြီး LED အနီရောင်ဖလက်ရှ် လင်းပါမည်။ LCD မျက်နှာပြင်တွင် <span class="highlight-my">DRY ALRM</span> ဟုပြသပြီး ဘတ်ဇာမှ ၆၀ စက္ကန့်တိတိ အသံလှိုင်းတိုဖြင့် အချက်ပေးမြည်ပါမည်။<br>
-            ၂။ <b>အဆင့် ၂ - စောင့်ဆိုင်း/ပိတ်ဆို့အဆင့် (LOCKED / WAITING_RETRY!):</b> ၆၀ စက္ကန့်ပြည့်ပါက ဘတ်ဇာရပ်သွားပါမည်။
+            ၁။ <b>အဆင့် ၁ - အချက်ပေးအဆင့် (DRY ALRM - ၆၀ စက္ကန့်):</b> ရေပြတ်လပ်သွားလျှင် မော်တာချက်ချင်းရပ်သွားပြီး LED
+            အနီရောင်ဖလက်ရှ် လင်းပါမည်။ LCD မျက်နှာပြင်တွင် <span class="highlight-my">DRY ALRM</span> ဟုပြသပြီး ဘတ်ဇာမှ
+            ၆၀ စက္ကန့်တိတိ အသံလှိုင်းတိုဖြင့် အချက်ပေးမြည်ပါမည်။<br>
+            ၂။ <b>အဆင့် ၂ - စောင့်ဆိုင်း/ပိတ်ဆို့အဆင့် (LOCKED / WAITING_RETRY!):</b> ၆၀ စက္ကန့်ပြည့်ပါက
+            ဘတ်ဇာရပ်သွားပါမည်။
             <ul>
-                <li><b>Auto-Retry ဖွင့်ထားပါက (မိနစ် ၃၀ သို့မဟုတ် ၆၀):</b> LCD တွင် <span class="highlight-my">LOCKED</span> ဟုပြပြီး ပြန်လည်စမ်းသပ်ရန် စက္ကန့်/မိနစ် Countdown ပြေးနေပါမည်။ အချိန်စေ့ပါက မော်တာကို အလိုအလျောက် ပြန်လည်မောင်းနှင် စမ်းသပ်ပါမည်။</li>
-                <li><b>Auto-Retry ပိတ်ထားပါက (OFF):</b> စက်သည် လုံးဝရပ်တန့်နေမည်ဖြစ်ပြီး (<span class="highlight-my">PUMP_LOCKED!</span>) အလိုအလျောက် ပြန်မလည်ပါ။</li>
+                <li><b>Auto-Retry ဖွင့်ထားပါက (မိနစ် ၃၀ သို့မဟုတ် ၆၀):</b> LCD တွင် <span
+                        class="highlight-my">LOCKED</span> ဟုပြပြီး ပြန်လည်စမ်းသပ်ရန် စက္ကန့်/မိနစ် Countdown
+                    ပြေးနေပါမည်။ အချိန်စေ့ပါက မော်တာကို အလိုအလျောက် ပြန်လည်မောင်းနှင် စမ်းသပ်ပါမည်။</li>
+                <li><b>Auto-Retry ပိတ်ထားပါက (OFF):</b> စက်သည် လုံးဝရပ်တန့်နေမည်ဖြစ်ပြီး (<span
+                        class="highlight-my">PUMP_LOCKED!</span>) အလိုအလျောက် ပြန်မလည်ပါ။</li>
             </ul>
-            <b>လက်ဖြင့် ပြန်လည်စတင်ပုံ (Reset):</b> စက်ရှိ Manual ခလုတ်ကို တစ်ချက်နှိပ်ခြင်းဖြင့်သော်လည်းကောင်း၊ Web Dashboard သို့မဟုတ် MQTT Cloud မှ Reset ပေးခြင်းဖြင့်သော်လည်းကောင်း အမှားကို ချက်ချင်းဖြေရှင်းပြီး မော်တာကို ပြန်လည်ပတ်စေနိုင်ပါသည်။
+            <b>လက်ဖြင့် ပြန်လည်စတင်ပုံ (Reset):</b> စက်ရှိ Manual ခလုတ်ကို တစ်ချက်နှိပ်ခြင်းဖြင့်သော်လည်းကောင်း၊ Web
+            Dashboard သို့မဟုတ် MQTT Cloud မှ Reset ပေးခြင်းဖြင့်သော်လည်းကောင်း အမှားကို ချက်ချင်းဖြေရှင်းပြီး မော်တာကို
+            ပြန်လည်ပတ်စေနိုင်ပါသည်။
         </div>
 
 
         <h2 class="sub-title">2. Manual Button Control (Industrial Logic)</h2>
         <p>The physical button on <strong>GPIO 9</strong> provides a robust multi-state interface for local control.
             <br><br>
-            1. <strong>Single Press:</strong> Toggles the motor ON or OFF manually. The system waits <span class="tech-val">850ms</span> after release to confirm it is a single-click (not the start of a double-click). If a block condition exists, the LED flashes red and the buzzer beeps once.
+            1. <strong>Single Press:</strong> Toggles the motor ON or OFF manually. The system waits <span
+                class="tech-val">850ms</span> after release to confirm it is a single-click (not the start of a
+            double-click). If a block condition exists, the LED flashes red and the buzzer beeps once.
             <br><br>
-            2. <strong>Double Click:</strong> On the second press <em>downstroke</em> (within 850ms of the first release), the system <strong>instantly</strong> displays the System Info screen on the LCD for 10 seconds — showing the <strong>Device IP Address</strong>, <strong>Cloud ID</strong>, and <strong>Remaining License Days</strong>. Two short beeps confirm the action.
+            2. <strong>Double Click:</strong> On the second press <em>downstroke</em> (within 850ms of the first
+            release), the system <strong>instantly</strong> displays the System Info screen on the LCD for 10 seconds —
+            showing the <strong>Device IP Address</strong>, <strong>Cloud ID</strong>, and <strong>Remaining License
+                Days</strong>. Two short beeps confirm the action.
             <br><br>
-            3. <strong>Long Press (3 seconds):</strong> Forces the device to enter <strong>AP Configuration Mode</strong> (SSID: <span class="tech-val">Auto-Pump-Config</span> / Password: <span class="tech-val">12345678</span>). A 1-second buzzer confirms activation. If no client connects within <span class="tech-val">5 minutes</span>, the device automatically exits AP mode.
+            3. <strong>Long Press (3 seconds):</strong> Forces the device to enter <strong>AP Configuration
+                Mode</strong> (SSID: <span class="tech-val">Auto-Pump-Config</span> / Password: <span
+                class="tech-val">12345678</span>). A 1-second buzzer confirms activation. If no client connects within
+            <span class="tech-val">5 minutes</span>, the device automatically exits AP mode.
         </p>
         <div class="my-block">
             <b>🎮 Manual ခလုတ် အသုံးပြုပုံ -</b> GPIO 9 ရှိ ခလုတ်ကို အောက်ပါအတိုင်း အသုံးပြုနိုင်ပါသည်။<br><br>
-            ၁။ <b>တစ်ချက်နှိပ်လျှင်:</b> မော်တာကို ဖွင့်ခြင်း/ပိတ်ခြင်း ပြုလုပ်ပါမည်။ (850ms ခေတ္တစောင့်သည်) ပိတ်ဆို့မှုရှိပါက LED အနီရောင် လက်ဒ် လင်းပြမည်ဖြစ်သည်။<br>
-            ၂။ <b>နှစ်ချက်ဆင့်နှိပ်လျှင်:</b> ပထမနှိပ်ပြီး 850ms အတွင်း ဒုတိယ ဆင်းသက်မြောက်သောအခါ LCD မျက်နှာပြင်တွင် 10 စက္ကန့် ကြာ System Info (IP၊ ID နှင့် License ရက်) ပြသပေးပါမည်။ တိုင်ထောင်ရှင် ၂ ချက် မြည်ပါမည်။<br>
-            ၃။ <b>၃ စက္ကန့် ဖိထားလျှင်:</b> ဝိုင်ဖိုင်အသစ် ပြန်လည်ချိန်ညှိရန် AP Mode (Auto-Pump-Config) သို့ ဝင်ရောက်ပါမည်။ ဘတ်ဇာ ၁ စက္ကန့် မြည်ပါမည်။ ၅ မိနစ်အတွင်း မည်သူမျှ မချိတ်ဆက်ပါက AP Mode မှ အလိုအလျောက် ပြန်ထွက်သွားပါမည်။)
+            ၁။ <b>တစ်ချက်နှိပ်လျှင်:</b> မော်တာကို ဖွင့်ခြင်း/ပိတ်ခြင်း ပြုလုပ်ပါမည်။ (850ms ခေတ္တစောင့်သည်)
+            ပိတ်ဆို့မှုရှိပါက LED အနီရောင် လက်ဒ် လင်းပြမည်ဖြစ်သည်။<br>
+            ၂။ <b>နှစ်ချက်ဆင့်နှိပ်လျှင်:</b> ပထမနှိပ်ပြီး 850ms အတွင်း ဒုတိယ ဆင်းသက်မြောက်သောအခါ LCD မျက်နှာပြင်တွင် 10
+            စက္ကန့် ကြာ System Info (IP၊ ID နှင့် License ရက်) ပြသပေးပါမည်။ တိုင်ထောင်ရှင် ၂ ချက် မြည်ပါမည်။<br>
+            ၃။ <b>၃ စက္ကန့် ဖိထားလျှင်:</b> ဝိုင်ဖိုင်အသစ် ပြန်လည်ချိန်ညှိရန် AP Mode (Auto-Pump-Config) သို့
+            ဝင်ရောက်ပါမည်။ ဘတ်ဇာ ၁ စက္ကန့် မြည်ပါမည်။ ၅ မိနစ်အတွင်း မည်သူမျှ မချိတ်ဆက်ပါက AP Mode မှ အလိုအလျောက်
+            ပြန်ထွက်သွားပါမည်။)
         </div>
 
         <!-- 10 THERMAL -->
         <h1 class="section-title"><span class="num">10.</span> ❄️ Thermal Cool-Down Protection</h1>
-        <p>To prevent motor fatigue, the system monitors continuous run-time. If the motor runs for 1 hour, it enters mandatory cooling.</p>
+        <p>To prevent motor fatigue, the system monitors continuous run-time. If the motor runs for 1 hour, it enters
+            mandatory cooling.</p>
         <div class="grid">
             <div class="card">
                 <h4><span class="feature-icon">💤</span> Adjustable Pump Rest</h4>
-                <p>Options: <strong class="tech-val">0, 5, 10, 15 mins</strong>. Set the "REST" duration to match your motor's thermal capacity.</p>
+                <p>Options: <strong class="tech-val">0, 5, 10, 15 mins</strong>. Set the "REST" duration to match your
+                    motor's thermal capacity.</p>
             </div>
         </div>
         <div class="my-block">
-            <b>❄️ မော်တာ အပူလွန်ကဲမှု ကာကွယ်ခြင်း -</b> မော်တာ အနားပေးချိန် <span class="highlight-my">(၅ မိနစ် မှ ၁၅ မိနစ်)</span> ကိုလည်း မိမိမော်တာ၏ အခြေအနေပေါ်မူတည်၍ စိတ်ကြိုက် သတ်မှတ်နိုင်ပါသည်။
+            <b>❄️ မော်တာ အပူလွန်ကဲမှု ကာကွယ်ခြင်း -</b> မော်တာ အနားပေးချိန် <span class="highlight-my">(၅ မိနစ် မှ ၁၅
+                မိနစ်)</span> ကိုလည်း မိမိမော်တာ၏ အခြေအနေပေါ်မူတည်၍ စိတ်ကြိုက် သတ်မှတ်နိုင်ပါသည်။
         </div>
 
         <!-- 11 COMPRESSOR MODE -->
         <h1 class="section-title"><span class="num">11.</span> 💨 Compressor Mode Logic</h1>
-        <p>In this mode, the Solenoid Valve executes <strong>Head-Pressure Venting</strong>. You can now tune the timing for optimal efficiency.</p>
+        <p>In this mode, the Solenoid Valve executes <strong>Head-Pressure Venting</strong>. You can now tune the timing
+            for optimal efficiency.</p>
         <div class="grid">
             <div class="card">
                 <h4><span class="feature-icon">🌬️</span> Adjustable Valve Delay</h4>
-                <p>Configurable: <strong class="tech-val">5s to 15s</strong>. Sets the venting time before motor start and after motor stop.</p>
+                <p>Configurable: <strong class="tech-val">5s to 15s</strong>. Sets the venting time before motor start
+                    and after motor stop.</p>
             </div>
         </div>
         <div class="my-block">
-            <b>💨 လေကွန်ပရက်ဆာ စနစ် -</b> လေကွန်ပရက်ဆာ စနစ်အတွက် လေဖိအားလျှော့ချချိန် <span class="highlight-my">(၅ စက္ကန့် မှ ၁၅ စက္ကန့်)</span> ကိုလည်း ချိန်ညှိနိုင်ပါသည်။
+            <b>💨 လေကွန်ပရက်ဆာ စနစ် -</b> လေကွန်ပရက်ဆာ စနစ်အတွက် လေဖိအားလျှော့ချချိန် <span class="highlight-my">(၅
+                စက္ကန့် မှ ၁၅ စက္ကန့်)</span> ကိုလည်း ချိန်ညှိနိုင်ပါသည်။
         </div>
 
         <!-- 12 CALIBRATION -->
@@ -1267,8 +1436,10 @@
             </div>
         </div>
         <div class="my-block">
-            <b>📏 ချိန်ညှိခြင်းနှင့် သိမ်းဆည်းမှု -</b> ၁ ပေ မှ ၇ ပေ အမြင့်ရှိသော တိုင်ကီများတွင် အသုံးပြုနိုင်ပါသည်။ သင်၏
-            သတ်မှတ်ချက်များအားလုံးကို စက်ထဲရှိ <span class="highlight-my">NVS</span> မှတ်ဉာဏ်တွင် အမြဲတမ်း သိမ်းဆည်းထားမည်
+            <b>📏 ချိန်ညှိခြင်းနှင့် သိမ်းဆည်းမှု -</b> ၁ ပေ မှ ၇ ပေ အမြင့်ရှိသော တိုင်ကီများတွင် အသုံးပြုနိုင်ပါသည်။
+            သင်၏
+            သတ်မှတ်ချက်များအားလုံးကို စက်ထဲရှိ <span class="highlight-my">NVS</span> မှတ်ဉာဏ်တွင် အမြဲတမ်း
+            သိမ်းဆည်းထားမည်
             ဖြစ်သောကြောင့် မီးပျက်သွားသော်လည်း ပျက်ပြယ်သွားမည် မဟုတ်ပါ။ (မှတ်ချက် - အချို့သော သတ်မှတ်ချက်များမှာ စက်ကို
             ပိတ်ပြီး ပြန်ဖွင့်မှသာ အသက်ဝင်မည် ဖြစ်ပါသည်။)
         </div>
@@ -1297,15 +1468,21 @@
         </div>
 
         <h2 class="sub-title">2. True Offline Fallback (No Internet Needed)</h2>
-        <p>The APC-S3 Pro is built for **mission-critical reliability**. If your home router loses internet connection, the
+        <p>The APC-S3 Pro is built for **mission-critical reliability**. If your home router loses internet connection,
+            the
             system <strong>works independently</strong> using your previously saved configuration. It will continue all
-            automatic pumping, safety checks, and scheduling tasks without interruption. Once your internet is restored, the
-            system <strong>seamlessly reconnects</strong> to the Cloud and synchronizes all data automatically without any
+            automatic pumping, safety checks, and scheduling tasks without interruption. Once your internet is restored,
+            the
+            system <strong>seamlessly reconnects</strong> to the Cloud and synchronizes all data automatically without
+            any
             manual intervention or even being noticed. For local dashboard access during an outage, simply <strong>press
                 and hold the manual button for 3 seconds</strong> to broadcast the <strong
                 class="tech-val">Auto-Pump-Config</strong> network.
             <br><br>
-            3. <strong>Sync Heartbeat Fallback (5m):</strong> In a Master/Slave configuration, if the wireless "Heartbeat" is lost for more than 5 minutes, the Slave unit will automatically revert to <strong>Standalone Mode</strong> to ensure water availability isn't blocked by a network failure.</p>
+            3. <strong>Sync Heartbeat Fallback (5m):</strong> In a Master/Slave configuration, if the wireless
+            "Heartbeat" is lost for more than 5 minutes, the Slave unit will automatically revert to <strong>Standalone
+                Mode</strong> to ensure water availability isn't blocked by a network failure.
+        </p>
         <div class="my-block">
             <b>📶 အင်တာနက်ပြတ်တောက်သွားသည့် အခြေအနေ (Autonomous Mode) -</b> အကယ်၍ အိမ်ရှိ အင်တာနက်လိုင်း ပြတ်သွားပါက
             စက်သည် ယခင်က သိမ်းဆည်းထားသော Settings များအတိုင်း မိမိဘာသာ လွတ်လပ်စွာ ဆက်လက် အလုပ်လုပ်နေမည် ဖြစ်သည်။
@@ -1329,9 +1506,12 @@
         </div>
 
         <h2 class="sub-title">Event History Log</h2>
-        <p>The interface now features an <strong>Event History</strong> section that logs all pump activities, alarms, and status changes. You can easily <strong>Show or Hide</strong> this log to keep your dashboard clean.</p>
+        <p>The interface now features an <strong>Event History</strong> section that logs all pump activities, alarms,
+            and status changes. You can easily <strong>Show or Hide</strong> this log to keep your dashboard clean.</p>
         <div class="my-block">
-            <b>📜 မှတ်တမ်း (Event History) -</b> စက်လည်ပတ်မှု အခြေအနေများနှင့် အမှားအယွင်းများကို အသေးစိတ် မှတ်တမ်းတင်ပေးသည့် စနစ်ကို ထည့်သွင်းပေးထားပါသည်။ ၎င်းမှတ်တမ်းများကို လိုအပ်သလို ဖွင့်ကြည့်/ပိတ်ထား (Show/Hide) နိုင်ပါသည်။
+            <b>📜 မှတ်တမ်း (Event History) -</b> စက်လည်ပတ်မှု အခြေအနေများနှင့် အမှားအယွင်းများကို အသေးစိတ်
+            မှတ်တမ်းတင်ပေးသည့် စနစ်ကို ထည့်သွင်းပေးထားပါသည်။ ၎င်းမှတ်တမ်းများကို လိုအပ်သလို ဖွင့်ကြည့်/ပိတ်ထား
+            (Show/Hide) နိုင်ပါသည်။
         </div>
 
         <!-- 15 LICENSE -->
@@ -1389,8 +1569,8 @@
                 <tr>
                     <td><strong>DRY ALRM</strong></td>
                     <td>Red Flash</td>
-                    <td><strong>Safety Lock:</strong> Dry-run detected for >60s. **Must press physical Button (GPIO 9)**
-                        to acknowledge and reset.</td>
+                    <td><strong>Safety Lock:</strong> No flow detected for the set delay (30s-180s). **Must press
+                        physical Button (GPIO 9)** to acknowledge and reset.</td>
                 </tr>
             </tbody>
         </table>
@@ -1412,19 +1592,25 @@
 
         <!-- 17 MASTER & SLAVE SYNC -->
         <h1 class="section-title"><span class="num">17.</span> 🔗 Master & Slave Synchronization</h1>
-        <p>The APC-S3 Pro v2.1.0 introduces the <strong>Sequential Priority Matrix</strong>, allowing a Master unit (at the Sump Tank) to coordinate with a Slave unit (at the Upper Tank) wirelessly via HiveMQ MQTT or ESP-NOW. This prevents the pump from starting if the supply source is insufficient or if another priority tank is being served.</p>
+        <p>The APC-S3 Pro v2.1.0 introduces the <strong>Sequential Priority Matrix</strong>, allowing a Master unit (at
+            the Sump Tank) to coordinate with a Slave unit (at the Upper Tank) wirelessly via HiveMQ MQTT or ESP-NOW.
+            This prevents the pump from starting if the supply source is insufficient or if another priority tank is
+            being served.</p>
 
         <div class="grid">
             <div class="card">
                 <h4>🎛️ Operational Roles</h4>
                 <p><strong>Mode 0:</strong> Standalone Device.<br>
-                <strong>Mode 1:</strong> Master (Authority / Sump Control).<br>
-                <strong>Mode 2:</strong> Slave (Consumer / Requestor).</p>
+                    <strong>Mode 1:</strong> Master (Authority / Sump Control).<br>
+                    <strong>Mode 2:</strong> Slave (Consumer / Requestor).
+                </p>
             </div>
             <div class="card">
                 <h4>🛡️ Safety Protocols</h4>
-                <p><strong>Settling Water:</strong> Prevents silt intake by waiting for sediment to settle (Purple LED).<br>
-                <strong>Heartbeat:</strong> 5-min fallback to local logic if network drops.</p>
+                <p><strong>Settling Water:</strong> Prevents silt intake by waiting for sediment to settle (Purple
+                    LED).<br>
+                    <strong>Heartbeat:</strong> 5-min fallback to local logic if network drops.
+                </p>
             </div>
         </div>
 
@@ -1433,17 +1619,31 @@
             <div class="alert-icon">🔗</div>
             <div class="alert-body">
                 <b>How the Slave decides to start:</b>
-                <p>The Slave continuously monitors the Master's published <span class="tech-val">info</span> field via MQTT. The Slave is only permitted to run its pump when the Master's reported state is either <span class="tech-val">SYSTEM_STANDBY!</span> or contains <span class="tech-val">FLOW</span> (i.e., <span class="tech-val">FLOW_DETECTED!</span> or <span class="tech-val">FLOW_CHECKING!</span>).<br><br>
-                If the Master is Pumping (<span class="tech-val">pStat = ON</span>), Settling, in Voltage Error, Cooling Down, or in any alarm state — the Slave's pump is <strong>immediately stopped</strong> and blocked until the Master returns to a safe state.</p>
-                <p><strong>Link Timeout (5 minutes):</strong> If no update is received from the Master for 5 minutes (network drop), the Slave automatically falls back to <strong>Standalone Mode</strong> and operates independently using its own sensor data.</p>
+                <p>The Slave continuously monitors the Master's published <span class="tech-val">info</span> field via
+                    MQTT. The Slave is only permitted to run its pump when the Master's reported state is either <span
+                        class="tech-val">SYSTEM_STANDBY!</span> or contains <span class="tech-val">FLOW</span> (i.e.,
+                    <span class="tech-val">FLOW_DETECTED!</span> or <span
+                        class="tech-val">FLOW_CHECKING!</span>).<br><br>
+                    If the Master is Pumping (<span class="tech-val">pStat = ON</span>), Settling, in Voltage Error,
+                    Cooling Down, or in any alarm state — the Slave's pump is <strong>immediately stopped</strong> and
+                    blocked until the Master returns to a safe state.
+                </p>
+                <p><strong>Link Timeout (5 minutes):</strong> If no update is received from the Master for 5 minutes
+                    (network drop), the Slave automatically falls back to <strong>Standalone Mode</strong> and operates
+                    independently using its own sensor data.</p>
             </div>
         </div>
 
         <div class="my-block">
-            <b>🔗 မာစတာနှင့် ဆလိဖ် ချိတ်ဆက်မှု -</b> ဤစနစ်သစ်တွင် Master (အောက်ကန်) နှင့် Slave (အပေါ်ကန်) တို့ကို ကြိုးသွယ်ရန်မလိုဘဲ MQTT ဖြင့် ချိတ်ဆက်ထားပါသည်။<br><br>
-            Slave သည် Master ၏ <span class="highlight-my">SYSTEM_STANDBY!</span> သို့မဟုတ် <span class="highlight-my">FLOW_DETECTED!/FLOW_CHECKING!</span> အခြေအနေတွင်သာ မော်တာ စတင်ခွင့်ရပါသည်။ Master ၏ Pump ဖွင့်နေစဉ်၊ SETTLING နေစဉ် သို့မဟုတ် Error အခြေအနေတွင် Slave မော်တာ ချက်ချင်းရပ်ပေးမည်ဖြစ်သည်။<br>
-            <span class="highlight-my">Purple LED (ခရမ်းရောင်):</span> Master ၏ Settling Water အဆင့်တွင် ရေအနည်ထိုင်ရန် ကြာမျှ ကျန်ရှိသည်ကို SETTL XXM ဖြင့် LCD တွင် ပြသပါသည်။<br>
-            <span class="highlight-my">Link Timeout (5 မိနစ်):</span> Master မှ ၅ မိနစ် ဆက်သွယ်မှု မရပါက Slave သည် Standalone Mode သို့ အလိုအလျောက် ပြောင်းသွားပါမည်။
+            <b>🔗 မာစတာနှင့် ဆလိဖ် ချိတ်ဆက်မှု -</b> ဤစနစ်သစ်တွင် Master (အောက်ကန်) နှင့် Slave (အပေါ်ကန်) တို့ကို
+            ကြိုးသွယ်ရန်မလိုဘဲ MQTT ဖြင့် ချိတ်ဆက်ထားပါသည်။<br><br>
+            Slave သည် Master ၏ <span class="highlight-my">SYSTEM_STANDBY!</span> သို့မဟုတ် <span
+                class="highlight-my">FLOW_DETECTED!/FLOW_CHECKING!</span> အခြေအနေတွင်သာ မော်တာ စတင်ခွင့်ရပါသည်။ Master ၏
+            Pump ဖွင့်နေစဉ်၊ SETTLING နေစဉ် သို့မဟုတ် Error အခြေအနေတွင် Slave မော်တာ ချက်ချင်းရပ်ပေးမည်ဖြစ်သည်။<br>
+            <span class="highlight-my">Purple LED (ခရမ်းရောင်):</span> Master ၏ Settling Water အဆင့်တွင် ရေအနည်ထိုင်ရန်
+            ကြာမျှ ကျန်ရှိသည်ကို SETTL XXM ဖြင့် LCD တွင် ပြသပါသည်။<br>
+            <span class="highlight-my">Link Timeout (5 မိနစ်):</span> Master မှ ၅ မိနစ် ဆက်သွယ်မှု မရပါက Slave သည်
+            Standalone Mode သို့ အလိုအလျောက် ပြောင်းသွားပါမည်။
         </div>
 
         <!-- 18 TECH SPECS -->
@@ -1480,7 +1680,8 @@
             <div class="faq-q">Does the system need the internet to function automatically?</div>
             <div class="faq-a">No. The system is designed for <strong>Autonomous Reliability</strong>. If internet
                 access is lost, the device continues to work independently based on your previously saved settings. Once
-                the internet connection resumes, the system will <strong>automatically reconnect and sync</strong> to the
+                the internet connection resumes, the system will <strong>automatically reconnect and sync</strong> to
+                the
                 cloud seamlessly without any user intervention.</div>
             <div class="faq-my">အင်တာနက်မရှိဘဲ စက်အလုပ်လုပ်ပါသလား? - ဟုတ်ကဲ့၊ အလုပ်လုပ်ပါသည်။ ဤစက်ကို Autonomous
                 Reliability အတွက် အထူးထုတ်လုပ်ထားသောကြောင့် အင်တာနက်ပြတ်တောက်သွားသော်လည်း ယခင်က သတ်မှတ်ထားသော Settings
@@ -1500,17 +1701,22 @@
         <div class="faq-item">
             <div class="faq-q">How can I change my settings if my home Wi-Fi is down?</div>
             <div class="faq-a">Press and hold the <strong>Manual Button for 3 seconds</strong> to activate the Direct
-                Configuration Hotspot. Connect your phone to "Auto-Pump-Config" and visit <strong>192.168.4.1</strong> to
+                Configuration Hotspot. Connect your phone to "Auto-Pump-Config" and visit <strong>192.168.4.1</strong>
+                to
                 manage settings offline.</div>
-            <div class="faq-my">ဝိုင်ဖိုင်မရှိဘဲ Settings များကို ဘယ်လိုပြင်မလဲ? - Manual ခလုတ်ကို ၃ စက္ကန့် ဖိနှိပ်၍ Direct
-                Config စနစ်ကို ဖွင့်ပါ။ ထို့နောက် ဖုန်းဖြင့် ၁၉၂.၁၆၈.၄.၁ သို့ တိုက်ရိုက်ဝင်ရောက် ပြင်ဆင်နိုင်ပါသည်။</div>
+            <div class="faq-my">ဝိုင်ဖိုင်မရှိဘဲ Settings များကို ဘယ်လိုပြင်မလဲ? - Manual ခလုတ်ကို ၃ စက္ကန့် ဖိနှိပ်၍
+                Direct
+                Config စနစ်ကို ဖွင့်ပါ။ ထို့နောက် ဖုန်းဖြင့် ၁၉၂.၁၆၈.၄.၁ သို့ တိုက်ရိုက်ဝင်ရောက် ပြင်ဆင်နိုင်ပါသည်။
+            </div>
         </div>
 
         <div class="faq-item">
             <div class="faq-q">What is the default 6-Digit PIN for remote access?</div>
-            <div class="faq-a">The default factory PIN is <strong class="tech-val">123456</strong>. For your security, it
+            <div class="faq-a">The default factory PIN is <strong class="tech-val">123456</strong>. For your security,
+                it
                 is highly recommended to change this to a private number via the web dashboard.</div>
-            <div class="faq-my">စက်၏ ၆ လုံးတွဲ PIN နံပါတ် အစောပိုင်းမှာ ဘယ်လောက်လဲ? - စက်ရုံထုတ် PIN မှာ ၁၂၃၄၅၆ ဖြစ်ပါသည်။
+            <div class="faq-my">စက်၏ ၆ လုံးတွဲ PIN နံပါတ် အစောပိုင်းမှာ ဘယ်လောက်လဲ? - စက်ရုံထုတ် PIN မှာ ၁၂၃၄၅၆
+                ဖြစ်ပါသည်။
                 လုံခြုံရေးအတွက် မိမိစိတ်ကြိုက် နံပါတ်အသစ်သို့ ချက်ချင်းပြောင်းလဲရန် အကြံပြုအပ်ပါသည်။</div>
         </div>
 
@@ -1557,7 +1763,8 @@
                 သိမ်းဆည်းထားသော Settings များအတိုင်း စက္ကန့် ၃၀ အတွင်း ပုံမှန်အတိုင်း ပြန်လည် အလုပ်လုပ်ပါမည်။</div>
         </div>
 
-        <div style="margin-top: 100px; padding: 40px 0; border-top: 1px solid var(--border); text-align: center; font-size: 0.85rem; color: var(--text-dim);">
+        <div
+            style="margin-top: 100px; padding: 40px 0; border-top: 1px solid var(--border); text-align: center; font-size: 0.85rem; color: var(--text-dim);">
             APC-S3 Pro — Master Engineering Manual <strong>v2.1.0</strong><br>
             Developed by <strong>Aung Moe Khine</strong><br>
             © 2026 — Official Factory Distribution.
