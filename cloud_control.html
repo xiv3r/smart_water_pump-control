@@ -42,22 +42,27 @@
             display: flex;
             max-width: 440px;
             margin: 0 auto 15px auto;
-            gap: 10px;
+            gap: 6px;
         }
 
         .tab {
             flex: 1;
-            padding: 12px;
+            padding: 10px 4px;
             text-decoration: none;
             border-radius: 12px;
             font-weight: bold;
-            font-size: 1.05rem;
+            font-size: 0.9rem;
             transition: 0.3s;
             border: 1px solid transparent;
             text-align: center;
             cursor: pointer;
             color: #888;
             background: transparent;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
         }
 
         .tab-active {
@@ -681,13 +686,14 @@
         }
 
         @media screen and (max-width: 440px) {
-            .lang-mm .tab {
-                font-size: 0.72rem;
-                padding: 12px 2px;
+            .tab {
+                font-size: 0.78rem;
+                padding: 10px 2px;
             }
 
-            .lang-mm .row {
-                font-size: 0.82rem;
+            .lang-mm .tab {
+                font-size: 0.72rem;
+                padding: 10px 1px;
             }
 
             .lang-mm .btn {
