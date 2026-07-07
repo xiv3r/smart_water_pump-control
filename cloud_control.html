@@ -40,7 +40,7 @@
 
         .tabs {
             display: flex;
-            max-width: 440px;
+            max-width: 400px;
             margin: 0 auto 15px auto;
             gap: 6px;
         }
@@ -1045,8 +1045,9 @@
         <div id="supportView" style="display:none;">
             <div class="card"
                 style="height: 80vh; padding: 0; overflow: hidden; display: flex; flex-direction: column;">
-                <iframe src="https://amk-pump-support.streamlit.app/?embed=true&theme=dark"
-                    style="width:100%; height:100%; border:none; background: transparent;" title="AMK AI Support"></iframe>
+                <iframe id="supportFrame" src="https://amk-pump-support.streamlit.app/?embed=true&theme=dark"
+                    style="width:100%; height:100%; border:none; background: transparent;"
+                    title="AMK AI Support"></iframe>
             </div>
             <!-- Removed redundant custom Full Screen button -->
         </div>
@@ -1187,6 +1188,13 @@
         function togglePass(id) { let x = document.getElementById(id); x.type = x.type === "password" ? "text" : "password"; }
         function showTab(t) {
             vibe();
+
+            // Block support tab if license is expired
+            if (t === 'support' && isExpired) {
+                showModal(sysLang == 1 ? "လိုင်စင်သက်တမ်းကုန်ဆုံးနေသဖြင့် AI အကူအညီကို အသုံးပြု၍မရပါ။" : "Support Chat is disabled because your license has expired.");
+                return;
+            }
+
             activeTab = t;
             // Show selected view, hide the others
             document.getElementById('homeView').style.display = t === 'home' ? 'block' : 'none';
@@ -1260,7 +1268,31 @@
         function updateUI(d) {
             renderTankRulerTicks(); if (sysLang == 1) document.body.classList.add('lang-mm'); else document.body.classList.remove('lang-mm'); if (document.getElementById('dndBadgeC')) { document.getElementById('dndBadgeC').style.display = (d.dndAct == 1) ? 'block' : 'none'; }
             let rb = document.getElementById('roleBadgeC'); if (rb) { if (d.sysRole == 1) { rb.innerText = sysLang == 1 ? "👑 အောက်တိုင်ကီ (MASTER)" : "👑 MASTER (SUMP)"; rb.className = "badge bg-info"; rb.style.display = "block"; rb.style.color = "#17a2b8"; } else if (d.sysRole == 2) { rb.innerText = sysLang == 1 ? "👷 အပေါ်တိုင်ကီ (SLAVE)" : "👷 SLAVE (ROOF)"; rb.className = "badge bg-warning"; rb.style.display = "block"; rb.style.color = "#ffc107"; } else { rb.style.display = "none"; } }
-            isExpired = d.expired ? true : false; const pBanner = document.getElementById('promoBanner'); const pText = document.getElementById('promoText'); if (d.promo && d.promo.trim() !== "" && d.promo !== localDismissedMsg) { pBanner.style.display = 'block'; pText.innerText = d.promo; } else if (!d.promo || d.promo.trim() === "") { pBanner.style.display = 'none'; localDismissedMsg = ""; localStorage.removeItem("amk_dismissed_promo"); } else { pBanner.style.display = 'none'; }
+            isExpired = d.expired ? true : false;
+
+            // --- 1. UPDATE CHATBOT LINK (Paste this here) ---
+            const frame = document.getElementById('supportFrame');
+            if (frame) {
+                const status = d.expired ? 'True' : 'False';
+                // Only update if status changes to avoid constant reloads
+                if (!frame.src.includes("expired=" + status)) {
+                    frame.src = `https://amk-pump-support.streamlit.app/?expired=${status}&embed=true&theme=dark`;
+                }
+            }
+
+            // --- 2. PROMO BANNER LOGIC (Keep this exactly as it was) ---
+            const pBanner = document.getElementById('promoBanner');
+            const pText = document.getElementById('promoText');
+            if (d.promo && d.promo.trim() !== "" && d.promo !== localDismissedMsg) {
+                pBanner.style.display = 'block';
+                pText.innerText = d.promo;
+            } else if (!d.promo || d.promo.trim() === "") {
+                pBanner.style.display = 'none';
+                localDismissedMsg = "";
+                localStorage.removeItem("amk_dismissed_promo");
+            } else {
+                pBanner.style.display = 'none';
+            }
             const expBanner = document.getElementById('expiryBanner'), warnBanner = document.getElementById('warnBanner'), licStat = document.getElementById('licStat'); if (isExpired) { expBanner.style.display = 'block'; warnBanner.style.display = 'none'; licStat.innerHTML = '<span style="color:#ff6b6b">' + (sysLang == 1 ? "သက်တမ်းကုန်ပြီ" : "EXPIRED") + '</span>'; } else { expBanner.style.display = 'none'; if (d.daysLeft <= 7 && d.daysLeft >= 0) { warnBanner.style.display = 'block'; document.getElementById('warnMsg').innerText = sysLang == 1 ? d.daysLeft + " ရက် ကျန်ပါသေးသည်။" : d.daysLeft + " days remaining."; } else warnBanner.style.display = 'none'; licStat.innerHTML = sysLang == 1 ? `<span style="color:#28a745">အသက်ဝင်သည် (${d.daysLeft} ရက် ကျန်သည်)</span>` : `<span style="color:#28a745">Active (${d.daysLeft} days left)</span>`; }
             const rawInfo = d.info || ""; let vS = d.vStat || "--", iF = d.info || "--", pS = d.pStat || "--", tS = d.tStr || (d.tank !== undefined ? d.tank + '%' : "-- %"); if (sysLang == 1) { vS = tr(vS); pS = tr(pS); iF = tr(iF); if (d.tStr == "FULL") tS = "ပြည့်"; else if (d.tStr == "LOW") tS = "နည်း"; else if (d.tStr == "ERR") tS = "ချို့ယွင်းချက်"; }
             document.getElementById('tankVal').innerText = tS; document.getElementById('dispIp').innerText = d.ip || "---"; document.getElementById('dispCid').innerText = d.id || "---"; document.getElementById('volt').innerText = (d.volt || "--") + " V";
