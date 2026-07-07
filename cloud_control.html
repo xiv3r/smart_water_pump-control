@@ -1276,7 +1276,7 @@
                 const status = d.expired ? 'True' : 'False';
                 // Only update if status changes to avoid constant reloads
                 if (!frame.src.includes("expired=" + status)) {
-                    frame.src = `https://amk-pump-support.streamlit.app/?expired=${status}&embed=true&theme=dark`;
+                    frame.src = `https://amk-pump-support.streamlit.app/?expired=${status}&id=${d.id}&embed=true&theme=dark`;
                 }
             }
 
